@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Claude Code
+.claude/settings.local.json
+.claude/local/
+
+# Cowork 작업 셸이 삭제 대신 옮겨두는 폴더
+_to_delete/
