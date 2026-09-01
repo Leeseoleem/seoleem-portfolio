@@ -34,8 +34,14 @@ export function Mug() {
   const sprites = useRef<Array<THREE.Sprite | null>>([]);
   const steamTex = useMemo(() => makeSteamTexture(), []);
   useEffect(() => () => steamTex.dispose(), [steamTex]);
+  // 김 입자마다 위상과 흔들림을 다르게 준다. 렌더 중 난수를 쓰지 않도록 인덱스 기반 결정적 값을 쓴다
   const seeds = useMemo(
-    () => Array.from({ length: STEAM_N }, (_, i) => ({ phase: i / STEAM_N, wobble: Math.random() * Math.PI * 2, drift: (Math.random() - 0.5) * 0.06 })),
+    () =>
+      Array.from({ length: STEAM_N }, (_, i) => ({
+        phase: i / STEAM_N,
+        wobble: (i * 2.399963) % (Math.PI * 2),
+        drift: ((i % 3) - 1) * 0.02,
+      })),
     [],
   );
 

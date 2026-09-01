@@ -110,7 +110,7 @@ export function Cat() {
   const tailMesh = useRef<THREE.Mesh>(null);
   const tailTip = useRef<THREE.Mesh>(null);
   const earMeshes = useRef<Array<THREE.Mesh | null>>([]);
-  const anim = useRef({ pupilSlit: 0, blinkStart: -10, nextIdleBlink: 6 + Math.random() * 8, lastBlink: -1, lastSlit: -1 });
+  const anim = useRef({ pupilSlit: 0, blinkStart: -10, nextIdleBlink: 7, lastBlink: -1, lastSlit: -1 });
 
   const assets = useMemo(() => buildHead(), []);
   const bodyGeo = useMemo(() => createCatBodyGeometry(), []);
