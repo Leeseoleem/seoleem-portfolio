@@ -63,3 +63,38 @@ export const positions = {
   tower: [1.3, 0, -0.2] as [number, number, number],
   wallZ: -1.7,
 };
+
+// ---------- 책상 위 이동 가능 영역 ----------
+
+/** 위에서 내려다본 사각형. 마우스를 끌 때 넘어갈 수 없는 영역이다 */
+interface Obstacle {
+  x: number;
+  z: number;
+  halfW: number;
+  halfD: number;
+}
+
+/**
+ * 책상 위 오브젝트가 차지하는 자리.
+ * 오브젝트를 옮기거나 크기를 바꾸면 여기 값도 같이 고쳐야 한다.
+ */
+export const deskObstacles: Obstacle[] = [
+  { x: 0, z: 0.72, halfW: 0.548, halfD: 0.227 }, // 키보드
+  { x: -0.55, z: 0.4, halfW: 0.15, halfD: 0.15 }, // 머그
+  { x: -1.25, z: 0.35, halfW: 0.44, halfD: 0.52 }, // 공책
+  { x: 1.25, z: -0.3, halfW: 0.33, halfD: 0.45 }, // 서류
+  { x: 1.3, z: 0.42, halfW: 0.17, halfD: 0.34 }, // 핸드폰
+  { x: 0, z: -0.47, halfW: 0.36, halfD: 0.28 }, // 모니터 받침
+  { x: -1.75, z: -0.55, halfW: 0.2, halfD: 0.2 }, // 스탠드 받침
+];
+
+/** 상판에서 오브젝트가 떨어지지 않도록 남기는 여유 */
+const EDGE_MARGIN = 0.02;
+
+/** (x, z)에 반지름 halfW·halfD짜리 물건을 놓을 수 있는지. 상판을 벗어나거나 다른 물건과 겹치면 false */
+export function canPlaceOnDesk(x: number, z: number, halfW: number, halfD: number) {
+  const limitX = DESK_W / 2 - halfW - EDGE_MARGIN;
+  const limitZ = DESK_D / 2 - halfD - EDGE_MARGIN;
+  if (x < -limitX || x > limitX || z < -limitZ || z > limitZ) return false;
+  return !deskObstacles.some((o) => Math.abs(x - o.x) < o.halfW + halfW && Math.abs(z - o.z) < o.halfD + halfD);
+}

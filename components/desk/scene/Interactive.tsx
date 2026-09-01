@@ -4,6 +4,7 @@ import { useRef, useState, type ReactNode } from 'react';
 import { useFrame, type ThreeEvent } from '@react-three/fiber';
 import type { Group } from 'three';
 import { useDeskStore } from '@/stores/useDeskStore';
+import { dragLock } from '@/lib/desk/drag-lock';
 
 interface InteractiveProps {
   /** 호버 시 툴팁에 뜨는 이름. 비우면 툴팁 없이 커서만 바뀐다 */
@@ -29,16 +30,18 @@ export function Interactive({ label, onActivate, lift = true, position, rotation
   const baseY = position?.[1] ?? 0;
 
   const isDeskView = () => useDeskStore.getState().phase === 'desk';
+  // 오브젝트를 끌고 있는 동안에는 지나치는 다른 물건에 호버가 걸리지 않게 한다
+  const canHover = () => isDeskView() && !dragLock.active;
 
   const over = (e: ThreeEvent<PointerEvent>) => {
-    if (!isDeskView()) return;
+    if (!canHover()) return;
     e.stopPropagation();
     setHovered(true);
     document.body.style.cursor = 'pointer';
     if (label) setHover(label, { x: e.clientX, y: e.clientY });
   };
   const move = (e: ThreeEvent<PointerEvent>) => {
-    if (!hovered || !label || !isDeskView()) return;
+    if (!hovered || !label || !canHover()) return;
     setHover(label, { x: e.clientX, y: e.clientY });
   };
   const out = () => {
@@ -55,7 +58,7 @@ export function Interactive({ label, onActivate, lift = true, position, rotation
 
   useFrame(() => {
     if (!group.current || !lift) return;
-    const targetY = baseY + (hovered && isDeskView() ? 0.03 : 0);
+    const targetY = baseY + (hovered && canHover() ? 0.03 : 0);
     group.current.position.y += (targetY - group.current.position.y) * 0.15;
   });
 
