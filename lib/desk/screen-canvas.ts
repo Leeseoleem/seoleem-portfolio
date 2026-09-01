@@ -119,15 +119,10 @@ export function drawBoot(ctx: CanvasRenderingContext2D, t: number, font: string,
   }
   ctx.restore();
 
-  // 푸터
+  // 푸터. 오른쪽 아래는 건너뛰기 버튼 자리라 비워 둔다
   ctx.fillStyle = c.footer;
   ctx.font = `12px ${font}`;
   ctx.fillText('Copyright © seoleem', vis.x + 32, vis.y + vis.h - 28);
-  ctx.textAlign = 'right';
-  ctx.font = `700 16px ${font}`;
-  ctx.fillStyle = c.footerBrand;
-  ctx.fillText('seoleem', vis.x + vis.w - 32, vis.y + vis.h - 28);
-  ctx.textAlign = 'left';
 }
 
 function timeLabel(): string {

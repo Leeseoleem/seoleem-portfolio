@@ -82,7 +82,6 @@ export const canvasPalette = {
     text: '#ffffff',
     intro: '#c9c9c9',
     footer: '#9a9a9a',
-    footerBrand: '#d0d0d0',
     barBorder: '#8a8a8a',
     barTop: '#6da2ff',
     barBottom: '#1d4fd1',
