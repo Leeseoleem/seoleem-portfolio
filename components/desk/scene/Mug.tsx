@@ -79,10 +79,16 @@ export function Mug() {
         <torusGeometry args={[0.062, 0.017, 10, 24, Math.PI]} />
         <meshStandardMaterial color={scenePalette.furniture.ceramic} roughness={0.35} />
       </mesh>
-      {/* 커피 */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[mx, TOP + 0.2, mz]}>
+      {/* 커피. 컵이 속 빈 원통이라 이 면이 그림자를 만들어야 바닥 그림자가 고리로 뚫리지 않는다.
+          단면 재질은 그림자를 뒷면으로 그리는데 이 면은 위를 보고 있어 잘려나가므로 양면으로 지정한다 */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[mx, TOP + 0.2, mz]} castShadow>
         <circleGeometry args={[0.106, 32]} />
-        <meshStandardMaterial color={scenePalette.furniture.coffee} roughness={0.2} metalness={0.05} />
+        <meshStandardMaterial
+          color={scenePalette.furniture.coffee}
+          roughness={0.2}
+          metalness={0.05}
+          shadowSide={THREE.DoubleSide}
+        />
       </mesh>
       </Interactive>
       {seeds.map((_, i) => (
