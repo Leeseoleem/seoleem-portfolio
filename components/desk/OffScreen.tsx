@@ -10,29 +10,28 @@ type Stage = 'hidden' | 'black' | 'collapse' | 'closing';
  * 클로징 문구와 전원 기호 버튼이 남는다. 버튼을 누르면 처음부터 다시 시작한다.
  */
 export function OffScreen() {
-  const phase = useDeskStore((s) => s.phase);
+  const isOff = useDeskStore((s) => s.phase === 'off');
+  // 연출 상태를 effect에서 되돌리지 않도록, 종료 상태에서만 시퀀스를 마운트한다
+  if (!isOff) return null;
+  return <OffSequence />;
+}
+
+function OffSequence() {
   const [stage, setStage] = useState<Stage>('hidden');
   const [shown, setShown] = useState(false);
 
   useEffect(() => {
-    if (phase !== 'off') {
-      setStage('hidden');
-      return;
-    }
     const timers = [
       window.setTimeout(() => setStage('black'), 1900),
       window.setTimeout(() => setStage('collapse'), 2600),
       window.setTimeout(() => setStage('closing'), 3600),
     ];
     return () => timers.forEach((id) => window.clearTimeout(id));
-  }, [phase]);
+  }, []);
 
   // 마운트 다음 프레임에 클래스를 붙여야 opacity 전환이 실제로 일어난다
   useEffect(() => {
-    if (stage === 'hidden') {
-      setShown(false);
-      return;
-    }
+    if (stage === 'hidden') return;
     const id = requestAnimationFrame(() => setShown(true));
     return () => cancelAnimationFrame(id);
   }, [stage]);

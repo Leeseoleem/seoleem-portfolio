@@ -18,7 +18,7 @@ const ARM_TILT = 0.3;
 export function Lamp() {
   const isNight = useDeskStore((s) => s.isNight);
   const light = useRef<THREE.SpotLight>(null);
-  const target = useRef<THREE.Object3D>(new THREE.Object3D());
+  const target = useMemo(() => new THREE.Object3D(), []);
   const headMat = useRef<THREE.MeshStandardMaterial>(null);
   const bulbMat = useRef<THREE.MeshBasicMaterial>(null);
   const flickerUntil = useRef(0);
@@ -45,7 +45,7 @@ export function Lamp() {
     if (light.current) {
       light.current.intensity = lerpLight('lamp', mix) * flicker;
       light.current.castShadow = mix >= 0.5;
-      light.current.target = target.current;
+      light.current.target = target;
     }
     if (headMat.current) headMat.current.emissiveIntensity = mix * 0.8 * 0.35;
     if (bulbMat.current) bulbMat.current.color.copy(geo.colors.off).lerp(geo.colors.on, mix);
@@ -96,7 +96,7 @@ export function Lamp() {
         shadow-mapSize={[512, 512]}
         shadow-bias={-0.0006}
       />
-      <primitive object={target.current} position={[-0.3, TOP, 0.25]} />
+      <primitive object={target} position={[-0.3, TOP, 0.25]} />
     </Interactive>
   );
 }

@@ -26,20 +26,20 @@ import { useDeskStore } from '@/stores/useDeskStore';
 export function DeskCanvas() {
   // 부팅 화면이 덮고 있는 동안에는 3D를 한 프레임도 그리지 않는다.
   // 그리지 않아도 보이지 않는데, 그림자까지 도는 씬이 2D 부팅 애니메이션을 끊어놓기 때문이다.
-  const isBooting = useDeskStore((s) => s.phase === 'boot');
   const phase = useDeskStore((s) => s.phase);
+  const shutdownAt = useDeskStore((s) => s.shutdownAt);
+  const isBooting = phase === 'boot';
   // 확대 상태에서는 카메라가 멈춰 있고 화면은 DOM이 덮는다. 요청이 있을 때만 그린다.
-  const isZoomed = useDeskStore((s) => s.phase === 'zoomed');
-  // 종료 연출(모니터 확대)이 끝나 화면이 검게 덮이면 더 그릴 이유가 없다
-  const [stoppedAfterOff, setStoppedAfterOff] = useState(false);
+  const isZoomed = phase === 'zoomed';
+  // 종료 연출(모니터 확대)이 끝나 화면이 검게 덮이면 더 그릴 이유가 없다.
+  // 종료 시각을 담아두고 렌더에서 비교한다(effect 안에서 상태를 되돌리지 않기 위해).
+  const [stoppedAt, setStoppedAt] = useState<number | null>(null);
   useEffect(() => {
-    if (phase !== 'off') {
-      setStoppedAfterOff(false);
-      return;
-    }
-    const id = window.setTimeout(() => setStoppedAfterOff(true), 2200);
+    if (phase !== 'off') return;
+    const id = window.setTimeout(() => setStoppedAt(shutdownAt), 2200);
     return () => window.clearTimeout(id);
-  }, [phase]);
+  }, [phase, shutdownAt]);
+  const stoppedAfterOff = phase === 'off' && stoppedAt === shutdownAt;
 
   return (
     <Canvas
