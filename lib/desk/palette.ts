@@ -87,21 +87,6 @@ export const canvasPalette = {
     barBottom: '#1d4fd1',
     flag: ['#f35325', '#81bc06', '#05a6f0', '#ffba08'],
   },
-  desktop: {
-    skyTop: '#2a6fd6',
-    skyMid: '#8ec5f0',
-    skyBottom: '#cfe7f7',
-    hillFar: '#5aa53a',
-    hillNear: '#3f8a2c',
-    taskbarTop: '#3a80f0',
-    taskbarMid: '#245edb',
-    taskbarBottom: '#1b44a8',
-    startTop: '#5fbf4f',
-    startBottom: '#2e8a2a',
-    tray: '#1a9be6',
-    iconLabel: '#ffffff',
-    icons: ['#f7c948', '#5b9cf6', '#e9eef5', '#b8c4d0'],
-  },
   // 키보드 상판에 그리는 키 배열
   keyboard: {
     base: '#a8a190',

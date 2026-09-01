@@ -11,7 +11,7 @@ import { createFrameGeometry, createTaperedBoxGeometry } from '@/lib/desk/geomet
 import { useDeskStore } from '@/stores/useDeskStore';
 import { scenePalette } from '@/lib/desk/palette';
 import { SCREEN_3D_H, SCREEN_3D_W, SCREEN_CENTER, TOP, zoomPoses } from '@/lib/desk/layout';
-import { drawDesktop, drawShutdown } from '@/lib/desk/screen-canvas';
+import { drawShutdown } from '@/lib/desk/screen-canvas';
 import { getCanvasFont, getScreenCanvas, sceneTime } from '@/lib/desk/runtime';
 
 const BODY_Y = TOP + 0.2 + 0.56;
@@ -32,7 +32,6 @@ const LED_Z = 0.101;
 export function Monitor() {
   const zoomTo = useDeskStore((s) => s.zoomTo);
   const ledMat = useRef<THREE.MeshBasicMaterial>(null);
-  const desktopDrawnAt = useRef(-1);
 
   const { canvas, texture } = useMemo(() => {
     const c = getScreenCanvas();
@@ -53,23 +52,13 @@ export function Monitor() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     const { phase, shutdownAt } = useDeskStore.getState();
-    const t = sceneTime();
-    const font = getCanvasFont();
-
-    if (phase === 'boot') return; // 부팅 화면은 BootOverlay가 그린다
-    if (phase === 'off') {
-      const k = Math.min(1, (t - shutdownAt) / 1.9);
-      drawShutdown(ctx, k, font);
-      texture.needsUpdate = true;
-      if (ledMat.current) ledMat.current.color.set(k > 0.95 ? scenePalette.led.off : scenePalette.led.on);
-      return;
-    }
-    // 부팅 직후 한 번, 그 뒤 30초마다 시계 갱신
-    if (desktopDrawnAt.current < 0 || t - desktopDrawnAt.current > 30) {
-      drawDesktop(ctx, font);
-      texture.needsUpdate = true;
-      desktopDrawnAt.current = t;
-    }
+    // 부팅 화면은 BootOverlay가, 책상·확대 화면은 MonitorScreen(DOM)이 맡는다.
+    // 여기서 그리는 건 종료 연출뿐이다
+    if (phase !== 'off') return;
+    const k = Math.min(1, (sceneTime() - shutdownAt) / 1.9);
+    drawShutdown(ctx, k, getCanvasFont());
+    texture.needsUpdate = true;
+    if (ledMat.current) ledMat.current.color.set(k > 0.95 ? scenePalette.led.off : scenePalette.led.on);
   });
 
   return (
@@ -86,7 +75,7 @@ export function Monitor() {
         <meshStandardMaterial color={scenePalette.furniture.beige} roughness={0.6} />
       </mesh>
       {/* 유리 */}
-      <mesh position={[0, BODY_Y, 0.041]}>
+      <mesh position={[0, BODY_Y, 0.093]}>
         <planeGeometry args={[OPEN_W, OPEN_H]} />
         <meshStandardMaterial color={scenePalette.furniture.black} roughness={0.5} />
       </mesh>
@@ -96,7 +85,7 @@ export function Monitor() {
         <meshBasicMaterial map={texture} toneMapped={false} />
       </mesh>
       {/* 확대 시 화면 위에 얹히는 DOM */}
-      <ZoomSurface target="monitor" size={[SCREEN_3D_W, SCREEN_3D_H]} pixels={[1024, 768]} position={[SCREEN_CENTER[0], SCREEN_CENTER[1], SCREEN_CENTER[2] + 0.002]}>
+      <ZoomSurface deskView target="monitor" size={[SCREEN_3D_W, SCREEN_3D_H]} pixels={[1024, 768]} position={[SCREEN_CENTER[0], SCREEN_CENTER[1], SCREEN_CENTER[2] + 0.002]}>
         <MonitorScreen />
       </ZoomSurface>
       {/* 전원 LED */}

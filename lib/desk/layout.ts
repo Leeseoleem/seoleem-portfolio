@@ -11,7 +11,11 @@ export const DESK_D = 2.0;
 // 모니터 화면(4:3). 부팅 화면이 여기 그려지고 카메라 시작 위치의 기준이 된다.
 export const SCREEN_3D_W = 1.2;
 export const SCREEN_3D_H = 0.9;
-export const SCREEN_CENTER: [number, number, number] = [0, TOP + 0.2 + 0.56, 0.043];
+// 앞 테두리 앞면(z = 0.1) 바로 뒤. 더 깊이 물리면 비스듬히 볼 때 확대 화면 DOM이
+// 테두리를 뚫고 나온다. DOM은 3D 깊이 판정을 받지 않기 때문이다.
+export const SCREEN_CENTER: [number, number, number] = [0, TOP + 0.2 + 0.56, 0.095];
+/** 모니터를 확대했을 때 화면에서 카메라까지의 거리 */
+const MONITOR_ZOOM_DIST = 1.507;
 
 export const CAMERA_FOV = 45;
 
@@ -33,8 +37,8 @@ export const orbitDefaults = {
 /** 각 오브젝트를 클릭했을 때의 카메라 포즈 */
 export const zoomPoses = {
   monitor: {
-    position: [0, SCREEN_CENTER[1], 1.55],
-    target: [0, SCREEN_CENTER[1], 0],
+    position: [0, SCREEN_CENTER[1], SCREEN_CENTER[2] + MONITOR_ZOOM_DIST],
+    target: [0, SCREEN_CENTER[1], SCREEN_CENTER[2]],
   },
   phone: {
     position: [1.3, TOP + 0.95, 0.47],

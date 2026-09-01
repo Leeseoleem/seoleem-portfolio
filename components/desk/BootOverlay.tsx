@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useDeskStore } from '@/stores/useDeskStore';
-import { BOOT_DURATION, drawBoot, drawDesktop } from '@/lib/desk/screen-canvas';
+import { BOOT_DURATION, SCREEN_H, SCREEN_W, drawBoot } from '@/lib/desk/screen-canvas';
 import { getCanvasFont, getScreenCanvas, sceneTime } from '@/lib/desk/runtime';
 import { getSound } from '@/lib/desk/sound';
 
@@ -30,8 +30,12 @@ export function BootOverlay() {
   const complete = () => {
     if (done.current) return;
     done.current = true;
+    // 부팅이 끝나면 화면 내용은 MonitorScreen(DOM)이 맡는다. 캔버스는 비워만 둔다
     const ctx = getScreenCanvas().getContext('2d');
-    if (ctx) drawDesktop(ctx, getCanvasFont());
+    if (ctx) {
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
+    }
     const sound = getSound();
     sound.play('chime');
     window.setTimeout(() => sound.play('whoosh'), 350);

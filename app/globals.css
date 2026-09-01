@@ -46,6 +46,21 @@
   --xp-border: #0831d9;
   --xp-desktop: #3a6ea5;
   --xp-text: #000000;
+  --xp-sky-top: #2a6fd6;
+  --xp-sky-mid: #8ec5f0;
+  --xp-sky-bottom: #cfe7f7;
+  --xp-hill-far: #5aa53a;
+  --xp-hill-near: #3f8a2c;
+  --xp-taskbar-top: #3a80f0;
+  --xp-taskbar-mid: #245edb;
+  --xp-taskbar-bottom: #1b44a8;
+  --xp-start-top: #5fbf4f;
+  --xp-start-bottom: #2e8a2a;
+  --xp-tray: #1a9be6;
+  --xp-icon-a: #f7c948;
+  --xp-icon-b: #5b9cf6;
+  --xp-icon-c: #e9eef5;
+  --xp-icon-d: #b8c4d0;
 
   /* 핸드폰 UI (토스 스타일). 실제 값은 폰 UI 작업에서 확정한다 */
   --toss-bg: #ffffff;
@@ -272,6 +287,129 @@ body {
   pointer-events: auto;
   overflow: hidden;
   user-select: none;
+}
+
+/* ---------- 모니터 안 XP 화면 ---------- */
+/* 확대뿐 아니라 책상 뷰에서도 계속 떠 있다. 매 프레임 변형되므로 그림자·필터는 쓰지 않는다 */
+.xp {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(var(--xp-sky-top), var(--xp-sky-mid) 55%, var(--xp-sky-bottom));
+  color: var(--xp-title-fg);
+}
+
+.xp__hills {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.xp__icons {
+  position: absolute;
+  top: 32px;
+  left: 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+
+.xp-icon {
+  width: 92px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.xp-icon__tile {
+  width: 44px;
+  height: 40px;
+  border-radius: 4px;
+  border-bottom: 10px solid rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+}
+
+.xp-icon__tile--a {
+  background: var(--xp-icon-a);
+}
+.xp-icon__tile--b {
+  background: var(--xp-icon-b);
+}
+.xp-icon__tile--c {
+  background: var(--xp-icon-c);
+}
+.xp-icon__tile--d {
+  background: var(--xp-icon-d);
+}
+
+.xp-icon__label {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.xp__taskbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(var(--xp-taskbar-top), var(--xp-taskbar-mid) 10%, var(--xp-taskbar-bottom));
+}
+
+.xp-start {
+  height: 100%;
+  padding: 0 22px 0 12px;
+  border-radius: 0 8px 8px 0;
+  background: linear-gradient(var(--xp-start-top), var(--xp-start-bottom));
+  font-size: 20px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.xp-start__flag {
+  display: grid;
+  grid-template-columns: 9px 9px;
+  grid-template-rows: 9px 9px;
+  gap: 3px;
+}
+
+.xp-start__flag i {
+  display: block;
+  border-radius: 2px;
+}
+.xp-start__flag i:nth-child(1) {
+  background: #f35325;
+}
+.xp-start__flag i:nth-child(2) {
+  background: #81bc06;
+}
+.xp-start__flag i:nth-child(3) {
+  background: #05a6f0;
+}
+.xp-start__flag i:nth-child(4) {
+  background: #ffba08;
+}
+
+.xp__tray {
+  height: 100%;
+  min-width: 120px;
+  padding: 0 20px;
+  background: var(--xp-tray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
 }
 
 /* 아래 placeholder 스타일은 실제 UI가 들어오면 지운다 */

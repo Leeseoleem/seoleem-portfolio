@@ -18,6 +18,12 @@ interface ZoomSurfaceProps {
   pixels: [number, number];
   position?: [number, number, number];
   rotation?: [number, number, number];
+  /**
+   * 책상 뷰에서도 계속 띄운다. 화면이 있는 오브젝트(모니터·핸드폰)에 쓴다.
+   * 멀리 보이는 모습과 확대한 모습이 같은 코드에서 나오므로 둘이 어긋날 수 없다.
+   * 이때 클릭은 3D 쪽이 받아야 확대가 되므로, 확대 상태에서만 입력을 받는다.
+   */
+  deskView?: boolean;
   children: ReactNode;
 }
 
@@ -28,9 +34,26 @@ interface ZoomSurfaceProps {
  * 텍스트 선택, 스크롤, 접근성, CSS 트랜지션이 그대로 동작한다.
  * 좌표는 부모 그룹 기준이라 오브젝트가 움직여도 화면이 따라간다.
  */
-export function ZoomSurface({ target, size, pixels, position, rotation, children }: ZoomSurfaceProps) {
-  const active = useDeskStore((s) => s.zoomed === target && (s.phase === 'zoomed' || s.phase === 'transition'));
+export function ZoomSurface({ target, size, pixels, position, rotation, deskView = false, children }: ZoomSurfaceProps) {
+  const phase = useDeskStore((s) => s.phase);
+  const zoomed = useDeskStore((s) => s.zoomed);
+  const onThis = zoomed === target && (phase === 'zoomed' || phase === 'transition');
+  // 부팅 화면과 종료 연출은 캔버스가 그리므로 그때는 비운다
+  const active = onThis || (deskView && phase !== 'boot' && phase !== 'off');
   if (!active) return null;
+  return <Surface {...{ size, pixels, position, rotation, onThis, children }} />;
+}
+
+interface SurfaceProps {
+  size: [number, number];
+  pixels: [number, number];
+  position?: [number, number, number];
+  rotation?: [number, number, number];
+  onThis: boolean;
+  children: ReactNode;
+}
+
+function Surface({ size, pixels, position, rotation, onThis, children }: SurfaceProps) {
   // 픽셀 크기의 div를 평면 크기에 정확히 맞춘다.
   // drei의 transform 모드는 월드 1 단위를 PX_PER_UNIT 픽셀로 그리므로 그만큼 곱해야 한다.
   const scale = (size[0] / pixels[0]) * PX_PER_UNIT;
@@ -43,11 +66,14 @@ export function ZoomSurface({ target, size, pixels, position, rotation, children
       scale={scale}
       occlude={false}
       zIndexRange={[8, 0]}
+      /* drei가 DOM을 감싸는 div의 pointer-events. 확대 상태가 아닐 때 켜두면
+         그 div가 캔버스로 갈 마우스 이벤트를 삼켜서 다른 오브젝트의 호버가 풀리지 않는다 */
+      pointerEvents={onThis ? 'auto' : 'none'}
       style={{ pointerEvents: 'none' }}
     >
       <div
         className="zoom-surface"
-        style={{ width: pixels[0], height: pixels[1] }}
+        style={{ width: pixels[0], height: pixels[1], pointerEvents: onThis ? 'auto' : 'none' }}
         onPointerDown={(e) => e.stopPropagation()}
       >
         {children}
