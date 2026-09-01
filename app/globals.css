@@ -287,6 +287,19 @@ body {
   pointer-events: auto;
   overflow: hidden;
   user-select: none;
+  animation: zoom-surface-in var(--duration-base) ease both;
+}
+
+@keyframes zoom-surface-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zoom-surface {
+    animation: none;
+  }
 }
 
 /* ---------- 모니터 안 XP 화면 ---------- */

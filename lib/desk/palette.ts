@@ -54,8 +54,6 @@ export const scenePalette = {
     ribbon: '#d8574a',
     labelPaper: '#f4efe4',
     labelBorder: '#c9c1b0',
-    labelInk: '#2a2a2a',
-    labelMuted: '#6b6b6b',
   },
   cat: {
     fur: '#8b9099',
