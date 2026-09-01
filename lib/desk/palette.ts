@@ -103,6 +103,12 @@ export const canvasPalette = {
     iconLabel: '#ffffff',
     icons: ['#f7c948', '#5b9cf6', '#e9eef5', '#b8c4d0'],
   },
+  // 키보드 상판에 그리는 키 배열
+  keyboard: {
+    base: '#a8a190',
+    key: '#e6e0d0',
+    keyEdge: '#9c9584',
+  },
   // 마우스 껍데기에 새기는 선. 셸 표면 텍스처로 그린다
   pointer: {
     body: '#dcd6c6',

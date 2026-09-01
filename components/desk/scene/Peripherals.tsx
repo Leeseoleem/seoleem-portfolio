@@ -5,12 +5,22 @@ import * as THREE from 'three';
 import { Interactive } from './Interactive';
 import { RoundedBox } from './RoundedBox';
 import { createMouseShellGeometry, mouseShellRise } from '@/lib/desk/geometry';
+import { drawKeyboardFace, KEY_COLS, KEY_ROWS } from '@/lib/desk/keyboard-face';
 import { canvasPalette, scenePalette } from '@/lib/desk/palette';
 import { positions, TOP } from '@/lib/desk/layout';
 import { getSound } from '@/lib/desk/sound';
 
 // 마우스는 매끈한 돔 하나로 만들고, 분할선과 아래 테두리는 표면 텍스처로 새긴다.
 // 껍데기를 쪼개면 덩어리가 따로 놀아서 실제 마우스처럼 보이지 않는다.
+// 키보드. 키 하나가 KEY_U이고 가로 15칸이다. 실제 슬림 키보드 비율을 따른다
+const [KX, , KZ] = positions.keyboard;
+const KEY_U = 0.069;
+const KEYS_W = KEY_COLS * KEY_U;
+const KEYS_D = KEY_ROWS * KEY_U;
+const BOARD_PAD = 0.03;
+const BOARD_H = 0.028;
+const KEY_TEX_W = 1200;
+
 const [MX, , MZ] = positions.mouse;
 const MOUSE_RX = 0.058;
 const MOUSE_RY = 0.05;
@@ -53,6 +63,19 @@ function drawShellTexture(ctx: CanvasRenderingContext2D) {
 
 /** 키보드와 마우스. 누르면 소리만 난다. 툴팁 없음 */
 export function Peripherals() {
+  const keyTexture = useMemo(() => {
+    const c = document.createElement('canvas');
+    c.width = KEY_TEX_W;
+    c.height = Math.round((KEY_TEX_W * KEY_ROWS) / KEY_COLS);
+    const ctx = c.getContext('2d');
+    if (ctx) drawKeyboardFace(ctx, c.width, c.height);
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.anisotropy = 4;
+    return tex;
+  }, []);
+  useEffect(() => () => keyTexture.dispose(), [keyTexture]);
+
   const texture = useMemo(() => {
     const c = document.createElement('canvas');
     c.width = TEX_W;
@@ -80,10 +103,16 @@ export function Peripherals() {
   return (
     <group>
       <Interactive onActivate={() => getSound().play('keys')} lift={false}>
-        <RoundedBox size={[1.15, 0.04, 0.36]} color={scenePalette.furniture.beige} roughness={0.6} position={positions.keyboard} />
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[positions.keyboard[0], TOP + 0.041, positions.keyboard[2]]}>
-          <planeGeometry args={[1.05, 0.28]} />
-          <meshStandardMaterial color={scenePalette.furniture.keys} roughness={0.8} />
+        <RoundedBox
+          size={[KEYS_W + BOARD_PAD * 2, BOARD_H, KEYS_D + BOARD_PAD * 2]}
+          radius={0.012}
+          color={scenePalette.furniture.beige}
+          roughness={0.6}
+          position={[KX, TOP + BOARD_H / 2, KZ]}
+        />
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[KX, TOP + BOARD_H + 0.001, KZ]}>
+          <planeGeometry args={[KEYS_W, KEYS_D]} />
+          <meshStandardMaterial map={keyTexture} roughness={0.8} />
         </mesh>
       </Interactive>
       <Interactive onActivate={() => getSound().play('mouseClick')} lift={false}>
