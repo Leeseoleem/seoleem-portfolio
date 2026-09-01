@@ -8,9 +8,8 @@ import { DocumentSheets } from '../surfaces/DocumentSheets';
 import { useDeskStore } from '@/stores/useDeskStore';
 import { canvasPalette } from '@/lib/desk/palette';
 import { positions, TOP, zoomPoses } from '@/lib/desk/layout';
-import { getCanvasFont, onFontsReady } from '@/lib/desk/runtime';
 
-/** 서류 세 장. 위 장에 이름과 임시 본문 줄이 그려져 있다 */
+/** 서류 세 장. 멀리서는 글씨 없는 뼈대만 보이고, 확대하면 DocumentSheets(DOM)가 내용을 그린다 */
 export function Documents() {
   const zoomTo = useDeskStore((s) => s.zoomTo);
 
@@ -28,15 +27,12 @@ export function Documents() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     const p = canvasPalette.doc;
-    const font = getCanvasFont();
     ctx.fillStyle = p.paper;
     ctx.fillRect(0, 0, 300, 420);
-    ctx.fillStyle = p.ink;
-    ctx.font = `800 24px ${font}`;
-    ctx.fillText('seoleem', 30, 50);
+    // 멀리서 보이는 종이는 글씨 없이 뼈대만 둔다. 실제 내용은 확대했을 때 DocumentSheets가 그린다
     ctx.fillStyle = p.muted;
-    ctx.font = `12px ${font}`;
-    ctx.fillText('Frontend Developer / Designer', 30, 72);
+    ctx.fillRect(30, 36, 108, 16);
+    ctx.fillRect(30, 62, 168, 8);
     ctx.fillStyle = p.line;
     for (let i = 0; i < 14; i++) ctx.fillRect(30, 105 + i * 20, 120 + ((i * 53) % 110), 6);
     texture.needsUpdate = true;
@@ -44,7 +40,6 @@ export function Documents() {
 
   useEffect(() => {
     draw();
-    onFontsReady(draw);
   }, [draw]);
 
   return (
