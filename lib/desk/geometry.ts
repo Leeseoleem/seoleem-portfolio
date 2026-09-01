@@ -226,3 +226,34 @@ export class DeformableTube {
     this.geometry.dispose();
   }
 }
+
+// ---------- 마우스 껍데기 ----------
+
+/** 마우스 높이 배율. z가 앞(-1)이면 낮고 뒤(+1)로 갈수록 부푼다 */
+export function mouseShellRise(z: number) {
+  const t = (z + 1) / 2;
+  return 0.6 + 0.55 * (t * t * (3 - 2 * t));
+}
+
+/** 마우스 폭 배율. 앞이 살짝 좁다 */
+function mouseShellWidth(z: number) {
+  const t = (z + 1) / 2;
+  return 0.86 + 0.16 * (t * t * (3 - 2 * t));
+}
+
+/**
+ * 마우스 껍데기. 반구를 앞뒤로 눌러 앞은 낮고 뒤로 갈수록 부푸는 형태로 만든다.
+ * UV는 건드리지 않으므로 표면에 새기는 선 텍스처는 그대로 쓸 수 있다.
+ */
+export function createMouseShellGeometry(radial = 48, height = 24) {
+  const geo = new THREE.SphereGeometry(1, radial, height, 0, Math.PI * 2, 0, Math.PI / 2);
+  const pos = geo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const z = pos.getZ(i);
+    pos.setX(i, pos.getX(i) * mouseShellWidth(z));
+    pos.setY(i, pos.getY(i) * mouseShellRise(z));
+  }
+  pos.needsUpdate = true;
+  geo.computeVertexNormals();
+  return geo;
+}

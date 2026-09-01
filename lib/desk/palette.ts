@@ -25,6 +25,10 @@ export const scenePalette = {
     coffee: '#4a2b16',
     cable: '#2a2a2e',
   },
+  // 책상 위 마우스(입력장치). 쥐구멍의 생쥐는 아래 mouse 항목이다
+  pointer: {
+    wheel: '#eceae2',
+  },
   lamp: {
     bulbOff: '#3a3226',
     bulbOn: '#fff1c8',
@@ -98,6 +102,12 @@ export const canvasPalette = {
     tray: '#1a9be6',
     iconLabel: '#ffffff',
     icons: ['#f7c948', '#5b9cf6', '#e9eef5', '#b8c4d0'],
+  },
+  // 마우스 껍데기에 새기는 선. 셸 표면 텍스처로 그린다
+  pointer: {
+    body: '#dcd6c6',
+    line: '#8c8574',
+    slot: '#6f6a5c',
   },
   shutdown: {
     top: '#3b6fd6',
