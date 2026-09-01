@@ -1,26 +1,321 @@
 @import "tailwindcss";
 
+/*
+  디자인 토큰.
+  - brand-* : 사이트 공통(부팅 화면, HUD, 종료 화면). 레트로 픽셀 폰트 톤
+  - xp-*    : 모니터 안 UI (실제 Windows XP 룩: 회색 크롬 + 파랑). 값은 XP 창 작업 시 확정
+  - toss-*  : 핸드폰 UI (토스 스타일). 값은 폰 UI 작업 시 확정
+  3D 씬의 재질 색은 lib/desk/palette.ts에 있다.
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --brand-ink: #0a0a0c;
+  --brand-fg: #e8e4d8;
+  --brand-muted: #9a978e;
+  --brand-surface: rgba(10, 10, 12, 0.72);
+  --brand-line: rgba(232, 228, 216, 0.35);
+  --brand-line-soft: rgba(232, 228, 216, 0.25);
+  --brand-accent: #245edb;
+  --brand-glow: #7be08a;
+  --brand-paper: #f4efe4;
+
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-md: 16px;
+  --text-lg: 22px;
+
+  --shadow-glow: 0 0 24px rgba(123, 224, 138, 0.45);
+  --shadow-crt: 0 0 18px 4px rgba(255, 255, 255, 0.8);
+
+  /* 모니터 안 UI (Windows XP). 실제 값은 XP 창 작업에서 확정한다 */
+  --xp-face: #ece9d8;
+  --xp-face-shadow: #aca899;
+  --xp-face-light: #ffffff;
+  --xp-title-from: #0a56d6;
+  --xp-title-to: #3d8aee;
+  --xp-title-fg: #ffffff;
+  --xp-border: #0831d9;
+  --xp-desktop: #3a6ea5;
+  --xp-text: #000000;
+
+  /* 핸드폰 UI (토스 스타일). 실제 값은 폰 UI 작업에서 확정한다 */
+  --toss-bg: #ffffff;
+  --toss-surface: #f2f4f6;
+  --toss-line: #e5e8eb;
+  --toss-text: #191f28;
+  --toss-text-weak: #8b95a1;
+  --toss-primary: #3182f6;
+  --toss-radius: 16px;
+
+  --duration-fast: 150ms;
+  --duration-base: 300ms;
+  --duration-slow: 900ms;
+  --duration-reveal: 1200ms;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-fg: var(--brand-fg);
+  --color-brand-muted: var(--brand-muted);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-glow: var(--brand-glow);
+  --font-pixel: var(--font-stardust);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  overflow: hidden;
+  background: var(--brand-ink);
+  color: var(--brand-fg);
+  font-family: var(--font-stardust), Tahoma, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+}
+
+/* ---------- 씬 루트 ---------- */
+.desk-root {
+  position: fixed;
+  inset: 0;
+}
+
+.desk-canvas,
+.desk-canvas-loading {
+  position: fixed !important;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  background: var(--brand-ink);
+}
+
+/* ---------- 부팅 오버레이 ---------- */
+.boot-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: #000;
+}
+
+.boot-canvas-host {
+  position: absolute;
+  inset: 0;
+}
+
+.boot-canvas-host canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.boot-skip {
+  position: fixed;
+  right: var(--space-5);
+  bottom: var(--space-5);
+  z-index: 11;
+}
+
+/* ---------- HUD ---------- */
+.hud {
+  position: fixed;
+  left: var(--space-5);
+  bottom: var(--space-5);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.hud-btn {
+  font: var(--text-xs) / 1 inherit;
+  font-family: inherit;
+  color: var(--brand-fg);
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-line);
+  padding: var(--space-2) 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(6px);
+}
+
+.hud-btn:hover {
+  background: rgba(232, 228, 216, 0.14);
+}
+
+.hud-btn:focus-visible {
+  outline: 2px solid var(--brand-accent);
+  outline-offset: 2px;
+}
+
+.hud-label {
+  position: fixed;
+  z-index: 6;
+  font-size: var(--text-xs);
+  color: var(--brand-fg);
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-line-soft);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-xs);
+  pointer-events: none;
+  transform: translate(12px, 12px);
+}
+
+/* ---------- 종료 화면 ---------- */
+.off-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--duration-slow) ease;
+}
+
+.off-screen.is-visible {
+  opacity: 1;
+}
+
+.off-line {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 2px;
+  width: 100%;
+  background: #fff;
+  transform: translate(-50%, -50%) scaleX(1);
+  box-shadow: var(--shadow-crt);
+  transition:
+    transform 500ms cubic-bezier(0.7, 0, 0.9, 0.4),
+    opacity 250ms ease 450ms;
+}
+
+.off-line.is-collapsed {
+  transform: translate(-50%, -50%) scaleX(0);
+  opacity: 0;
+}
+
+.closing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  color: var(--brand-fg);
+  opacity: 0;
+  transition: opacity var(--duration-reveal) ease;
+}
+
+.closing.is-visible {
+  opacity: 1;
+}
+
+.closing-title {
+  margin: 0;
+  font-size: var(--text-lg);
+  letter-spacing: 0.02em;
+}
+
+.closing-sub {
+  margin: 0 0 26px;
+  font-size: var(--text-md);
+  color: var(--brand-muted);
+}
+
+.power-btn {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 2px solid rgba(232, 228, 216, 0.4);
+  background: transparent;
+  color: var(--brand-fg);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition:
+    border-color var(--duration-base),
+    box-shadow var(--duration-base),
+    color var(--duration-base);
+}
+
+.power-btn:hover,
+.power-btn:focus-visible {
+  outline: none;
+  color: var(--brand-glow);
+  border-color: var(--brand-glow);
+  box-shadow: var(--shadow-glow);
+}
+
+.closing-hint {
+  margin: 30px 0 0;
+  font-size: var(--text-xs);
+  color: var(--brand-muted);
+  letter-spacing: 0.08em;
+}
+
+/* ---------- 확대 화면(3D 위에 얹히는 DOM) ---------- */
+.zoom-surface {
+  pointer-events: auto;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* 아래 placeholder 스타일은 실제 UI가 들어오면 지운다 */
+.screen-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-size: 20px;
+  text-align: center;
+}
+
+.screen-placeholder p {
+  margin: 0;
+}
+
+.screen-placeholder__hint {
+  font-size: 14px;
+  opacity: 0.6;
+}
+
+.screen-placeholder--xp {
+  background: var(--xp-desktop);
+  color: var(--xp-title-fg);
+}
+
+.screen-placeholder--toss {
+  background: var(--toss-bg);
+  color: var(--toss-text);
+}
+
+.screen-placeholder--paper {
+  background: var(--brand-paper);
+  color: #2a2a2a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .off-screen,
+  .off-line,
+  .closing,
+  .power-btn {
+    transition: none;
+  }
 }
