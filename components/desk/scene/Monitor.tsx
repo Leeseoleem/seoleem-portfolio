@@ -7,6 +7,7 @@ import { Interactive } from './Interactive';
 import { ZoomSurface } from './ZoomSurface';
 import { MonitorScreen } from '../surfaces/MonitorScreen';
 import { RoundedBox } from './RoundedBox';
+import { createFrameGeometry, createTaperedBoxGeometry } from '@/lib/desk/geometry';
 import { useDeskStore } from '@/stores/useDeskStore';
 import { scenePalette } from '@/lib/desk/palette';
 import { SCREEN_3D_H, SCREEN_3D_W, SCREEN_CENTER, TOP, zoomPoses } from '@/lib/desk/layout';
@@ -14,6 +15,15 @@ import { drawDesktop, drawShutdown } from '@/lib/desk/screen-canvas';
 import { getCanvasFont, getScreenCanvas, sceneTime } from '@/lib/desk/runtime';
 
 const BODY_Y = TOP + 0.2 + 0.56;
+
+// 앞 테두리는 가운데가 뚫린 액자 한 덩어리다. 조각을 붙이면 모서리 홈이 두 겹처럼 보인다.
+// 앞에서 보는 테 두께는 얇게 두고 깊이만 두껍게 해서, 옆에서 볼 때 CRT다운 덩어리감이 나오게 한다.
+const OPEN_W = 1.3; // 테두리가 감싸는 구멍(유리 크기)
+const OPEN_H = 0.98;
+const BEZEL_W = 1.5;
+const BEZEL_H = 1.18;
+const BEZEL_D = 0.2; // 앞면이 z = 0.1. 화면(0.043)이 그만큼 안쪽으로 물린다
+const LED_Z = 0.101;
 
 /**
  * CRT 모니터. 화면 텍스처는 부팅 오버레이와 공유하는 캔버스다.
@@ -32,6 +42,12 @@ export function Monitor() {
     return { canvas: c, texture: tex };
   }, []);
   useEffect(() => () => texture.dispose(), [texture]);
+
+  const body = useMemo(() => createTaperedBoxGeometry(1.46, 1.14, 0.9, 0.05, 0.6, 0.56), []);
+  useEffect(() => () => body.dispose(), [body]);
+
+  const bezel = useMemo(() => createFrameGeometry(BEZEL_W, BEZEL_H, OPEN_W, OPEN_H, BEZEL_D), []);
+  useEffect(() => () => bezel.dispose(), [bezel]);
 
   useFrame(() => {
     const ctx = canvas.getContext('2d');
@@ -61,12 +77,17 @@ export function Monitor() {
       {/* 받침 */}
       <RoundedBox size={[0.7, 0.06, 0.5]} color={scenePalette.furniture.beigeDark} position={[0, TOP + 0.03, -0.45]} />
       <RoundedBox size={[0.36, 0.14, 0.3]} color={scenePalette.furniture.beigeDark} position={[0, TOP + 0.13, -0.5]} />
-      {/* 본체와 앞 베젤 */}
-      <RoundedBox size={[1.42, 1.12, 0.9]} color={scenePalette.furniture.beige} roughness={0.6} position={[0, BODY_Y, -0.45]} />
-      <RoundedBox size={[1.5, 1.18, 0.08]} color={scenePalette.furniture.beige} roughness={0.6} position={[0, BODY_Y, 0]} />
+      {/* 본체. 뒤로 갈수록 좁아지는 사다리꼴 */}
+      <mesh geometry={body} position={[0, BODY_Y, -0.45]} castShadow receiveShadow>
+        <meshStandardMaterial color={scenePalette.furniture.beige} roughness={0.6} />
+      </mesh>
+      {/* 앞 테두리. 가운데가 뚫린 액자 한 덩어리 */}
+      <mesh geometry={bezel} position={[0, BODY_Y, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color={scenePalette.furniture.beige} roughness={0.6} />
+      </mesh>
       {/* 유리 */}
       <mesh position={[0, BODY_Y, 0.041]}>
-        <planeGeometry args={[1.3, 0.98]} />
+        <planeGeometry args={[OPEN_W, OPEN_H]} />
         <meshStandardMaterial color={scenePalette.furniture.black} roughness={0.5} />
       </mesh>
       {/* 화면 */}
@@ -79,7 +100,7 @@ export function Monitor() {
         <MonitorScreen />
       </ZoomSurface>
       {/* 전원 LED */}
-      <mesh position={[0.62, TOP + 0.25, 0.041]}>
+      <mesh position={[0.62, TOP + 0.25, LED_Z]}>
         <circleGeometry args={[0.012, 12]} />
         <meshBasicMaterial ref={ledMat} color={scenePalette.led.on} />
       </mesh>

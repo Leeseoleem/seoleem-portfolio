@@ -257,3 +257,71 @@ export function createMouseShellGeometry(radial = 48, height = 24) {
   geo.computeVertexNormals();
   return geo;
 }
+
+/**
+ * 뒤로 갈수록 좁아지는 상자. CRT 모니터 뒤통수처럼 사다리꼴 옆면을 만든다.
+ * 둥근 상자를 만든 뒤 z 위치에 따라 x·y를 줄인다. z가 +d/2면 앞면(원래 크기), -d/2면 뒷면이다.
+ */
+export function createTaperedBoxGeometry(
+  w: number,
+  h: number,
+  d: number,
+  radius = 0.05,
+  backScaleX = 0.62,
+  backScaleY = 0.58,
+): THREE.BufferGeometry {
+  const geo = createRoundedBoxGeometry(w, h, d, radius);
+  const pos = geo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const t = Math.min(1, Math.max(0, (pos.getZ(i) + d / 2) / d));
+    pos.setX(i, pos.getX(i) * (backScaleX + (1 - backScaleX) * t));
+    pos.setY(i, pos.getY(i) * (backScaleY + (1 - backScaleY) * t));
+  }
+  pos.needsUpdate = true;
+  geo.computeVertexNormals();
+  return geo;
+}
+
+/**
+ * 가운데가 뚫린 액자 모양. 모니터 앞 테두리처럼 이음매 없는 한 덩어리가 필요할 때 쓴다.
+ * 조각을 여러 개 붙이면 각자의 둥근 모서리 때문에 홈이 생겨 두 겹처럼 보인다.
+ */
+export function createFrameGeometry(
+  outerW: number,
+  outerH: number,
+  holeW: number,
+  holeH: number,
+  depth: number,
+  radius = 0.03,
+  bevel = 0.012,
+): THREE.BufferGeometry {
+  const roundedRect = (w: number, h: number, r: number) => {
+    const path = new THREE.Path();
+    const rr = Math.min(r, w / 2 - 0.001, h / 2 - 0.001);
+    path.moveTo(-w / 2 + rr, -h / 2);
+    path.lineTo(w / 2 - rr, -h / 2);
+    path.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + rr);
+    path.lineTo(w / 2, h / 2 - rr);
+    path.quadraticCurveTo(w / 2, h / 2, w / 2 - rr, h / 2);
+    path.lineTo(-w / 2 + rr, h / 2);
+    path.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - rr);
+    path.lineTo(-w / 2, -h / 2 + rr);
+    path.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + rr, -h / 2);
+    return path;
+  };
+  // 베벨이 바깥으로 부풀고 구멍은 좁아지므로, 그만큼 미리 줄이고 넓혀 둔다
+  const outer = roundedRect(outerW - bevel * 2, outerH - bevel * 2, radius);
+  const shape = new THREE.Shape(outer.getPoints(48));
+  shape.holes.push(roundedRect(holeW + bevel * 2, holeH + bevel * 2, radius * 0.6));
+  const geo = new THREE.ExtrudeGeometry(shape, {
+    depth: depth - bevel * 2,
+    bevelEnabled: true,
+    bevelThickness: bevel,
+    bevelSize: bevel,
+    bevelSegments: 2,
+    curveSegments: 6,
+  });
+  geo.translate(0, 0, -depth / 2 + bevel);
+  geo.computeVertexNormals();
+  return geo;
+}
