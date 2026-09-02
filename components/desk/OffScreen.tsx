@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useDeskStore } from '@/stores/useDeskStore';
+import { getSound } from '@/lib/desk/sound';
 
 type Stage = 'hidden' | 'black' | 'collapse' | 'closing';
 
@@ -19,6 +20,17 @@ export function OffScreen() {
 function OffSequence() {
   const [stage, setStage] = useState<Stage>('hidden');
   const [shown, setShown] = useState(false);
+
+  /**
+   * 다시 켜기. 시작음을 여기서 낸다.
+   * 처음 접속할 때 내면 사용자가 아직 화면을 건드리기 전이라 소리가 대기했다가
+   * 첫 클릭 때 클릭음과 겹친다. 이 버튼은 사용자가 직접 누른 것이라 바로 울린다.
+   * 소리가 잘리지 않게 잠깐 두고 새로 고친다.
+   */
+  const restart = () => {
+    getSound().play('chime');
+    window.setTimeout(() => window.location.reload(), 420);
+  };
 
   useEffect(() => {
     const timers = [
@@ -44,7 +56,7 @@ function OffSequence() {
       <div className={`closing${stage === 'closing' ? ' is-visible' : ''}`} aria-hidden={stage !== 'closing'}>
         <p className="closing-title">긍정적인 검토를 기다리겠습니다.</p>
         <p className="closing-sub">감사합니다.</p>
-        <button type="button" className="power-btn" aria-label="다시 켜기" onClick={() => window.location.reload()}>
+        <button type="button" className="power-btn" aria-label="다시 켜기" onClick={restart}>
           <svg viewBox="0 0 48 48" width="56" height="56" aria-hidden="true">
             <path d="M24 6v18" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" fill="none" />
             <path d="M14.5 12.5a15 15 0 1 0 19 0" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" fill="none" />
