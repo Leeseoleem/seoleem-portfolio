@@ -26,7 +26,8 @@ export const scenePalette = {
     ceramic: '#e8e2d0',
     white: '#f4f1ea',
     vent: '#a9a08c',
-    coffee: '#4a2b16',
+    coffee: '#33190c',
+    steam: '#d8d2ca',
     // 케이블. 흰 책상 위에서 검은 선은 먹선처럼 튀어서, 책상보다 한 단계 어두운 회색으로 둔다
     cable: '#c6bfb2',
   },
