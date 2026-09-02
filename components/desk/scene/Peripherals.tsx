@@ -20,6 +20,7 @@ import {
   positions,
   TOP,
 } from '@/lib/desk/layout';
+import { requestShadowUpdate } from '@/lib/desk/shadows';
 import { getSound } from '@/lib/desk/sound';
 import { useDeskStore } from '@/stores/useDeskStore';
 
@@ -157,6 +158,8 @@ export function Peripherals() {
       const nz = p.z + drag.current.offZ;
       if (canPlaceOnDesk(nx, pos.z, MOUSE_RX, MOUSE_RZ)) pos.x = nx;
       if (canPlaceOnDesk(pos.x, nz, MOUSE_RX, MOUSE_RZ)) pos.z = nz;
+      // 그림자 맵은 요청이 있을 때만 다시 그린다. 안 부르면 그림자가 옛 자리에 남는다
+      requestShadowUpdate();
     };
     const onRelease = () => {
       if (!drag.current.active) return;

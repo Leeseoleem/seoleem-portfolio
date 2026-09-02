@@ -8,6 +8,7 @@ import { scenePalette } from '@/lib/desk/palette';
 import { ContactShadows } from '@react-three/drei';
 import { DESK_D, DESK_W, positions, SCREEN_CENTER, TOP } from '@/lib/desk/layout';
 import { lerpLight, nightMix } from '@/lib/desk/night';
+import { shadowDirty } from '@/lib/desk/shadows';
 import { prefersReducedMotion, sceneTime } from '@/lib/desk/runtime';
 
 /**
@@ -70,8 +71,10 @@ export function Room() {
       if (phase === 'off') s *= 1 - Math.min(1, (sceneTime() - shutdownAt) / 1.9);
       screenLight.current.intensity = s;
     }
-    if (Math.abs(mix - shadowMix.current) > 0.02) {
+    // 조명이 바뀌었거나, 물건이 움직여서 다시 그려 달라는 요청이 있을 때만 그림자 맵을 갱신한다
+    if (shadowDirty.value || Math.abs(mix - shadowMix.current) > 0.02) {
       gl.shadowMap.needsUpdate = true;
+      shadowDirty.value = false;
       shadowMix.current = mix;
     }
     if (wallMat.current) wallMat.current.color.copy(colors.wallDay).lerp(colors.wallNight, mix);
