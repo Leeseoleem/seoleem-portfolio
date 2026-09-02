@@ -86,6 +86,13 @@ export const canvasPalette = {
     barBottom: '#1d4fd1',
     flag: ['#f35325', '#81bc06', '#05a6f0', '#ffba08'],
   },
+  // 책상 윗면 나무결. 바탕은 scenePalette.furniture.wood와 같아야 둥근 모서리와 이어진다
+  wood: {
+    base: '#ece3d4',
+    grainDark: '#d9cbb6',
+    grainLight: '#f6f0e6',
+    seam: '#cfc1ab',
+  },
   // 키보드 상판에 그리는 키 배열
   keyboard: {
     base: '#a8a190',
