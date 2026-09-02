@@ -15,7 +15,7 @@ const legXZ: Array<[number, number]> = [
 export function Desk() {
   return (
     <group>
-      <RoundedBox size={[DESK_W, DESK_THICKNESS, DESK_D]} color={scenePalette.furniture.wood} position={[0, DESK_Y, 0]} />
+      <RoundedBox size={[DESK_W, DESK_THICKNESS, DESK_D]} color={scenePalette.furniture.wood} roughness={0.7} position={[0, DESK_Y, 0]} />
       {legXZ.map(([x, z]) => (
         <RoundedBox key={`${x},${z}`} size={[LEG, DESK_Y, LEG]} color={scenePalette.furniture.woodDark} roughness={0.8} position={[x, DESK_Y / 2, z]} />
       ))}

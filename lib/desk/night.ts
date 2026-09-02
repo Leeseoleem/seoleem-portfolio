@@ -4,9 +4,13 @@
  */
 export const nightMix = { value: 0 };
 
+/**
+ * 낮은 키 라이트(fill) 하나가 주도하고 ambient·hemi는 그림자 속을 살짝 밝히는 정도로만 둔다.
+ * 사방에서 고르게 비추면 그림자가 사라져 씬이 평평해진다.
+ */
 export const lighting = {
-  day: { ambient: 1.0, hemi: 0.9, fill: 1.3, lamp: 0, screen: 1.1 },
-  night: { ambient: 0.63, hemi: 0.5, fill: 0.31, lamp: 7, screen: 3.1 },
+  day: { ambient: 0.4, hemi: 0.55, fill: 2.4, lamp: 0, screen: 1.1 },
+  night: { ambient: 0.28, hemi: 0.32, fill: 0.4, lamp: 7, screen: 3.1 },
 } as const;
 
 export function lerpLight(key: keyof typeof lighting.day, mix: number): number {

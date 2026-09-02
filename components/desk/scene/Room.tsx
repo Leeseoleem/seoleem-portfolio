@@ -5,7 +5,8 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useDeskStore } from '@/stores/useDeskStore';
 import { scenePalette } from '@/lib/desk/palette';
-import { positions, SCREEN_CENTER } from '@/lib/desk/layout';
+import { ContactShadows } from '@react-three/drei';
+import { DESK_D, DESK_W, positions, SCREEN_CENTER, TOP } from '@/lib/desk/layout';
 import { lerpLight, nightMix } from '@/lib/desk/night';
 import { prefersReducedMotion, sceneTime } from '@/lib/desk/runtime';
 
@@ -97,14 +98,27 @@ export function Room() {
 
       <ambientLight ref={ambient} color={scenePalette.light.ambientDay} intensity={1.0} />
       <hemisphereLight ref={hemi} color={scenePalette.light.hemiSkyDay} groundColor={scenePalette.light.hemiGround} intensity={0.9} />
+      {/* 키 라이트. 스탠드가 있는 왼쪽 위에서 들어와 그림자가 오른쪽 아래로 떨어진다 */}
       <directionalLight
         ref={fill}
         color={scenePalette.light.fill}
-        intensity={1.3}
-        position={[2, 4, 3]}
+        intensity={2.4}
+        position={[-2.6, 4.5, 2.4]}
         castShadow
-        shadow-mapSize={[512, 512]}
-        shadow-bias={-0.0005}
+        shadow-mapSize={[1024, 1024]}
+        shadow-bias={-0.0004}
+        shadow-normalBias={0.02}
+      />
+      {/* 물건이 책상에 닿은 자리의 어두운 얼룩. 없으면 전부 살짝 떠 보인다.
+          마우스가 움직이고 공책이 열리므로 매 프레임 다시 그린다. 해상도를 낮게 두어 비용을 막는다 */}
+      <ContactShadows
+        position={[0, TOP + 0.002, 0]}
+        scale={[DESK_W, DESK_D]}
+        resolution={512}
+        far={0.7}
+        blur={2.2}
+        opacity={0.55}
+        frames={Infinity}
       />
       <pointLight
         ref={screenLight}

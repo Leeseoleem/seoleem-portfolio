@@ -7,7 +7,7 @@ import { Interactive } from './Interactive';
 import { useDeskStore } from '@/stores/useDeskStore';
 import { scenePalette } from '@/lib/desk/palette';
 import { positions } from '@/lib/desk/layout';
-import { lerpLight, nightMix } from '@/lib/desk/night';
+import { lerpLight, lighting, nightMix } from '@/lib/desk/night';
 import { prefersReducedMotion } from '@/lib/desk/runtime';
 import { getSound } from '@/lib/desk/sound';
 
@@ -28,6 +28,33 @@ const SHADE_ROT = 0.47;
 // 받침 안에서 봉 전체가 돌아간 각도(약 27도). 갓은 앞쪽을 보되 팔 실루엣이 가려지지 않는 선
 const YAW = -0.48;
 
+/**
+ * 형광등 스타터처럼 켜지는 순서. [이 시각(초)까지, 밝기] 구간의 나열이다.
+ * 효과음(lightFlicker)의 박자에 맞춰 두었다. 0초와 0.05초의 '띡', 0.12초부터의 '띠딕',
+ * 0.5초부터 이어지는 웅- 소리. 마지막 구간이 끝나면 평소 밝기로 넘어간다.
+ */
+const IGNITE: Array<[number, number]> = [
+  [0.04, 1],
+  [0.12, 0],
+  [0.2, 0.55],
+  [0.3, 0],
+  [0.38, 1],
+  [0.46, 0.08],
+  [0.6, 1],
+];
+/** 끌 때는 한 번 되살아나는 듯하다가 꺼진다 */
+const EXTINGUISH: Array<[number, number]> = [
+  [0.05, 0],
+  [0.1, 0.7],
+  [0.22, 0],
+];
+
+/** 구간표에서 지금 밝기를 찾는다. 표가 끝났으면 null */
+function envelope(pattern: Array<[number, number]>, elapsed: number): number | null {
+  for (const [until, level] of pattern) if (elapsed < until) return level;
+  return null;
+}
+
 /** +Y축을 Z축 기준으로 rz만큼 돌렸을 때의 방향 */
 function dirFromRot(rz: number) {
   return new THREE.Vector3(-Math.sin(rz), Math.cos(rz), 0);
@@ -40,7 +67,8 @@ export function Lamp() {
   const target = useMemo(() => new THREE.Object3D(), []);
   const headMat = useRef<THREE.MeshStandardMaterial>(null);
   const bulbMat = useRef<THREE.MeshBasicMaterial>(null);
-  const flickerUntil = useRef(0);
+  /** 진행 중인 점등/소등 연출. 없으면 밤낮 진행도를 그대로 따른다 */
+  const flick = useRef<{ start: number; pattern: Array<[number, number]> } | null>(null);
 
   // 받침 중심을 원점으로 두고 계산한다. 실제 배치와 회전은 바깥 group이 맡는다
   const geo = useMemo(() => {
@@ -74,27 +102,36 @@ export function Lamp() {
 
   useFrame(() => {
     const mix = nightMix.value;
-    const now = performance.now();
-    // 켜진 직후 0.7초 동안 불규칙하게 떨린다
-    let flicker = 1;
-    if (now < flickerUntil.current) {
-      const k = (flickerUntil.current - now) / 700;
-      flicker = Math.random() < 0.35 * k ? 0.15 : 1;
+    // 평소에는 밤낮 진행도를 따라 서서히 밝아진다
+    let intensity = lerpLight('lamp', mix);
+    let glow = mix;
+    // 연출 중에는 진행도와 무관하게 구간표의 밝기를 그대로 낸다.
+    // 진행도에 곱하면 켜지기 시작할 때 값이 0에 가까워 깜빡임이 보이지 않는다
+    const f = flick.current;
+    if (f) {
+      const level = envelope(f.pattern, (performance.now() - f.start) / 1000);
+      if (level === null) {
+        flick.current = null;
+      } else {
+        intensity = lighting.night.lamp * level;
+        glow = level;
+      }
     }
     if (light.current) {
-      light.current.intensity = lerpLight('lamp', mix) * flicker;
+      light.current.intensity = intensity;
       light.current.castShadow = mix >= 0.5;
       light.current.target = target;
     }
-    if (headMat.current) headMat.current.emissiveIntensity = mix * 0.8 * 0.35;
-    if (bulbMat.current) bulbMat.current.color.copy(geo.colors.off).lerp(geo.colors.on, mix);
+    // 전구와 갓 안쪽도 같은 밝기로 깜빡여야 램프가 켜지는 것처럼 보인다
+    if (headMat.current) headMat.current.emissiveIntensity = glow * 0.8 * 0.35;
+    if (bulbMat.current) bulbMat.current.color.copy(geo.colors.off).lerp(geo.colors.on, glow);
   });
 
   const toggle = () => {
     const next = !useDeskStore.getState().isNight;
     useDeskStore.getState().setNight(next);
     getSound().play('lightFlicker');
-    if (next && !prefersReducedMotion()) flickerUntil.current = performance.now() + 700;
+    if (!prefersReducedMotion()) flick.current = { start: performance.now(), pattern: next ? IGNITE : EXTINGUISH };
   };
 
   return (

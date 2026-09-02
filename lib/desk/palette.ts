@@ -3,16 +3,18 @@
 
 export const scenePalette = {
   room: {
-    wallDay: '#e6c9b4',
+    // 책상보다 한 단계 어둡고 탁하게. 밝은 책상이 벽에 묻히지 않게 하는 바탕이다
+    wallDay: '#cdb5a1',
     wallNight: '#2b3552',
-    floorDay: '#c09a74',
+    floorDay: '#a07b58',
     floorNight: '#3b322f',
-    backgroundDay: '#e6c9b4',
+    backgroundDay: '#cdb5a1',
     backgroundNight: '#1c2338',
   },
   furniture: {
-    wood: '#d9b587',
-    woodDark: '#bf9666',
+    // 화이트 워시 우드. 실제 작업 책상을 따른다. 대비는 벽을 한 단계 내리고 그림자로 만든다
+    wood: '#ece3d4',
+    woodDark: '#d6cbb8',
     beige: '#d9d2c0',
     beigeDark: '#b9b2a0',
     black: '#14141a',
@@ -39,7 +41,7 @@ export const scenePalette = {
     ambientNight: '#8fa4ff',
     hemiSkyDay: '#fff0e0',
     hemiSkyNight: '#7f93d8',
-    hemiGround: '#b08868',
+    hemiGround: '#8c7259',
     fill: '#fff4e6',
     screenGlow: '#7fb6ff',
   },
