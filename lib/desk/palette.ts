@@ -17,6 +17,9 @@ export const scenePalette = {
     woodDark: '#d6cbb8',
     beige: '#d9d2c0',
     beigeDark: '#b9b2a0',
+    // 모니터 껍데기. 오래된 플라스틱처럼 베이지보다 살짝 누렇다
+    crt: '#ddd3bb',
+    crtSlot: '#8f8878',
     black: '#14141a',
     paper: '#f2ede2',
     kraft: '#b98a5a',

@@ -24,6 +24,10 @@ const BEZEL_W = 1.5;
 const BEZEL_H = 1.18;
 const BEZEL_D = 0.2; // 앞면이 z = 0.1. 화면(0.043)이 그만큼 안쪽으로 물린다
 const LED_Z = 0.101;
+/** 아래 테두리 띠의 세로 중심. 통풍구·버튼·LED가 이 줄에 놓인다 */
+const BAND_Y = BODY_Y - (OPEN_H + BEZEL_H) / 4;
+const VENT_X = [-0.62, -0.595, -0.57, -0.545, -0.52, -0.495, -0.47, -0.445];
+const BUTTON_X = [0.46, 0.51, 0.56];
 
 /**
  * CRT 모니터. 화면 텍스처는 부팅 오버레이와 공유하는 캔버스다.
@@ -68,12 +72,25 @@ export function Monitor() {
       <RoundedBox size={[0.36, 0.14, 0.3]} color={scenePalette.furniture.beigeDark} position={[0, TOP + 0.13, -0.5]} />
       {/* 본체. 뒤로 갈수록 좁아지는 사다리꼴 */}
       <mesh geometry={body} position={[0, BODY_Y, -0.45]} castShadow receiveShadow>
-        <meshStandardMaterial color={scenePalette.furniture.beige} roughness={0.6} />
+        <meshStandardMaterial color={scenePalette.furniture.crt} roughness={0.55} />
       </mesh>
       {/* 앞 테두리. 가운데가 뚫린 액자 한 덩어리 */}
       <mesh geometry={bezel} position={[0, BODY_Y, 0]} castShadow receiveShadow>
-        <meshStandardMaterial color={scenePalette.furniture.beige} roughness={0.6} />
+        <meshStandardMaterial color={scenePalette.furniture.crt} roughness={0.55} />
       </mesh>
+      {/* 아래 테두리 띠: 왼쪽 통풍 슬릿, 오른쪽 조작 버튼과 LED */}
+      {VENT_X.map((x) => (
+        <mesh key={x} position={[x, BAND_Y, LED_Z]}>
+          <planeGeometry args={[0.007, 0.046]} />
+          <meshStandardMaterial color={scenePalette.furniture.crtSlot} roughness={0.9} />
+        </mesh>
+      ))}
+      {BUTTON_X.map((x) => (
+        <mesh key={x} position={[x, BAND_Y, LED_Z]}>
+          <circleGeometry args={[0.011, 16]} />
+          <meshStandardMaterial color={scenePalette.furniture.beigeDark} roughness={0.7} />
+        </mesh>
+      ))}
       {/* 유리 */}
       <mesh position={[0, BODY_Y, 0.093]}>
         <planeGeometry args={[OPEN_W, OPEN_H]} />
@@ -89,7 +106,7 @@ export function Monitor() {
         <MonitorScreen />
       </ZoomSurface>
       {/* 전원 LED */}
-      <mesh position={[0.62, TOP + 0.25, LED_Z]}>
+      <mesh position={[0.62, BAND_Y, LED_Z]}>
         <circleGeometry args={[0.012, 12]} />
         <meshBasicMaterial ref={ledMat} color={scenePalette.led.on} />
       </mesh>
