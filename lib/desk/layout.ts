@@ -1,4 +1,5 @@
 import type { CameraPose } from '@/stores/useDeskStore';
+import { KEY_COLS, KEY_ROWS } from './keyboard-face';
 
 /** 책상 씬의 치수와 배치. 오브젝트 컴포넌트와 카메라 리그가 같은 숫자를 본다. 단위는 미터에 가깝다. */
 
@@ -68,6 +69,22 @@ export const positions = {
   wallZ: -1.7,
 };
 
+// ---------- 책상 위 물건의 치수 ----------
+// 오브젝트를 그리는 컴포넌트와 아래 충돌 판정이 같은 숫자를 보게 여기서 한 번만 정한다.
+// 따로 적어두면 한쪽만 바뀌었을 때 눈에 보이는 크기와 부딪히는 벽이 어긋난다.
+
+/** 키보드. 키 한 칸이 KEY_U이고 가로 KEY_COLS칸, 세로 KEY_ROWS줄이다 */
+export const KEY_U = 0.069;
+export const KEYBOARD_PAD = 0.03;
+export const KEYBOARD_H = 0.028;
+export const KEYBOARD_W = KEY_COLS * KEY_U + KEYBOARD_PAD * 2;
+export const KEYBOARD_D = KEY_ROWS * KEY_U + KEYBOARD_PAD * 2;
+
+/** 마우스 껍데기 반지름 */
+export const MOUSE_RX = 0.0696;
+export const MOUSE_RY = 0.06;
+export const MOUSE_RZ = 0.102;
+
 // ---------- 책상 위 이동 가능 영역 ----------
 
 /** 위에서 내려다본 사각형. 마우스를 끌 때 넘어갈 수 없는 영역이다 */
@@ -83,13 +100,14 @@ interface Obstacle {
  * 오브젝트를 옮기거나 크기를 바꾸면 여기 값도 같이 고쳐야 한다.
  */
 export const deskObstacles: Obstacle[] = [
-  { x: 0, z: 0.72, halfW: 0.548, halfD: 0.227 }, // 키보드
-  { x: -0.55, z: 0.4, halfW: 0.15, halfD: 0.15 }, // 머그
-  { x: -1.25, z: 0.35, halfW: 0.44, halfD: 0.52 }, // 공책
-  { x: 1.25, z: -0.3, halfW: 0.33, halfD: 0.45 }, // 서류
-  { x: 1.3, z: 0.42, halfW: 0.17, halfD: 0.34 }, // 핸드폰
-  { x: 0, z: -0.47, halfW: 0.36, halfD: 0.28 }, // 모니터 받침
-  { x: -1.75, z: -0.55, halfW: 0.2, halfD: 0.2 }, // 스탠드 받침
+  { x: positions.keyboard[0], z: positions.keyboard[2], halfW: KEYBOARD_W / 2, halfD: KEYBOARD_D / 2 },
+  { x: positions.mug[0], z: positions.mug[2], halfW: 0.15, halfD: 0.15 },
+  { x: positions.notebook[0], z: positions.notebook[2], halfW: 0.44, halfD: 0.52 },
+  { x: positions.docs[0], z: positions.docs[2], halfW: 0.33, halfD: 0.45 },
+  { x: positions.phone[0], z: positions.phone[2], halfW: 0.17, halfD: 0.34 },
+  // 모니터. 받침뿐 아니라 본체까지 막는다. 본체가 빠지면 마우스가 그 밑으로 들어가 화면에서 사라진다
+  { x: 0, z: -0.45, halfW: 0.75, halfD: 0.5 },
+  { x: positions.lampBase[0], z: positions.lampBase[2], halfW: 0.2, halfD: 0.2 },
 ];
 
 /** 상판에서 오브젝트가 떨어지지 않도록 남기는 여유 */

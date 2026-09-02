@@ -8,26 +8,29 @@ import { RoundedBox } from './RoundedBox';
 import { createMouseShellGeometry, mouseShellRise } from '@/lib/desk/geometry';
 import { drawKeyboardFace, KEY_COLS, KEY_ROWS } from '@/lib/desk/keyboard-face';
 import { canvasPalette, scenePalette } from '@/lib/desk/palette';
-import { canPlaceOnDesk, positions, TOP } from '@/lib/desk/layout';
+import {
+  canPlaceOnDesk,
+  KEYBOARD_D,
+  KEYBOARD_H,
+  KEYBOARD_PAD,
+  KEYBOARD_W,
+  MOUSE_RX,
+  MOUSE_RY,
+  MOUSE_RZ,
+  positions,
+  TOP,
+} from '@/lib/desk/layout';
 import { getSound } from '@/lib/desk/sound';
 import { dragLock } from '@/lib/desk/drag-lock';
 import { useDeskStore } from '@/stores/useDeskStore';
 
 // 마우스는 매끈한 돔 하나로 만들고, 분할선과 아래 테두리는 표면 텍스처로 새긴다.
 // 껍데기를 쪼개면 덩어리가 따로 놀아서 실제 마우스처럼 보이지 않는다.
-// 키보드. 키 하나가 KEY_U이고 가로 15칸이다. 실제 슬림 키보드 비율을 따른다
+// 키보드 판과 마우스 크기는 lib/desk/layout.ts에 있다. 충돌 판정과 같은 숫자를 봐야 하기 때문이다
 const [KX, , KZ] = positions.keyboard;
-const KEY_U = 0.069;
-const KEYS_W = KEY_COLS * KEY_U;
-const KEYS_D = KEY_ROWS * KEY_U;
-const BOARD_PAD = 0.03;
-const BOARD_H = 0.028;
 const KEY_TEX_W = 1200;
 
 const [MX, , MZ] = positions.mouse;
-const MOUSE_RX = 0.0696;
-const MOUSE_RY = 0.06;
-const MOUSE_RZ = 0.102;
 // 돔 꼭대기에서 휠까지의 각도. 0이 꼭대기, Math.PI / 2가 바닥 테두리다
 const WHEEL_ANGLE = 0.62;
 const WHEEL_R = 0.0156;
@@ -177,14 +180,14 @@ export function Peripherals() {
     <group>
       <Interactive onActivate={() => getSound().play('keys')} lift={false}>
         <RoundedBox
-          size={[KEYS_W + BOARD_PAD * 2, BOARD_H, KEYS_D + BOARD_PAD * 2]}
+          size={[KEYBOARD_W, KEYBOARD_H, KEYBOARD_D]}
           radius={0.012}
           color={scenePalette.furniture.beige}
           roughness={0.6}
-          position={[KX, TOP + BOARD_H / 2, KZ]}
+          position={[KX, TOP + KEYBOARD_H / 2, KZ]}
         />
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[KX, TOP + BOARD_H + 0.001, KZ]}>
-          <planeGeometry args={[KEYS_W, KEYS_D]} />
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[KX, TOP + KEYBOARD_H + 0.001, KZ]}>
+          <planeGeometry args={[KEYBOARD_W - KEYBOARD_PAD * 2, KEYBOARD_D - KEYBOARD_PAD * 2]} />
           <meshStandardMaterial map={keyTexture} roughness={0.8} />
         </mesh>
       </Interactive>

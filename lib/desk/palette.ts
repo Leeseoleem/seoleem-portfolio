@@ -21,7 +21,6 @@ export const scenePalette = {
     ceramic: '#e8e2d0',
     white: '#f4f1ea',
     vent: '#a9a08c',
-    keys: '#cdc6b4',
     coffee: '#4a2b16',
     cable: '#2a2a2e',
   },

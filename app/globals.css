@@ -57,6 +57,11 @@
   --xp-start-top: #5fbf4f;
   --xp-start-bottom: #2e8a2a;
   --xp-tray: #1a9be6;
+  --xp-icon-shadow: rgba(0, 0, 0, 0.15);
+  --xp-flag-a: #f35325;
+  --xp-flag-b: #81bc06;
+  --xp-flag-c: #05a6f0;
+  --xp-flag-d: #ffba08;
   --xp-icon-a: #f7c948;
   --xp-icon-b: #5b9cf6;
   --xp-icon-c: #e9eef5;
@@ -344,7 +349,7 @@ body {
   width: 44px;
   height: 40px;
   border-radius: 4px;
-  border-bottom: 10px solid rgba(0, 0, 0, 0.15);
+  border-bottom: 10px solid var(--xp-icon-shadow);
   box-sizing: border-box;
 }
 
@@ -402,16 +407,16 @@ body {
   border-radius: 2px;
 }
 .xp-start__flag i:nth-child(1) {
-  background: #f35325;
+  background: var(--xp-flag-a);
 }
 .xp-start__flag i:nth-child(2) {
-  background: #81bc06;
+  background: var(--xp-flag-b);
 }
 .xp-start__flag i:nth-child(3) {
-  background: #05a6f0;
+  background: var(--xp-flag-c);
 }
 .xp-start__flag i:nth-child(4) {
-  background: #ffba08;
+  background: var(--xp-flag-d);
 }
 
 .xp__tray {
