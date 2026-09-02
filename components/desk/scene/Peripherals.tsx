@@ -28,6 +28,11 @@ import { useDeskStore } from '@/stores/useDeskStore';
 // 껍데기를 쪼개면 덩어리가 따로 놀아서 실제 마우스처럼 보이지 않는다.
 // 키보드 판과 마우스 크기는 lib/desk/layout.ts에 있다. 충돌 판정과 같은 숫자를 봐야 하기 때문이다
 const [KX, , KZ] = positions.keyboard;
+/** 키보드 기울기. 뒤가 이만큼 들려 있다. 실제 슬림 키보드의 3도 정도 */
+const KEY_TILT = 0.052;
+/** 뒤쪽이 들린 높이. 이 높이의 받침 두 개가 뒤 모서리를 받친다 */
+const KEY_LIFT = KEYBOARD_D * Math.sin(KEY_TILT);
+const FOOT_W = 0.05;
 const KEY_TEX_W = 1200;
 
 const [MX, , MZ] = positions.mouse;
@@ -181,17 +186,26 @@ export function Peripherals() {
   return (
     <group>
       <Interactive onActivate={() => getSound().play('keys')} lift={false}>
-        <RoundedBox
-          size={[KEYBOARD_W, KEYBOARD_H, KEYBOARD_D]}
-          radius={0.012}
-          color={scenePalette.furniture.beige}
-          roughness={0.6}
-          position={[KX, TOP + KEYBOARD_H / 2, KZ]}
-        />
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[KX, TOP + KEYBOARD_H + 0.001, KZ]}>
-          <planeGeometry args={[KEYBOARD_W - KEYBOARD_PAD * 2, KEYBOARD_D - KEYBOARD_PAD * 2]} />
-          <meshStandardMaterial map={keyTexture} roughness={0.8} />
-        </mesh>
+        {/* 뒤가 살짝 들린 채 놓인다. 축은 앞 모서리 높이라 앞은 책상에 닿고 뒤만 뜬다 */}
+        <group position={[KX, TOP + KEY_LIFT / 2, KZ]} rotation={[KEY_TILT, 0, 0]}>
+          <RoundedBox size={[KEYBOARD_W, KEYBOARD_H, KEYBOARD_D]} radius={0.012} color={scenePalette.furniture.beige} roughness={0.6} position={[0, KEYBOARD_H / 2, 0]} />
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, KEYBOARD_H + 0.001, 0]}>
+            <planeGeometry args={[KEYBOARD_W - KEYBOARD_PAD * 2, KEYBOARD_D - KEYBOARD_PAD * 2]} />
+            <meshStandardMaterial map={keyTexture} roughness={0.8} />
+          </mesh>
+        </group>
+        {/* 뒤 모서리를 받치는 받침 두 개 */}
+        {[-1, 1].map((side) => (
+          <RoundedBox
+            key={side}
+            size={[FOOT_W, KEY_LIFT, 0.03]}
+            radius={0.006}
+            color={scenePalette.furniture.beigeDark}
+            roughness={0.7}
+            position={[KX + side * (KEYBOARD_W / 2 - FOOT_W), TOP + KEY_LIFT / 2, KZ - KEYBOARD_D / 2 + 0.03]}
+            castShadow={false}
+          />
+        ))}
       </Interactive>
       <Interactive onActivate={() => getSound().play('mouseClick')} lift={false}>
         {/* 꾹 눌러 끌면 상판 위를 움직인다. 다른 물건과 상판 밖으로는 못 나간다 */}
