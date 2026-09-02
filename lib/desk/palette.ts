@@ -98,6 +98,12 @@ export const canvasPalette = {
     grainLight: '#f6f0e6',
     seam: '#cfc1ab',
   },
+  // 모니터 베젤에 붙인 포스트잇
+  sticky: {
+    yellow: '#fbe66e',
+    pink: '#f8b7c6',
+    ink: '#3b3a36',
+  },
   // 공책 표지 가죽 결. 바탕은 scenePalette.furniture.kraft에서 시작한다
   leather: {
     base: '#b98a5a',

@@ -9,7 +9,8 @@ import { MonitorScreen } from '../surfaces/MonitorScreen';
 import { RoundedBox } from './RoundedBox';
 import { createFrameGeometry, createTaperedBoxGeometry } from '@/lib/desk/geometry';
 import { useDeskStore } from '@/stores/useDeskStore';
-import { scenePalette } from '@/lib/desk/palette';
+import { canvasPalette, scenePalette } from '@/lib/desk/palette';
+import { drawStickyNote } from '@/lib/desk/sticky-note';
 import { SCREEN_3D_H, SCREEN_3D_W, SCREEN_CENTER, TOP, zoomPoses } from '@/lib/desk/layout';
 import { drawShutdown } from '@/lib/desk/screen-canvas';
 import { getCanvasFont, getScreenCanvas, sceneTime } from '@/lib/desk/runtime';
@@ -26,6 +27,36 @@ const BEZEL_D = 0.2; // 앞면이 z = 0.1. 화면(0.043)이 그만큼 안쪽으�
 const LED_Z = 0.101;
 /** 아래 테두리 띠의 세로 중심. 통풍구·버튼·LED가 이 줄에 놓인다 */
 const BAND_Y = BODY_Y - (OPEN_H + BEZEL_H) / 4;
+/** 베젤에 붙인 포스트잇. 처음 온 사람에게 어디를 눌러야 하는지 알려주는 유일한 장치다 */
+const NOTES: Array<{ color: string; arrow: number; position: [number, number, number]; tilt: number }> = [
+  // 오른쪽 위: 화면을 가리키는 화살표(왼쪽)
+  { color: canvasPalette.sticky.yellow, arrow: Math.PI, position: [0.71, BODY_Y + 0.33, LED_Z + 0.003], tilt: -0.07 },
+  // 왼쪽 아래: 책상 위 물건들을 가리키는 화살표(왼쪽 아래)
+  { color: canvasPalette.sticky.pink, arrow: Math.PI * 0.72, position: [-0.71, BODY_Y - 0.26, LED_Z + 0.003], tilt: 0.09 },
+];
+const NOTE_SIZE = 0.105;
+const NOTE_TEX = 256;
+
+function StickyNote({ color, arrow, position, tilt }: (typeof NOTES)[number]) {
+  const tex = useMemo(() => {
+    const c = document.createElement('canvas');
+    c.width = c.height = NOTE_TEX;
+    const ctx = c.getContext('2d');
+    if (ctx) drawStickyNote(ctx, NOTE_TEX, color, arrow);
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.anisotropy = 4;
+    return t;
+  }, [color, arrow]);
+  useEffect(() => () => tex.dispose(), [tex]);
+  return (
+    <mesh position={position} rotation={[0, 0, tilt]} castShadow>
+      <planeGeometry args={[NOTE_SIZE, NOTE_SIZE]} />
+      <meshStandardMaterial map={tex} roughness={0.9} />
+    </mesh>
+  );
+}
+
 const VENT_X = [-0.62, -0.595, -0.57, -0.545, -0.52, -0.495, -0.47, -0.445];
 const BUTTON_X = [0.46, 0.51, 0.56];
 
@@ -78,6 +109,9 @@ export function Monitor() {
       <mesh geometry={bezel} position={[0, BODY_Y, 0]} castShadow receiveShadow>
         <meshStandardMaterial color={scenePalette.furniture.crt} roughness={0.55} />
       </mesh>
+      {NOTES.map((n) => (
+        <StickyNote key={n.color} {...n} />
+      ))}
       {/* 아래 테두리 띠: 왼쪽 통풍 슬릿, 오른쪽 조작 버튼과 LED */}
       {VENT_X.map((x) => (
         <mesh key={x} position={[x, BAND_Y, LED_Z]}>
