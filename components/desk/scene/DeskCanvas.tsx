@@ -45,7 +45,7 @@ export function DeskCanvas() {
     <Canvas
       className="desk-canvas"
       frameloop={isBooting || stoppedAfterOff ? 'never' : isZoomed ? 'demand' : 'always'}
-      shadows={{ type: THREE.PCFShadowMap }}
+      shadows={{ type: THREE.PCFSoftShadowMap }}
       dpr={1}
       performance={{ min: 0.5 }}
       camera={{ fov: CAMERA_FOV, near: 0.02, far: 60, position: [0, 2.5, 4] }}

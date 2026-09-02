@@ -63,10 +63,8 @@ export function Room() {
       hemi.current.intensity = lerpLight('hemi', mix);
       hemi.current.color.copy(colors.hemiDay).lerp(colors.hemiNight, mix);
     }
-    if (fill.current) {
-      fill.current.intensity = lerpLight('fill', mix);
-      fill.current.castShadow = mix < 0.5;
-    }
+    // 그림자는 항상 켜둔다. 세기가 줄면 그림자도 같이 옅어지므로 따로 끌 이유가 없다
+    if (fill.current) fill.current.intensity = lerpLight('fill', mix);
     if (screenLight.current) {
       let s = lerpLight('screen', mix) * (1 + Math.sin(state.clock.elapsedTime * 9) * 0.05);
       if (phase === 'off') s *= 1 - Math.min(1, (sceneTime() - shutdownAt) / 1.9);
@@ -105,9 +103,16 @@ export function Room() {
         intensity={2.4}
         position={[-2.6, 4.5, 2.4]}
         castShadow
-        shadow-mapSize={[1024, 1024]}
-        shadow-bias={-0.0004}
-        shadow-normalBias={0.02}
+        shadow-mapSize={[2048, 2048]}
+        shadow-bias={-0.0003}
+        shadow-normalBias={0.03}
+        /* 그림자 카메라를 책상 주변만 덮게 조인다. 기본값(±5m)은 방 전체를 덮어 텍셀이 굵어진다 */
+        shadow-camera-left={-2.8}
+        shadow-camera-right={2.8}
+        shadow-camera-top={2.4}
+        shadow-camera-bottom={-2.4}
+        shadow-camera-near={1}
+        shadow-camera-far={12}
       />
       {/* 물건이 책상에 닿은 자리의 어두운 얼룩. 없으면 전부 살짝 떠 보인다.
           마우스가 움직이고 공책이 열리므로 매 프레임 다시 그린다. 해상도를 낮게 두어 비용을 막는다 */}

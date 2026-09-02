@@ -64,6 +64,8 @@ function dirFromRot(rz: number) {
 export function Lamp() {
   const isNight = useDeskStore((s) => s.isNight);
   const light = useRef<THREE.SpotLight>(null);
+  /** 갓 주변으로 번지는 빛. 원뿔 하나만 있으면 손전등처럼 보인다 */
+  const glowLight = useRef<THREE.PointLight>(null);
   const target = useMemo(() => new THREE.Object3D(), []);
   const headMat = useRef<THREE.MeshStandardMaterial>(null);
   const bulbMat = useRef<THREE.MeshBasicMaterial>(null);
@@ -104,6 +106,7 @@ export function Lamp() {
     const mix = nightMix.value;
     // 평소에는 밤낮 진행도를 따라 서서히 밝아진다
     let intensity = lerpLight('lamp', mix);
+    let spill = lerpLight('lampGlow', mix);
     let glow = mix;
     // 연출 중에는 진행도와 무관하게 구간표의 밝기를 그대로 낸다.
     // 진행도에 곱하면 켜지기 시작할 때 값이 0에 가까워 깜빡임이 보이지 않는다
@@ -114,16 +117,17 @@ export function Lamp() {
         flick.current = null;
       } else {
         intensity = lighting.night.lamp * level;
+        spill = lighting.night.lampGlow * level;
         glow = level;
       }
     }
     if (light.current) {
       light.current.intensity = intensity;
-      light.current.castShadow = mix >= 0.5;
       light.current.target = target;
     }
+    if (glowLight.current) glowLight.current.intensity = spill;
     // 전구와 갓 안쪽도 같은 밝기로 깜빡여야 램프가 켜지는 것처럼 보인다
-    if (headMat.current) headMat.current.emissiveIntensity = glow * 0.8 * 0.35;
+    if (headMat.current) headMat.current.emissiveIntensity = glow * 0.6;
     if (bulbMat.current) bulbMat.current.color.copy(geo.colors.off).lerp(geo.colors.on, glow);
   });
 
@@ -187,15 +191,22 @@ export function Lamp() {
           ref={light}
           color={scenePalette.lamp.lightWarm}
           intensity={0}
-          distance={6}
-          angle={Math.PI / 3.2}
-          penumbra={0.55}
+          distance={5.5}
+          /* 갓 폭보다 조금 넓은 원뿔. 너무 넓히면 책상 전체가 고르게 밝아져서 웅덩이가 사라진다.
+             가장자리는 최대한 풀어서 경계선이 보이지 않게 한다 */
+          angle={Math.PI / 4}
+          penumbra={0.95}
           decay={2}
           position={geo.bulb}
+          /* 그림자는 진행도로 켜고 끄지 않는다. 세기에 비례해 저절로 짙어지고 옅어지므로,
+             중간에 스위치를 두면 그 순간 그림자가 한 번에 튀어나온다 */
           castShadow
-          shadow-mapSize={[512, 512]}
-          shadow-bias={-0.0006}
+          shadow-mapSize={[1024, 1024]}
+          shadow-bias={-0.0004}
+          shadow-normalBias={0.03}
         />
+        {/* 갓에서 새는 빛과 되튕긴 빛. 그림자는 만들지 않고 주변만 채운다 */}
+        <pointLight ref={glowLight} color={scenePalette.lamp.lightWarm} intensity={0} distance={3.5} decay={2} position={geo.bulb} />
         <primitive object={target} position={geo.aim} />
       </group>
     </Interactive>
