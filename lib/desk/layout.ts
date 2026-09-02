@@ -26,12 +26,15 @@ export const DOCS_FAN = 0.12;
 /** 공책 표지와 속지 치수 */
 export const COVER_W = 0.72;
 export const COVER_D = 0.94;
-const PAPER_OUT = 0.004;
+/** 속지가 표지보다 안으로 들어간 폭. 실제 공책처럼 표지가 속지를 조금 덮는다 */
 const PAPER_IN = 0.006;
-export const PAPER_W = COVER_W - PAPER_IN + PAPER_OUT;
-export const PAPER_D = COVER_D + PAPER_OUT * 2;
-export const PAPER_X = (PAPER_OUT + PAPER_IN) / 2;
-export const PAPER_OUTSET = PAPER_OUT;
+export const PAPER_W = COVER_W - PAPER_IN;
+export const PAPER_D = COVER_D - PAPER_IN * 2;
+/** 속지 중심 x. 책등(왼쪽)에는 붙고 오른쪽만 들어가므로 왼쪽으로 반만큼 치우친다 */
+export const PAPER_X = -PAPER_IN / 2;
+/** 앞뒤 표지 두께와 속지 두께. 셋을 합친 것이 닫힌 공책의 높이다 */
+export const COVER_T = 0.006;
+export const PAPER_H = 0.034;
 
 /** 책상 뷰 궤도 카메라 기본값 */
 export const orbitDefaults = {
@@ -58,6 +61,7 @@ export const positions = {
   keyboard: [0, TOP + 0.02, 0.72] as [number, number, number],
   mouse: [0.78, TOP + 0.025, 0.72] as [number, number, number],
   lampBase: [-1.75, TOP + 0.04, -0.55] as [number, number, number],
+  // 책상 아래 안쪽. 기본 시점에선 거의 안 보이고 시점을 낮춰야 발견되는, 숨은 고양이다
   cat: [-1.45, 0, -0.5] as [number, number, number],
   mouseHole: [-0.55, 0, -1.695] as [number, number, number],
   tower: [1.3, 0, -0.2] as [number, number, number],

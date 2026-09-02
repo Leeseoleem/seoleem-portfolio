@@ -98,6 +98,12 @@ export const canvasPalette = {
     grainLight: '#f6f0e6',
     seam: '#cfc1ab',
   },
+  // 공책 표지 가죽 결. 바탕은 scenePalette.furniture.kraft에서 시작한다
+  leather: {
+    base: '#b98a5a',
+    dark: '#8f6538',
+    light: '#d3a877',
+  },
   // 키보드 상판에 그리는 키 배열
   keyboard: {
     base: '#a8a190',
