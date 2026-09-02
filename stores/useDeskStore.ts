@@ -18,6 +18,8 @@ interface DeskState {
   soundOn: boolean;
   hoverLabel: string | null;
   hoverPoint: { x: number; y: number } | null;
+  /** 책상 위 오브젝트를 끌고 있는 중. 시점 회전과 호버 표시를 멈춘다 */
+  dragging: boolean;
   /** 종료 시퀀스 시작 시각(초, 씬 시계 기준). -1이면 아직 아님 */
   shutdownAt: number;
   /** 카메라 이동 요청. CameraRig가 소비한다. */
@@ -28,6 +30,7 @@ interface DeskState {
   toggleNight: () => void;
   setSound: (on: boolean) => void;
   setHover: (label: string | null, point?: { x: number; y: number } | null) => void;
+  setDragging: (on: boolean) => void;
   zoomTo: (target: ZoomTarget, pose: CameraPose) => void;
   backToDesk: () => void;
   finishBoot: () => void;
@@ -44,6 +47,7 @@ export const useDeskStore = create<DeskState>((set) => ({
   soundOn: true,
   hoverLabel: null,
   hoverPoint: null,
+  dragging: false,
   shutdownAt: -1,
   cameraRequest: null,
 
@@ -52,6 +56,7 @@ export const useDeskStore = create<DeskState>((set) => ({
   toggleNight: () => set((s) => ({ isNight: !s.isNight })),
   setSound: (on) => set({ soundOn: on }),
   setHover: (label, point = null) => set({ hoverLabel: label, hoverPoint: point }),
+  setDragging: (on) => set({ dragging: on }),
 
   zoomTo: (target, pose) =>
     set({

@@ -9,7 +9,10 @@ import { useDeskStore } from '@/stores/useDeskStore';
 import { canvasPalette } from '@/lib/desk/palette';
 import { positions, TOP, zoomPoses } from '@/lib/desk/layout';
 
-/** 서류 세 장. 멀리서는 글씨 없는 뼈대만 보이고, 확대하면 DocumentSheets(DOM)가 내용을 그린다 */
+/**
+ * 서류 세 장. 멀리서는 글씨 없는 뼈대만 보이고, 카메라가 다 다가온 뒤에 DocumentSheets(DOM)가 내용을 그린다.
+ * 다가오는 동안 DOM이 먼저 뜨면 종이가 아직 작을 때 글씨만 커져 보여 어색하다.
+ */
 export function Documents() {
   const zoomTo = useDeskStore((s) => s.zoomTo);
 
@@ -44,7 +47,7 @@ export function Documents() {
 
   return (
     <Interactive label="서류" position={positions.docs} onActivate={() => zoomTo('docs', zoomPoses.docs)}>
-      <ZoomSurface target="docs" size={[0.6, 0.84]} pixels={[600, 840]} position={[0.02, TOP + 0.02, 0.015]} rotation={[-Math.PI / 2, 0, 0]}>
+      <ZoomSurface waitForZoom target="docs" size={[0.6, 0.84]} pixels={[600, 840]} position={[0.02, TOP + 0.02, 0.015]} rotation={[-Math.PI / 2, 0, 0]}>
         <DocumentSheets />
       </ZoomSurface>
       {[0, 1, 2].map((i) => (

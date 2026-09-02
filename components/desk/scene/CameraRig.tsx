@@ -6,7 +6,6 @@ import * as THREE from 'three';
 import { useDeskStore, type CameraPose } from '@/stores/useDeskStore';
 import { CAMERA_FOV, SCREEN_3D_H, SCREEN_3D_W, SCREEN_CENTER, orbitDefaults } from '@/lib/desk/layout';
 import { prefersReducedMotion } from '@/lib/desk/runtime';
-import { dragLock } from '@/lib/desk/drag-lock';
 
 interface Tween {
   fromPos: THREE.Vector3;
@@ -105,7 +104,7 @@ export function CameraRig() {
         drag.active = false;
         return;
       }
-      if (!isDesk() || ev.button !== 0 || dragLock.active) return;
+      if (!isDesk() || ev.button !== 0 || useDeskStore.getState().dragging) return;
       drag.active = true;
       drag.moved = false;
       drag.x = ev.clientX;
@@ -127,7 +126,7 @@ export function CameraRig() {
         return;
       }
       // 오브젝트를 끄는 중이면 시점을 돌리지 않는다. 포인터 다운 순서에 의존하지 않도록 여기서도 확인한다
-      if (dragLock.active) {
+      if (useDeskStore.getState().dragging) {
         drag.active = false;
         return;
       }

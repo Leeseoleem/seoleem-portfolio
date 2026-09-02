@@ -21,7 +21,6 @@ import {
   TOP,
 } from '@/lib/desk/layout';
 import { getSound } from '@/lib/desk/sound';
-import { dragLock } from '@/lib/desk/drag-lock';
 import { useDeskStore } from '@/stores/useDeskStore';
 
 // 마우스는 매끈한 돔 하나로 만들고, 분할선과 아래 테두리는 표면 텍스처로 새긴다.
@@ -140,7 +139,7 @@ export function Peripherals() {
       if (!p) return;
       e.stopPropagation();
       drag.current = { active: true, offX: rig.current.position.x - p.x, offZ: rig.current.position.z - p.z };
-      dragLock.active = true;
+      useDeskStore.getState().setDragging(true);
       useDeskStore.getState().setHover(null);
       document.body.style.cursor = 'grabbing';
     },
@@ -162,7 +161,7 @@ export function Peripherals() {
     const onRelease = () => {
       if (!drag.current.active) return;
       drag.current.active = false;
-      dragLock.active = false;
+      useDeskStore.getState().setDragging(false);
       document.body.style.cursor = '';
     };
     window.addEventListener('pointermove', onMove);
@@ -172,7 +171,7 @@ export function Peripherals() {
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onRelease);
       window.removeEventListener('pointercancel', onRelease);
-      dragLock.active = false;
+      useDeskStore.getState().setDragging(false);
     };
   }, [toDeskPoint]);
 
