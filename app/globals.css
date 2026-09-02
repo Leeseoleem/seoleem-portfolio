@@ -80,6 +80,15 @@
   --toss-primary: #3182f6;
   --toss-radius: 16px;
 
+  /* 핸드폰 잠금화면 */
+  --phone-wall-a: #1b2a55;
+  --phone-wall-b: #3a2f6b;
+  --phone-wall-c: #0d1a3a;
+  --phone-fg: rgba(255, 255, 255, 0.92);
+  --phone-fg-weak: rgba(255, 255, 255, 0.62);
+  --phone-card: rgba(255, 255, 255, 0.14);
+  --phone-app: #3182f6;
+
   /* HUD (파워셸 창) */
   --ps-bar-from: #0a56d6;
   --ps-bar-to: #3d8aee;
@@ -993,6 +1002,117 @@ body {
 .screen-placeholder--toss {
   background: var(--toss-bg);
   color: var(--toss-text);
+}
+
+/* ---------- 핸드폰 잠금화면 ---------- */
+.lock {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 18px 22px 0;
+  box-sizing: border-box;
+  background: linear-gradient(160deg, var(--phone-wall-b) 0%, var(--phone-wall-a) 48%, var(--phone-wall-c) 100%);
+  color: var(--phone-fg);
+  /* 픽셀 폰트가 아닌 현대 폰 글꼴 */
+  font-family: -apple-system, 'Apple SD Gothic Neo', 'Segoe UI', 'Malgun Gothic', system-ui, sans-serif;
+}
+
+.lock__status {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.lock__battery {
+  width: 26px;
+  height: 12px;
+  border: 2px solid var(--phone-fg);
+  border-radius: 4px;
+  padding: 1px;
+  box-sizing: border-box;
+  display: block;
+}
+
+.lock__battery i {
+  display: block;
+  width: 70%;
+  height: 100%;
+  border-radius: 1px;
+  background: var(--phone-fg);
+}
+
+.lock__clock {
+  margin-top: 88px;
+  text-align: center;
+}
+
+.lock__clock p {
+  margin: 0;
+}
+
+.lock__time {
+  font-size: 84px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.lock__date {
+  margin-top: 10px;
+  font-size: 18px;
+  color: var(--phone-fg-weak);
+}
+
+/* 알림 카드 하나. 토스 UI가 들어오기 전까지의 안내 */
+.lock__notice {
+  margin-top: 64px;
+  width: 100%;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: var(--phone-card);
+  backdrop-filter: blur(6px);
+}
+
+.lock__app {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--phone-app);
+}
+
+.lock__notice p {
+  margin: 0;
+}
+
+.lock__notice-title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.lock__notice-body {
+  margin-top: 2px;
+  font-size: 14px;
+  color: var(--phone-fg-weak);
+}
+
+.lock__home {
+  position: absolute;
+  bottom: 14px;
+  width: 120px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--phone-fg-weak);
 }
 
 .screen-placeholder--paper {
