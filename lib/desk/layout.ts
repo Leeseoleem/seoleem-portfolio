@@ -76,6 +76,15 @@ export const positions = {
  * up은 비스듬히 놓인 물건을 화면과 나란히 세우기 위한 것이다. 물건이 y축으로 θ만큼 돌아 있으면
  * 그 물건의 뒤쪽 방향인 (-sin θ, 0, -cos θ)가 화면 위쪽이 된다.
  */
+/**
+ * 위에서 내려다보되 종이의 아래쪽으로 k만큼 기울인 시선.
+ * 기울이는 방향이 월드 +z로 고정돼 있으면, y축으로 돌아 있는 종이는 화면에서 비스듬한 사다리꼴로 보인다.
+ * 종이 자신의 세로축을 따라 기울여야 화면에 반듯한 직사각형으로 잡힌다.
+ */
+function tiltToward(yaw: number, k: number): [number, number, number] {
+  return [Math.sin(yaw) * k, 1, Math.cos(yaw) * k];
+}
+
 export const zoomPoses = {
   monitor: {
     target: [...SCREEN_CENTER] as [number, number, number],
@@ -85,14 +94,14 @@ export const zoomPoses = {
   },
   phone: {
     target: [positions.phone[0], TOP + 0.03, positions.phone[2]] as [number, number, number],
-    dir: [0, 1, 0.22] as [number, number, number],
+    dir: tiltToward(PHONE_YAW, 0.22),
     fit: [0.276, 0.598] as [number, number],
     margin: 1.16,
     up: [-Math.sin(PHONE_YAW), 0, -Math.cos(PHONE_YAW)] as [number, number, number],
   },
   notebook: {
     target: [positions.notebook[0], TOP + 0.05, positions.notebook[2]] as [number, number, number],
-    dir: [0, 1, 0.24] as [number, number, number],
+    dir: tiltToward(NOTEBOOK_YAW, 0.24),
     fit: [PAPER_W, PAPER_D] as [number, number],
     margin: 1.14,
     up: [-Math.sin(NOTEBOOK_YAW), 0, -Math.cos(NOTEBOOK_YAW)] as [number, number, number],
@@ -100,7 +109,7 @@ export const zoomPoses = {
   docs: {
     // 맨 위 장 기준이다. 가운데 장에 맞추면 실제로 보이는 종이와 각도·자리가 어긋난다
     target: [positions.docs[0] + 0.04, TOP + 0.012, positions.docs[2] + 0.03] as [number, number, number],
-    dir: [0, 1, 0.24] as [number, number, number],
+    dir: tiltToward(DOCS_FAN, 0.24),
     fit: [0.6, 0.84] as [number, number],
     margin: 1.16,
     up: [-Math.sin(DOCS_FAN), 0, -Math.cos(DOCS_FAN)] as [number, number, number],
