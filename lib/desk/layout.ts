@@ -15,10 +15,23 @@ export const SCREEN_3D_H = 0.9;
 // 앞 테두리 앞면(z = 0.1) 바로 뒤. 더 깊이 물리면 비스듬히 볼 때 확대 화면 DOM이
 // 테두리를 뚫고 나온다. DOM은 3D 깊이 판정을 받지 않기 때문이다.
 export const SCREEN_CENTER: [number, number, number] = [0, TOP + 0.2 + 0.56, 0.095];
-/** 모니터를 확대했을 때 화면에서 카메라까지의 거리 */
-const MONITOR_ZOOM_DIST = 1.507;
-
 export const CAMERA_FOV = 45;
+
+/** 오브젝트가 y축으로 돌아 있는 각도. 확대 구도를 화면과 나란히 맞출 때 쓴다 */
+export const NOTEBOOK_YAW = 0.22;
+export const PHONE_YAW = -0.18;
+/** 서류가 부채처럼 벌어진 간격. 맨 위 장은 이만큼 틀어져 있다 */
+export const DOCS_FAN = 0.12;
+
+/** 공책 표지와 속지 치수 */
+export const COVER_W = 0.72;
+export const COVER_D = 0.94;
+const PAPER_OUT = 0.004;
+const PAPER_IN = 0.006;
+export const PAPER_W = COVER_W - PAPER_IN + PAPER_OUT;
+export const PAPER_D = COVER_D + PAPER_OUT * 2;
+export const PAPER_X = (PAPER_OUT + PAPER_IN) / 2;
+export const PAPER_OUTSET = PAPER_OUT;
 
 /** 책상 뷰 궤도 카메라 기본값 */
 export const orbitDefaults = {
@@ -35,25 +48,7 @@ export const orbitDefaults = {
   zoomMax: 1.12,
 };
 
-/** 각 오브젝트를 클릭했을 때의 카메라 포즈 */
-export const zoomPoses = {
-  monitor: {
-    position: [0, SCREEN_CENTER[1], SCREEN_CENTER[2] + MONITOR_ZOOM_DIST],
-    target: [0, SCREEN_CENTER[1], SCREEN_CENTER[2]],
-  },
-  phone: {
-    position: [1.3, TOP + 0.95, 0.47],
-    target: [1.3, TOP, 0.42],
-  },
-  notebook: {
-    position: [-1.25, TOP + 1.15, 0.55],
-    target: [-1.25, TOP, 0.35],
-  },
-  docs: {
-    position: [1.25, TOP + 1.1, -0.15],
-    target: [1.25, TOP, -0.3],
-  },
-} satisfies Record<string, CameraPose>;
+
 
 export const positions = {
   phone: [1.3, 0, 0.42] as [number, number, number],
@@ -68,6 +63,45 @@ export const positions = {
   tower: [1.3, 0, -0.2] as [number, number, number],
   wallZ: -1.7,
 };
+
+/**
+ * 각 오브젝트를 클릭했을 때의 카메라 포즈.
+ *
+ * 자리를 직접 적지 않고 "무엇을 얼마나 담을지"로 적는다. 거리는 화면 비율에 맞춰 계산되므로
+ * 창을 어떻게 늘려도 대상이 같은 비율로 화면에 들어온다.
+ * up은 비스듬히 놓인 물건을 화면과 나란히 세우기 위한 것이다. 물건이 y축으로 θ만큼 돌아 있으면
+ * 그 물건의 뒤쪽 방향인 (-sin θ, 0, -cos θ)가 화면 위쪽이 된다.
+ */
+export const zoomPoses = {
+  monitor: {
+    target: [...SCREEN_CENTER] as [number, number, number],
+    dir: [0, 0, 1] as [number, number, number],
+    fit: [SCREEN_3D_W, SCREEN_3D_H] as [number, number],
+    margin: 1.08,
+  },
+  phone: {
+    target: [positions.phone[0], TOP + 0.03, positions.phone[2]] as [number, number, number],
+    dir: [0, 1, 0.22] as [number, number, number],
+    fit: [0.276, 0.598] as [number, number],
+    margin: 1.16,
+    up: [-Math.sin(PHONE_YAW), 0, -Math.cos(PHONE_YAW)] as [number, number, number],
+  },
+  notebook: {
+    target: [positions.notebook[0], TOP + 0.05, positions.notebook[2]] as [number, number, number],
+    dir: [0, 1, 0.24] as [number, number, number],
+    fit: [PAPER_W, PAPER_D] as [number, number],
+    margin: 1.14,
+    up: [-Math.sin(NOTEBOOK_YAW), 0, -Math.cos(NOTEBOOK_YAW)] as [number, number, number],
+  },
+  docs: {
+    // 맨 위 장 기준이다. 가운데 장에 맞추면 실제로 보이는 종이와 각도·자리가 어긋난다
+    target: [positions.docs[0] + 0.04, TOP + 0.012, positions.docs[2] + 0.03] as [number, number, number],
+    dir: [0, 1, 0.24] as [number, number, number],
+    fit: [0.6, 0.84] as [number, number],
+    margin: 1.16,
+    up: [-Math.sin(DOCS_FAN), 0, -Math.cos(DOCS_FAN)] as [number, number, number],
+  },
+} satisfies Record<string, CameraPose>;
 
 // ---------- 책상 위 물건의 치수 ----------
 // 오브젝트를 그리는 컴포넌트와 아래 충돌 판정이 같은 숫자를 보게 여기서 한 번만 정한다.
