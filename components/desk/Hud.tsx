@@ -96,6 +96,18 @@ export function Hud() {
 
   useEffect(() => () => window.clearTimeout(snapTimer.current), []);
 
+  // 돌아가는 길은 창을 접어도 막히면 안 된다. Esc는 창 상태와 상관없이 항상 통한다
+  useEffect(() => {
+    if (phase !== 'zoomed') return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      getSound().play('click');
+      backToDesk();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [phase, backToDesk]);
+
   const visible = phase === 'desk' || phase === 'zoomed' || phase === 'transition';
 
   const back = () => {
@@ -116,17 +128,24 @@ export function Hud() {
       {visible && (
         <section
           ref={panel}
-          className={`ps${snapping ? ' is-snapping' : ''}`}
+          // 확대 중에는 화면을 가리지 않게 흐려 둔다. 마우스를 올리면 다시 진해진다
+          className={`ps${snapping ? ' is-snapping' : ''}${phase === 'zoomed' ? ' is-dim' : ''}`}
           style={pos ? { left: pos.x, top: pos.y, right: 'auto', bottom: 'auto' } : undefined}
           aria-label="seoleem 포트폴리오 안내"
         >
           {/* 타이틀바를 잡아 창을 옮긴다 */}
           <header className="ps__bar" onPointerDown={onBarDown} onPointerMove={onBarMove} onPointerUp={onBarUp} onPointerCancel={onBarUp}>
             <span className="ps__title">{TITLE}</span>
+            {/* 접어 두면 본문의 cd ..가 사라진다. 확대 중에는 돌아갈 길을 제목 표시줄에 남긴다 */}
+            {collapsed && phase === 'zoomed' && (
+              <button type="button" className="ps__back" onPointerDown={stopDrag} onClick={back}>
+                cd ..
+              </button>
+            )}
             <button
               type="button"
               className="ps__min"
-              onPointerDown={(e) => e.stopPropagation()}
+              onPointerDown={stopDrag}
               onClick={toggleCollapsed}
               aria-label={collapsed ? '펼치기' : '접기'}
             >
@@ -151,7 +170,7 @@ export function Hud() {
                   <button type="button" className="ps__cmd" onClick={back}>
                     cd ..
                   </button>
-                  <span className="ps__note"># 책상으로</span>
+                  <span className="ps__note"># 책상으로 (Esc)</span>
                 </p>
               )}
               <p className="ps__line">
@@ -168,4 +187,9 @@ export function Hud() {
       )}
     </>
   );
+}
+
+/** 제목 표시줄 버튼을 눌렀을 때 창 끌기가 같이 시작되지 않게 막는다 */
+function stopDrag(e: React.PointerEvent<HTMLButtonElement>) {
+  e.stopPropagation();
 }

@@ -66,6 +66,10 @@
   --xp-icon-b: #5b9cf6;
   --xp-icon-c: #e9eef5;
   --xp-icon-d: #b8c4d0;
+  --xp-title-idle-from: #7e97c8;
+  --xp-title-idle-to: #a9bde1;
+  --xp-skel: #e3e3e3;
+  --xp-skel-strong: #cfcfcf;
 
   /* 핸드폰 UI (토스 스타일). 실제 값은 폰 UI 작업에서 확정한다 */
   --toss-bg: #ffffff;
@@ -216,6 +220,17 @@ body {
   background: var(--ps-frame);
   font-family: var(--ps-mono);
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.32);
+  transition: opacity 0.2s ease;
+}
+
+/* 확대 중에는 아래 화면이 비치게 물러나 있다가, 손이 오면 돌아온다 */
+.ps.is-dim {
+  opacity: 0.3;
+}
+
+.ps.is-dim:hover,
+.ps.is-dim:focus-within {
+  opacity: 1;
 }
 
 .ps__bar {
@@ -236,7 +251,33 @@ body {
 }
 
 .ps__title {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   letter-spacing: 0.02em;
+}
+
+/* 접어 둔 상태에서만 제목 표시줄에 나오는 복귀 버튼 */
+.ps__back {
+  flex: none;
+  height: 18px;
+  padding: 0 8px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 3px;
+  background: linear-gradient(rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.05));
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: none;
+  cursor: pointer;
+}
+
+.ps__back:hover,
+.ps__back:focus-visible {
+  outline: none;
+  background: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.2));
 }
 
 /* XP 창 버튼 */
@@ -312,7 +353,8 @@ body {
 .ps.is-snapping {
   transition:
     left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-    top 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    top 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.2s ease;
 }
 
 /* 깜빡이는 커서 */
@@ -503,6 +545,19 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 8px;
+  padding: 4px;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.xp-icon:hover,
+.xp-icon:focus-visible {
+  outline: none;
+  background: rgba(255, 255, 255, 0.22);
 }
 
 .xp-icon__tile {
@@ -537,9 +592,10 @@ body {
   right: 0;
   bottom: 0;
   height: 40px;
+  z-index: 900;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
   background: linear-gradient(var(--xp-taskbar-top), var(--xp-taskbar-mid) 10%, var(--xp-taskbar-bottom));
 }
 
@@ -582,12 +638,223 @@ body {
 .xp__tray {
   height: 100%;
   min-width: 120px;
+  margin-left: auto;
   padding: 0 20px;
   background: var(--xp-tray);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
+  flex: none;
+}
+
+/* 열려 있는 창 목록 */
+.xp-tasks {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.xp-task {
+  max-width: 180px;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  background: linear-gradient(rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.06));
+  color: var(--xp-title-fg);
+  font: inherit;
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.xp-task:hover,
+.xp-task:focus-visible {
+  outline: none;
+  background: linear-gradient(rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.14));
+}
+
+/* 지금 앞에 나와 있는 창은 눌린 것처럼 보인다 */
+.xp-task.is-active {
+  background: rgba(0, 0, 0, 0.22);
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- 모니터 안의 창 ---------- */
+.xpw {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  padding: 3px;
+  border: 1px solid var(--xp-border);
+  border-radius: 8px 8px 2px 2px;
+  background: var(--xp-face);
+  color: var(--xp-text);
+  font-family: 'Tahoma', 'Segoe UI', sans-serif;
+  box-shadow: 2px 3px 10px rgba(0, 0, 0, 0.35);
+}
+
+/* 뒤에 있는 창은 제목 표시줄이 흐려진다. 어느 창이 앞인지 한눈에 보이게 */
+.xpw__bar {
+  flex: none;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 4px 0 10px;
+  border-radius: 5px 5px 0 0;
+  background: linear-gradient(var(--xp-title-idle-to), var(--xp-title-idle-from) 45%, var(--xp-title-idle-from));
+  color: var(--xp-title-fg);
+  font-size: 15px;
+  font-weight: 700;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+  cursor: move;
+  touch-action: none;
+  user-select: none;
+}
+
+.xpw.is-active .xpw__bar {
+  background: linear-gradient(var(--xp-title-to), var(--xp-title-from) 45%, var(--xp-title-from));
+}
+
+.xpw__title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.xpw__btns {
+  flex: none;
+  display: flex;
+  gap: 3px;
+}
+
+.xpw__btn {
+  width: 22px;
+  height: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 3px;
+  background: linear-gradient(rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.04));
+  color: var(--xp-title-fg);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1;
+  text-shadow: none;
+  cursor: pointer;
+}
+
+.xpw__btn:hover,
+.xpw__btn:focus-visible {
+  outline: none;
+  background: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.2));
+}
+
+.xpw__btn--close {
+  background: linear-gradient(#f08b78, #d4381a);
+}
+
+.xpw__btn--close:hover,
+.xpw__btn--close:focus-visible {
+  background: linear-gradient(#ff9f8c, #e84526);
+}
+
+.xpw__body {
+  flex: 1;
+  min-height: 0;
+  padding: 12px;
+  border: 1px solid var(--xp-face-shadow);
+  background: #ffffff;
+  overflow: auto;
+}
+
+/* 폴더 창 안의 목록 */
+.xp-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.xp-list__row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.xp-list__row:hover,
+.xp-list__row:focus-visible {
+  outline: none;
+  background: var(--xp-title-to);
+  color: var(--xp-title-fg);
+}
+
+.xp-list__icon {
+  flex: none;
+  width: 26px;
+  height: 22px;
+  border-radius: 3px;
+  border-bottom: 5px solid var(--xp-icon-shadow);
+  background: var(--xp-icon-a);
+  box-sizing: border-box;
+}
+
+/* 글이 들어오기 전까지 자리만 잡아 두는 골격 */
+.xp-doc {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.xp-doc__shot {
+  height: 150px;
+  border-radius: 3px;
+  background: var(--xp-skel);
+}
+
+.xp-doc__line {
+  height: 12px;
+  border-radius: 6px;
+  background: var(--xp-skel);
+}
+
+.xp-doc__line--title {
+  height: 20px;
+  width: 55%;
+  background: var(--xp-skel-strong);
+}
+
+.xp-doc__line--short {
+  width: 40%;
+}
+
+.xp-empty {
+  margin: 0;
+  padding: 24px 0;
+  text-align: center;
+  font-size: 15px;
+  color: var(--xp-face-shadow);
 }
 
 /* ---------- 공책 속지 (넘김 동작 확인용 임시) ---------- */
