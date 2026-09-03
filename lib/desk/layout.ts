@@ -65,6 +65,8 @@ export const positions = {
   cat: [-1.45, 0, -0.5] as [number, number, number],
   mouseHole: [-0.55, 0, -1.695] as [number, number, number],
   tower: [1.3, 0, -0.2] as [number, number, number],
+  // 공책 오른쪽 옆에 놓인 연필. 공책과 머그 사이 틈에 세로로 놓인다
+  pencil: [-0.72, TOP, 0.5] as [number, number, number],
   wallZ: -1.7,
 };
 
@@ -155,6 +157,7 @@ export const deskObstacles: Obstacle[] = [
   // 모니터. 받침뿐 아니라 본체까지 막는다. 본체가 빠지면 마우스가 그 밑으로 들어가 화면에서 사라진다
   { x: 0, z: -0.45, halfW: 0.75, halfD: 0.5 },
   { x: positions.lampBase[0], z: positions.lampBase[2], halfW: 0.2, halfD: 0.2 },
+  { x: positions.pencil[0], z: positions.pencil[2], halfW: 0.04, halfD: 0.22 },
 ];
 
 /** 상판에서 오브젝트가 떨어지지 않도록 남기는 여유 */

@@ -32,6 +32,14 @@ export const scenePalette = {
     // 케이블. 흰 책상 위에서 검은 선은 먹선처럼 튀어서, 책상보다 한 단계 어두운 회색으로 둔다
     cable: '#c6bfb2',
   },
+  // 연필
+  pencil: {
+    body: '#d9b04c',
+    wood: '#e6cfa4',
+    graphite: '#33302c',
+    ferrule: '#c9c4b8',
+    eraser: '#e2a0a5',
+  },
   // 책상 위 마우스(입력장치). 쥐구멍의 생쥐는 아래 mouse 항목이다
   pointer: {
     wheel: '#eceae2',

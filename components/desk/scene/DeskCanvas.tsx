@@ -17,6 +17,7 @@ import { Cat } from './Cat';
 import { MouseHole } from './MouseHole';
 import { Tower } from './Tower';
 import { Cables } from './Cables';
+import { Props } from './Props';
 import { CAMERA_FOV } from '@/lib/desk/layout';
 import { useDeskStore } from '@/stores/useDeskStore';
 
@@ -71,6 +72,7 @@ export function DeskCanvas() {
       <MouseHole />
       <Tower />
       <Cables />
+      <Props />
     </Canvas>
   );
 }
