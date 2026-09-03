@@ -551,7 +551,7 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  z-index: 950;
+  z-index: 10001;
   pointer-events: none;
   background:
     linear-gradient(118deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.03) 32%, rgba(255, 255, 255, 0) 55%),
@@ -630,7 +630,8 @@ body {
   right: 0;
   bottom: 0;
   height: 40px;
-  z-index: 900;
+  /* 창 z는 앞으로 가져올 때마다 1씩 자란다. 세션 안에서 여기까지 올 일은 없다 */
+  z-index: 10000;
   display: flex;
   align-items: center;
   gap: 8px;
