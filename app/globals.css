@@ -80,14 +80,20 @@
   --toss-primary: #3182f6;
   --toss-radius: 16px;
 
-  /* 핸드폰 잠금화면 */
-  --phone-wall-a: #1b2a55;
-  --phone-wall-b: #3a2f6b;
-  --phone-wall-c: #0d1a3a;
-  --phone-fg: rgba(255, 255, 255, 0.92);
-  --phone-fg-weak: rgba(255, 255, 255, 0.62);
-  --phone-card: rgba(255, 255, 255, 0.14);
-  --phone-app: #3182f6;
+  /* 현대 UI 글꼴. 핸드폰 화면과 XP 창 안 글자. 픽셀 폰트(--font-stardust)와 대비된다 */
+  --font-ui: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', 'Segoe UI', 'Malgun Gothic', system-ui, sans-serif;
+
+  /* 핸드폰 홈 화면. 연회색 단색 뉴모피즘 */
+  --phone-bg: #e9ebee;
+  --phone-bg-light: #f6f7f9;
+  --phone-ink: #1f2226;
+  --phone-ink-weak: #7b8088;
+  --phone-card: #2a2c31;
+  --phone-card-fg: #f2f3f5;
+  --phone-card-fg-weak: rgba(242, 243, 245, 0.62);
+  --phone-shadow-dark: rgba(31, 34, 38, 0.14);
+  --phone-shadow-light: rgba(255, 255, 255, 0.95);
+
 
   /* HUD (파워셸 창) */
   --ps-bar-from: #0a56d6;
@@ -356,6 +362,16 @@ body {
   background: var(--ps-cmd);
   color: var(--ps-bg);
   text-decoration: none;
+}
+
+/* 좁은 화면에서는 창이 화면 폭에 맞춰 줄어든다. 300px 고정이면 폰에서 화면 대부분을 덮는다 */
+@media (max-width: 640px) {
+  .ps {
+    left: var(--space-3);
+    right: var(--space-3);
+    bottom: var(--space-3);
+    width: auto;
+  }
 }
 
 /* 화면 밖으로 나갔던 창이 도로 튕겨 들어올 때만 켜진다 */
@@ -721,7 +737,7 @@ body {
   border-radius: 8px 8px 2px 2px;
   background: var(--xp-face);
   color: var(--xp-text);
-  font-family: 'Tahoma', 'Segoe UI', sans-serif;
+  font-family: var(--font-ui);
   box-shadow: 2px 3px 10px rgba(0, 0, 0, 0.35);
 }
 
@@ -1004,115 +1020,244 @@ body {
   color: var(--toss-text);
 }
 
-/* ---------- 핸드폰 잠금화면 ---------- */
-.lock {
+/* ---------- 핸드폰 홈 화면 ---------- */
+.home {
   position: relative;
   width: 100%;
   height: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 18px 22px 0;
+  padding: 14px 22px 0;
   box-sizing: border-box;
-  background: linear-gradient(160deg, var(--phone-wall-b) 0%, var(--phone-wall-a) 48%, var(--phone-wall-c) 100%);
-  color: var(--phone-fg);
-  /* 픽셀 폰트가 아닌 현대 폰 글꼴 */
-  font-family: -apple-system, 'Apple SD Gothic Neo', 'Segoe UI', 'Malgun Gothic', system-ui, sans-serif;
+  /* 연회색 단색. 왼쪽 위가 아주 조금 밝아 뉴모피즘 그림자의 광원 방향과 맞는다 */
+  background: linear-gradient(150deg, var(--phone-bg-light) 0%, var(--phone-bg) 45%);
+  color: var(--phone-ink);
+  font-family: var(--font-ui);
 }
 
-.lock__status {
-  width: 100%;
+.home__status {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
-.lock__battery {
-  width: 26px;
-  height: 12px;
-  border: 2px solid var(--phone-fg);
-  border-radius: 4px;
-  padding: 1px;
+.home__signal {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 11px;
+}
+
+.home__signal i {
+  display: block;
+  width: 3px;
+  border-radius: 1px;
+  background: var(--phone-ink);
+}
+
+.home__signal i:nth-child(1) {
+  height: 4px;
+}
+.home__signal i:nth-child(2) {
+  height: 6px;
+}
+.home__signal i:nth-child(3) {
+  height: 8px;
+}
+.home__signal i:nth-child(4) {
+  height: 11px;
+  opacity: 0.35;
+}
+
+.home__battery {
+  width: 24px;
+  height: 11px;
+  border: 1.5px solid var(--phone-ink);
+  border-radius: 3.5px;
+  padding: 1.5px;
   box-sizing: border-box;
   display: block;
 }
 
-.lock__battery i {
+.home__battery i {
   display: block;
   width: 70%;
   height: 100%;
   border-radius: 1px;
-  background: var(--phone-fg);
+  background: var(--phone-ink);
 }
 
-.lock__clock {
-  margin-top: 88px;
-  text-align: center;
-}
-
-.lock__clock p {
-  margin: 0;
-}
-
-.lock__time {
-  font-size: 84px;
-  font-weight: 300;
-  letter-spacing: -0.02em;
-  line-height: 1;
-}
-
-.lock__date {
-  margin-top: 10px;
-  font-size: 18px;
-  color: var(--phone-fg-weak);
-}
-
-/* 알림 카드 하나. 토스 UI가 들어오기 전까지의 안내 */
-.lock__notice {
-  margin-top: 64px;
-  width: 100%;
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  padding: 14px 16px;
-  border-radius: 18px;
+/* 어두운 소개 카드. 화면의 유일한 짙은 덩어리라 시선이 여기 모인다 */
+.card {
+  margin-top: 26px;
+  padding: 22px 22px 20px;
+  border-radius: 22px;
   background: var(--phone-card);
-  /* backdrop-filter는 쓰지 않는다. 매 프레임 3D 변형되는 DOM 안에서는 프레임마다 다시 흐려야 해서 무겁다 */
+  color: var(--phone-card-fg);
+  box-shadow:
+    10px 10px 24px var(--phone-shadow-dark),
+    -6px -6px 18px var(--phone-shadow-light);
 }
 
-.lock__app {
-  flex: none;
-  width: 38px;
-  height: 38px;
-  border-radius: 11px;
-  background: var(--phone-app);
-}
-
-.lock__notice p {
+.card p {
   margin: 0;
 }
 
-.lock__notice-title {
-  font-size: 15px;
+.card__eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--phone-card-fg-weak);
+}
+
+.card__title {
+  margin-top: 8px;
+  font-size: 24px;
   font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
-.lock__notice-body {
-  margin-top: 2px;
+.card__body {
+  margin-top: 10px;
   font-size: 14px;
-  color: var(--phone-fg-weak);
+  line-height: 1.5;
+  color: var(--phone-card-fg-weak);
 }
 
-.lock__home {
+.card__meta {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.card__meta span {
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(242, 243, 245, 0.18);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--phone-card-fg);
+}
+
+/* 앱 타일 */
+.apps {
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px 12px;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--phone-ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.app__tile {
+  width: 62px;
+  height: 62px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--phone-bg);
+  box-shadow:
+    7px 7px 16px var(--phone-shadow-dark),
+    -5px -5px 14px var(--phone-shadow-light);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.app:hover .app__tile,
+.app:focus-visible .app__tile {
+  transform: translateY(-2px);
+}
+
+.app:focus-visible {
+  outline: none;
+}
+
+.app:active .app__tile {
+  /* 누르면 눌린 것처럼 안쪽 그림자로 바뀐다 */
+  transform: none;
+  box-shadow:
+    inset 4px 4px 10px var(--phone-shadow-dark),
+    inset -4px -4px 10px var(--phone-shadow-light);
+}
+
+.app__name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--phone-ink-weak);
+}
+
+/* 페이지 점 */
+.home__dots {
   position: absolute;
-  bottom: 14px;
-  width: 120px;
-  height: 5px;
-  border-radius: 3px;
-  background: var(--phone-fg-weak);
+  left: 0;
+  right: 0;
+  bottom: 96px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.home__dots i {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--phone-ink);
+  opacity: 0.25;
+}
+
+.home__dots i.is-on {
+  opacity: 1;
+}
+
+/* 하단 독. 틀 없이 검은 원 아이콘만 바탕 위에 놓인다 */
+.dock {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 26px;
+  display: flex;
+  justify-content: center;
+  gap: 26px;
+}
+
+.dock__item {
+  display: block;
+  border-radius: 50%;
+  line-height: 0;
+  /* filter: drop-shadow 대신 box-shadow. 매 프레임 변형되는 DOM 안에서 필터는 다시 그리는 비용이 크다 */
+  box-shadow: 0 5px 12px rgba(31, 34, 38, 0.28);
+  transition: transform 0.15s ease;
+}
+
+.dock__item svg {
+  display: block;
+}
+
+.dock__item:hover,
+.dock__item:focus-visible {
+  outline: none;
+  transform: translateY(-3px);
 }
 
 .screen-placeholder--paper {
