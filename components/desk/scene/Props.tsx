@@ -1,6 +1,5 @@
 'use client';
 
-import { RoundedBox } from './RoundedBox';
 import { scenePalette } from '@/lib/desk/palette';
 import { positions } from '@/lib/desk/layout';
 
