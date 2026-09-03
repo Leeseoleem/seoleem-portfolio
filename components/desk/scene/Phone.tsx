@@ -6,7 +6,7 @@ import { PhoneScreen } from '../surfaces/PhoneScreen';
 import { RoundedBox } from './RoundedBox';
 import { useDeskStore } from '@/stores/useDeskStore';
 import { scenePalette } from '@/lib/desk/palette';
-import { positions, TOP, zoomPoses } from '@/lib/desk/layout';
+import { PHONE_YAW, positions, TOP, zoomPoses } from '@/lib/desk/layout';
 
 const BODY: [number, number, number] = [0.31, 0.022, 0.66];
 const SCREEN: [number, number] = [0.276, 0.598];
@@ -20,7 +20,7 @@ export function Phone() {
   const zoomTo = useDeskStore((s) => s.zoomTo);
 
   return (
-    <Interactive label="핸드폰" position={positions.phone} rotation={[0, -0.18, 0]} onActivate={() => zoomTo('phone', zoomPoses.phone)}>
+    <Interactive label="핸드폰" position={positions.phone} rotation={[0, PHONE_YAW, 0]} onActivate={() => zoomTo('phone', zoomPoses.phone)}>
       <RoundedBox size={BODY} radius={0.03} color={scenePalette.furniture.black} roughness={0.5} position={[0, TOP + 0.011, 0]} />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, TOP + 0.0225, 0]}>
         <planeGeometry args={SCREEN} />

@@ -7,8 +7,21 @@ export type DeskPhase = 'boot' | 'transition' | 'desk' | 'zoomed' | 'off';
 export type ZoomTarget = 'monitor' | 'phone' | 'notebook' | 'docs';
 
 export interface CameraPose {
-  position: [number, number, number];
+  /** 바라볼 지점 */
   target: [number, number, number];
+  /** 카메라를 둘 자리. fit을 쓰면 생략한다 */
+  position?: [number, number, number];
+  /** target에서 카메라 쪽을 보는 방향. fit과 함께 쓴다 */
+  dir?: [number, number, number];
+  /**
+   * 이 크기(가로, 세로)가 화면에 다 들어오도록 거리를 계산한다.
+   * 자리를 눈대중으로 적어두면 화면 비율이 달라질 때 구도가 어긋난다.
+   */
+  fit?: [number, number];
+  /** fit에 남길 여백 배수. 1.1이면 대상 크기의 1.1배가 화면에 들어온다 */
+  margin?: number;
+  /** 화면의 위쪽이 될 방향. 비스듬히 놓인 물건을 화면과 나란히 보여줄 때 쓴다 */
+  up?: [number, number, number];
 }
 
 interface DeskState {
