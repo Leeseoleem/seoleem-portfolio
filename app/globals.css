@@ -1080,7 +1080,7 @@ body {
   padding: 14px 16px;
   border-radius: 18px;
   background: var(--phone-card);
-  backdrop-filter: blur(6px);
+  /* backdrop-filter는 쓰지 않는다. 매 프레임 3D 변형되는 DOM 안에서는 프레임마다 다시 흐려야 해서 무겁다 */
 }
 
 .lock__app {

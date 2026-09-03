@@ -5,8 +5,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useDeskStore } from '@/stores/useDeskStore';
 import { scenePalette } from '@/lib/desk/palette';
-import { ContactShadows } from '@react-three/drei';
-import { DESK_D, DESK_W, positions, SCREEN_CENTER, TOP } from '@/lib/desk/layout';
+import { positions, SCREEN_CENTER } from '@/lib/desk/layout';
 import { lerpLight, nightMix } from '@/lib/desk/night';
 import { shadowDirty } from '@/lib/desk/shadows';
 import { prefersReducedMotion, sceneTime } from '@/lib/desk/runtime';
@@ -116,17 +115,6 @@ export function Room() {
         shadow-camera-bottom={-2.4}
         shadow-camera-near={1}
         shadow-camera-far={12}
-      />
-      {/* 물건이 책상에 닿은 자리의 어두운 얼룩. 없으면 전부 살짝 떠 보인다.
-          마우스가 움직이고 공책이 열리므로 매 프레임 다시 그린다. 해상도를 낮게 두어 비용을 막는다 */}
-      <ContactShadows
-        position={[0, TOP + 0.002, 0]}
-        scale={[DESK_W, DESK_D]}
-        resolution={512}
-        far={0.7}
-        blur={2.2}
-        opacity={0.55}
-        frames={Infinity}
       />
       <pointLight
         ref={screenLight}
