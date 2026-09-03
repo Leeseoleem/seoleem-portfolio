@@ -42,8 +42,16 @@ export function Desk() {
   return (
     <group>
       <RoundedBox size={[DESK_W, DESK_THICKNESS, DESK_D]} radius={EDGE_R} color={scenePalette.furniture.wood} roughness={0.7} position={[0, DESK_Y, 0]} />
-      {/* 결 무늬 면. 상판보다 아주 조금 위에 두어 겹침 깜빡임을 피한다 */}
-      <mesh position={[0, TOP + 0.0006, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+      {/* 결 무늬 면. 상판보다 아주 조금 위에 두어 겹침 깜빡임을 피한다.
+          포인터 이벤트를 받아 멈추는 이유: R3F는 핸들러가 있는 물체만 레이캐스트하므로,
+          아무 핸들러도 없으면 상판이 아래 고양이를 가려 주지 못해 책상 위에서 고양이가 호버된다 */}
+      <mesh
+        position={[0, TOP + 0.0006, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+        onPointerOver={(e) => e.stopPropagation()}
+        onPointerMove={(e) => e.stopPropagation()}
+      >
         <planeGeometry args={[DESK_W - EDGE_R * 2, DESK_D - EDGE_R * 2]} />
         <meshStandardMaterial map={grain} roughness={0.7} />
       </mesh>
