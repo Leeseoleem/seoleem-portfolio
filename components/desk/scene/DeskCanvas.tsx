@@ -56,6 +56,11 @@ export function DeskCanvas() {
         gl.toneMapping = THREE.ACESFilmicToneMapping;
         gl.toneMappingExposure = 0.95;
         gl.outputColorSpace = THREE.SRGBColorSpace;
+        // 컨텍스트를 잃으면(GPU 리셋, 탭 과다 등) 캔버스가 하얗게 남는다. 오류 화면으로 넘긴다
+        gl.domElement.addEventListener('webglcontextlost', (e) => {
+          e.preventDefault();
+          useDeskStore.getState().setCrashed();
+        });
       }}
     >
       <CameraRig />

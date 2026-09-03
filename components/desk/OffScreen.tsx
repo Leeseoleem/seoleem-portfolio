@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useDeskStore } from '@/stores/useDeskStore';
 import { getSound } from '@/lib/desk/sound';
+import { PowerButton } from './PowerButton';
 
 type Stage = 'hidden' | 'black' | 'collapse' | 'closing';
 
@@ -56,12 +57,7 @@ function OffSequence() {
       <div className={`closing${stage === 'closing' ? ' is-visible' : ''}`} aria-hidden={stage !== 'closing'}>
         <p className="closing-title">긍정적인 검토를 기다리겠습니다.</p>
         <p className="closing-sub">감사합니다.</p>
-        <button type="button" className="power-btn" aria-label="다시 켜기" onClick={restart}>
-          <svg viewBox="0 0 48 48" width="56" height="56" aria-hidden="true">
-            <path d="M24 6v18" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" fill="none" />
-            <path d="M14.5 12.5a15 15 0 1 0 19 0" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" fill="none" />
-          </svg>
-        </button>
+        <PowerButton label="다시 켜기" onClick={restart} />
         <p className="closing-hint">seoleem desk</p>
       </div>
     </div>

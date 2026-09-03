@@ -35,6 +35,8 @@ interface DeskState {
   dragging: boolean;
   /** 종료 시퀀스 시작 시각(초, 씬 시계 기준). -1이면 아직 아님 */
   shutdownAt: number;
+  /** 복구 불가능한 오류(WebGL 컨텍스트 소실 등). true면 오류 화면이 전체를 덮는다 */
+  crashed: boolean;
   /** 카메라 이동 요청. CameraRig가 소비한다. */
   cameraRequest: { pose: CameraPose | 'orbit' | 'close'; duration: number; then?: DeskPhase; id: number } | null;
 
@@ -44,6 +46,7 @@ interface DeskState {
   setSound: (on: boolean) => void;
   setHover: (label: string | null, point?: { x: number; y: number } | null) => void;
   setDragging: (on: boolean) => void;
+  setCrashed: () => void;
   zoomTo: (target: ZoomTarget, pose: CameraPose) => void;
   backToDesk: () => void;
   finishBoot: () => void;
@@ -62,6 +65,7 @@ export const useDeskStore = create<DeskState>((set) => ({
   hoverPoint: null,
   dragging: false,
   shutdownAt: -1,
+  crashed: false,
   cameraRequest: null,
 
   setPhase: (phase) => set({ phase }),
@@ -70,6 +74,7 @@ export const useDeskStore = create<DeskState>((set) => ({
   setSound: (on) => set({ soundOn: on }),
   setHover: (label, point = null) => set({ hoverLabel: label, hoverPoint: point }),
   setDragging: (on) => set({ dragging: on }),
+  setCrashed: () => set({ crashed: true, hoverLabel: null }),
 
   zoomTo: (target, pose) =>
     set({
