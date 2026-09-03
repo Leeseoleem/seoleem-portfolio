@@ -13,6 +13,7 @@ import { COVER_D, COVER_T, COVER_W, NOTEBOOK_YAW, PAPER_D, PAPER_H, PAPER_W, PAP
 import { createRoundedBoxGeometry } from '@/lib/desk/geometry';
 import { drawLeather } from '@/lib/desk/leather';
 import { requestShadowUpdate } from '@/lib/desk/shadows';
+import { smoothstep } from '@/lib/desk/math';
 import { prefersReducedMotion } from '@/lib/desk/runtime';
 
 // 표지·속지 치수는 lib/desk/layout.ts에 있다. 확대 구도가 같은 숫자를 봐야 하기 때문이다
@@ -35,11 +36,6 @@ const BAND_PHASE = 0.34;
 const COVER_PHASE_START = 0.28;
 // 밴드가 오른쪽으로 밀려나는 거리
 const BAND_SLIDE = 0.22;
-
-function smoothstep(from: number, to: number, x: number) {
-  const t = Math.min(1, Math.max(0, (x - from) / (to - from)));
-  return t * t * (3 - 2 * t);
-}
 
 /**
  * 고무 밴드 경로. 표지 위를 한 줄로 지나 양쪽 모서리를 넘고, 속지 안으로 들어가 끝난다.
@@ -115,8 +111,8 @@ export function Notebook() {
     }
 
     // 펼칠 때는 밴드가 먼저 빠지고 표지가 열린다. 닫을 때는 진행도가 거꾸로 흐르며 순서도 뒤집힌다
-    const bandOff = smoothstep(0, BAND_PHASE, t.current);
-    const openP = smoothstep(COVER_PHASE_START, 1, t.current);
+    const bandOff = smoothstep(t.current, 0, BAND_PHASE);
+    const openP = smoothstep(t.current, COVER_PHASE_START, 1);
 
     if (cover.current) {
       cover.current.rotation.z = OPEN_ANGLE * openP;

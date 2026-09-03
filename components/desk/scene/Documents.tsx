@@ -11,15 +11,11 @@ import { canvasPalette, scenePalette } from '@/lib/desk/palette';
 import { DOCS_FAN, positions, TOP, zoomPoses } from '@/lib/desk/layout';
 import { requestShadowUpdate } from '@/lib/desk/shadows';
 import { prefersReducedMotion } from '@/lib/desk/runtime';
+import { smoothstep } from '@/lib/desk/math';
 
 /** 클립이 빠지는 연출 길이(초)와 이동 거리. 카메라가 다가오는 동안 끝나야 한다 */
 const CLIP_SLIDE_DURATION = 0.45;
 const CLIP_SLIDE = 0.14;
-
-function smoothstep(x: number) {
-  const t = Math.min(1, Math.max(0, x));
-  return t * t * (3 - 2 * t);
-}
 
 /**
  * 서류 세 장. 멀리서는 글씨 없는 뼈대만 보이고, 카메라가 다 다가온 뒤에 DocumentSheets(DOM)가 내용을 그린다.

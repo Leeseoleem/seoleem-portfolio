@@ -2,7 +2,7 @@
 
 import type { ReactNode, RefObject } from 'react';
 import { useRef } from 'react';
-import { SCREEN_W, TASKBAR_H, type WindowState } from './window-state';
+import { SCREEN_H, SCREEN_W, TASKBAR_H, type WindowState } from './window-state';
 
 interface Props {
   win: WindowState;
@@ -54,7 +54,7 @@ export function XpWindow({ win, active, screen, onFocus, onMove, onMinimize, onT
   };
 
   const geo = win.maximized
-    ? { left: 0, top: 0, width: SCREEN_W, height: 768 - TASKBAR_H }
+    ? { left: 0, top: 0, width: SCREEN_W, height: SCREEN_H - TASKBAR_H }
     : { left: win.x, top: win.y, width: win.w, height: win.h };
 
   return (
