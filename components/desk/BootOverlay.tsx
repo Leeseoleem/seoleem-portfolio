@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useDeskStore } from '@/stores/useDeskStore';
 import { BOOT_DURATION, SCREEN_H, SCREEN_W, drawBoot } from '@/lib/desk/screen-canvas';
-import { getCanvasFont, getScreenCanvas, sceneTime } from '@/lib/desk/runtime';
+import { getCanvasFont, getScreenCanvas, getScreenContext, sceneTime } from '@/lib/desk/runtime';
 
 /**
  * 부팅 화면 오버레이. 모니터 텍스처와 같은 캔버스를 DOM에 그대로 붙여서(object-fit: cover)
@@ -30,7 +30,7 @@ export function BootOverlay() {
     if (done.current) return;
     done.current = true;
     // 부팅이 끝나면 화면 내용은 MonitorScreen(DOM)이 맡는다. 캔버스는 비워만 둔다
-    const ctx = getScreenCanvas().getContext('2d');
+    const ctx = getScreenContext();
     if (ctx) {
       ctx.fillStyle = '#000000';
       ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
@@ -43,8 +43,7 @@ export function BootOverlay() {
   // 부팅 애니메이션 루프. 2D 캔버스만 그리므로 3D가 멈춰 있어도 부드럽게 돈다
   useEffect(() => {
     if (phase !== 'boot') return;
-    const canvas = getScreenCanvas();
-    const ctx = canvas.getContext('2d');
+    const ctx = getScreenContext();
     let raf = 0;
     const tick = () => {
       const t = sceneTime();

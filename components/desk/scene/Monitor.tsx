@@ -13,7 +13,7 @@ import { canvasPalette, scenePalette } from '@/lib/desk/palette';
 import { drawStickyNote } from '@/lib/desk/sticky-note';
 import { SCREEN_3D_H, SCREEN_3D_W, SCREEN_CENTER, TOP, zoomPoses } from '@/lib/desk/layout';
 import { drawShutdown } from '@/lib/desk/screen-canvas';
-import { getCanvasFont, getScreenCanvas, sceneTime } from '@/lib/desk/runtime';
+import { getCanvasFont, getScreenCanvas, getScreenContext, sceneTime } from '@/lib/desk/runtime';
 
 const BODY_Y = TOP + 0.2 + 0.56;
 
@@ -68,12 +68,11 @@ export function Monitor() {
   const zoomTo = useDeskStore((s) => s.zoomTo);
   const ledMat = useRef<THREE.MeshBasicMaterial>(null);
 
-  const { canvas, texture } = useMemo(() => {
-    const c = getScreenCanvas();
-    const tex = new THREE.CanvasTexture(c);
+  const texture = useMemo(() => {
+    const tex = new THREE.CanvasTexture(getScreenCanvas());
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.anisotropy = 4;
-    return { canvas: c, texture: tex };
+    return tex;
   }, []);
   useEffect(() => () => texture.dispose(), [texture]);
 
@@ -84,12 +83,12 @@ export function Monitor() {
   useEffect(() => () => bezel.dispose(), [bezel]);
 
   useFrame(() => {
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
     const { phase, shutdownAt } = useDeskStore.getState();
     // 부팅 화면은 BootOverlay가, 책상·확대 화면은 MonitorScreen(DOM)이 맡는다.
     // 여기서 그리는 건 종료 연출뿐이다
     if (phase !== 'off') return;
+    const ctx = getScreenContext();
+    if (!ctx) return;
     const k = Math.min(1, (sceneTime() - shutdownAt) / 1.9);
     drawShutdown(ctx, k, getCanvasFont());
     texture.needsUpdate = true;

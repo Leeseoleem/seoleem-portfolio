@@ -98,7 +98,13 @@ export const canvasPalette = {
     barBorder: '#8a8a8a',
     barTop: '#6da2ff',
     barBottom: '#1d4fd1',
-    flag: ['#f35325', '#81bc06', '#05a6f0', '#ffba08'],
+    // 로고 네 칸. 윈도우 깃발 자리에 쓰는 대표 툴 넷: React, Next.js, TypeScript, Figma
+    tiles: {
+      react: { bg: '#20232a', fg: '#61dafb' },
+      next: { bg: '#000000', fg: '#ffffff', edge: '#4a4a4a' },
+      ts: { bg: '#3178c6', fg: '#ffffff' },
+      figma: { bg: '#1e1e1e', shapes: ['#f24e1e', '#a259ff', '#0acf83', '#ff7262', '#1abcfe'] },
+    },
   },
   // 책상 윗면 나무결. 바탕은 scenePalette.furniture.wood와 같아야 둥근 모서리와 이어진다
   wood: {

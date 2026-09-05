@@ -16,13 +16,26 @@ export function sceneTime(): number {
 
 let screenCanvas: HTMLCanvasElement | null = null;
 
+/**
+ * 화면 캔버스의 실제 픽셀 배율. 그리는 코드는 여전히 SCREEN_W × SCREEN_H 좌표를 쓰고,
+ * 컨텍스트 변환으로 이 배율을 곱한다. 1배로 두면 큰 화면에 늘려 보일 때 글자가 뭉개진다.
+ */
+export const SCREEN_SCALE = 2;
+
 export function getScreenCanvas(): HTMLCanvasElement {
   if (!screenCanvas) {
     screenCanvas = document.createElement('canvas');
-    screenCanvas.width = SCREEN_W;
-    screenCanvas.height = SCREEN_H;
+    screenCanvas.width = SCREEN_W * SCREEN_SCALE;
+    screenCanvas.height = SCREEN_H * SCREEN_SCALE;
   }
   return screenCanvas;
+}
+
+/** 화면 캔버스의 2D 컨텍스트. 배율 변환을 걸어 돌려주므로 그리는 쪽은 기준 좌표만 쓰면 된다 */
+export function getScreenContext(): CanvasRenderingContext2D | null {
+  const ctx = getScreenCanvas().getContext('2d');
+  ctx?.setTransform(SCREEN_SCALE, 0, 0, SCREEN_SCALE, 0, 0);
+  return ctx;
 }
 
 const FALLBACK_FONT = 'Tahoma, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif';
