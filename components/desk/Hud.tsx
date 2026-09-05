@@ -22,7 +22,9 @@ export function Hud() {
   const backToDesk = useDeskStore((s) => s.backToDesk);
   const soundOn = useDeskStore((s) => s.soundOn);
   const setSound = useDeskStore((s) => s.setSound);
-  const [collapsed, setCollapsed] = useState(false);
+  // 좁은 화면에서는 접힌 채 시작한다. 펼쳐진 창이 3D 씬의 절반을 가리기 때문이다.
+  // 부팅 중에는 이 창이 그려지지 않아 서버 렌더와 어긋날 일이 없다
+  const [collapsed, setCollapsed] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches);
   /** 사용자가 옮긴 자리. null이면 CSS의 기본 자리(오른쪽 아래)를 쓴다 */
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   /** 밖으로 나간 창을 도로 들일 때만 켜는 스냅 연출 */
