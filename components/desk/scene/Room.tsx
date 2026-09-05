@@ -18,6 +18,7 @@ export function Room() {
   const scene = useThree((s) => s.scene);
   const gl = useThree((s) => s.gl);
   const shadowMix = useRef(-1);
+  const shadowAt = useRef(0);
   const wallMat = useRef<THREE.MeshStandardMaterial>(null);
   const floorMat = useRef<THREE.MeshStandardMaterial>(null);
   const ambient = useRef<THREE.AmbientLight>(null);
@@ -70,11 +71,16 @@ export function Room() {
       if (phase === 'off') s *= 1 - Math.min(1, (sceneTime() - shutdownAt) / 1.9);
       screenLight.current.intensity = s;
     }
-    // 조명이 바뀌었거나, 물건이 움직여서 다시 그려 달라는 요청이 있을 때만 그림자 맵을 갱신한다
-    if (shadowDirty.value || Math.abs(mix - shadowMix.current) > 0.02) {
+    // 조명이 바뀌었거나, 물건이 움직여서 다시 그려 달라는 요청이 있을 때만 그림자 맵을 갱신한다.
+    // 요청은 초당 20번까지만 받는다. 마우스를 끄는 동안 매 프레임 그림자 맵 두 장을 다시 그리면
+    // 그때만 유독 버벅인다. 요청 플래그는 처리될 때까지 남으므로 마지막 자리는 반드시 반영된다
+    const now = performance.now();
+    const wanted = shadowDirty.value || Math.abs(mix - shadowMix.current) > 0.02;
+    if (wanted && now - shadowAt.current >= 45) {
       gl.shadowMap.needsUpdate = true;
       shadowDirty.value = false;
       shadowMix.current = mix;
+      shadowAt.current = now;
     }
     if (wallMat.current) wallMat.current.color.copy(colors.wallDay).lerp(colors.wallNight, mix);
     if (floorMat.current) floorMat.current.color.copy(colors.floorDay).lerp(colors.floorNight, mix);
