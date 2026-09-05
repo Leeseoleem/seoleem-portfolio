@@ -7,8 +7,21 @@ export type DeskPhase = 'boot' | 'transition' | 'desk' | 'zoomed' | 'off';
 export type ZoomTarget = 'monitor' | 'phone' | 'notebook' | 'docs';
 
 export interface CameraPose {
-  position: [number, number, number];
+  /** 바라볼 지점 */
   target: [number, number, number];
+  /** 카메라를 둘 자리. fit을 쓰면 생략한다 */
+  position?: [number, number, number];
+  /** target에서 카메라 쪽을 보는 방향. fit과 함께 쓴다 */
+  dir?: [number, number, number];
+  /**
+   * 이 크기(가로, 세로)가 화면에 다 들어오도록 거리를 계산한다.
+   * 자리를 눈대중으로 적어두면 화면 비율이 달라질 때 구도가 어긋난다.
+   */
+  fit?: [number, number];
+  /** fit에 남길 여백 배수. 1.1이면 대상 크기의 1.1배가 화면에 들어온다 */
+  margin?: number;
+  /** 화면의 위쪽이 될 방향. 비스듬히 놓인 물건을 화면과 나란히 보여줄 때 쓴다 */
+  up?: [number, number, number];
 }
 
 interface DeskState {
@@ -18,8 +31,12 @@ interface DeskState {
   soundOn: boolean;
   hoverLabel: string | null;
   hoverPoint: { x: number; y: number } | null;
+  /** 책상 위 오브젝트를 끌고 있는 중. 시점 회전과 호버 표시를 멈춘다 */
+  dragging: boolean;
   /** 종료 시퀀스 시작 시각(초, 씬 시계 기준). -1이면 아직 아님 */
   shutdownAt: number;
+  /** 복구 불가능한 오류(WebGL 컨텍스트 소실 등). true면 오류 화면이 전체를 덮는다 */
+  crashed: boolean;
   /** 카메라 이동 요청. CameraRig가 소비한다. */
   cameraRequest: { pose: CameraPose | 'orbit' | 'close'; duration: number; then?: DeskPhase; id: number } | null;
 
@@ -28,6 +45,8 @@ interface DeskState {
   toggleNight: () => void;
   setSound: (on: boolean) => void;
   setHover: (label: string | null, point?: { x: number; y: number } | null) => void;
+  setDragging: (on: boolean) => void;
+  setCrashed: () => void;
   zoomTo: (target: ZoomTarget, pose: CameraPose) => void;
   backToDesk: () => void;
   finishBoot: () => void;
@@ -44,7 +63,9 @@ export const useDeskStore = create<DeskState>((set) => ({
   soundOn: true,
   hoverLabel: null,
   hoverPoint: null,
+  dragging: false,
   shutdownAt: -1,
+  crashed: false,
   cameraRequest: null,
 
   setPhase: (phase) => set({ phase }),
@@ -52,6 +73,8 @@ export const useDeskStore = create<DeskState>((set) => ({
   toggleNight: () => set((s) => ({ isNight: !s.isNight })),
   setSound: (on) => set({ soundOn: on }),
   setHover: (label, point = null) => set({ hoverLabel: label, hoverPoint: point }),
+  setDragging: (on) => set({ dragging: on }),
+  setCrashed: () => set({ crashed: true, hoverLabel: null }),
 
   zoomTo: (target, pose) =>
     set({

@@ -10,8 +10,10 @@ import { prefersReducedMotion } from '@/lib/desk/runtime';
 interface Tween {
   fromPos: THREE.Vector3;
   fromTarget: THREE.Vector3;
+  fromUp: THREE.Vector3;
   toPos: THREE.Vector3;
   toTarget: THREE.Vector3;
+  toUp: THREE.Vector3;
   start: number;
   duration: number;
   then?: 'desk' | 'zoomed' | 'boot' | 'transition' | 'off';
@@ -33,7 +35,7 @@ export function CameraRig() {
   const gl = useThree((s) => s.gl);
 
   const orbit = useRef({ yaw: orbitDefaults.yaw, pitch: orbitDefaults.pitch, zoom: orbitDefaults.zoom });
-  const cam = useRef({ pos: new THREE.Vector3(), target: new THREE.Vector3() });
+  const cam = useRef({ pos: new THREE.Vector3(), target: new THREE.Vector3(), up: new THREE.Vector3(0, 1, 0) });
   const tween = useRef<Tween | null>(null);
   const reduceMotion = useRef(false);
 
@@ -64,7 +66,29 @@ export function CameraRig() {
 
   const apply = () => {
     camera.position.copy(cam.current.pos);
+    camera.up.copy(cam.current.up).normalize();
     camera.lookAt(cam.current.target);
+  };
+
+  /**
+   * 포즈를 실제 카메라 자리로 바꾼다.
+   * fit이 있으면 대상 크기가 화면에 다 들어오는 거리를 화면 비율에서 계산한다.
+   * 자리를 눈대중으로 적어두면 창 비율이 달라질 때 대상이 잘리거나 너무 작아진다.
+   */
+  const resolve = (pose: CameraPose, aspect: number) => {
+    const target = new THREE.Vector3(...pose.target);
+    const up = new THREE.Vector3(...(pose.up ?? [0, 1, 0]));
+    if (!pose.fit || !pose.dir) {
+      return { pos: new THREE.Vector3(...(pose.position ?? [0, 0, 0])), target, up };
+    }
+    const tanHalf = Math.tan(THREE.MathUtils.degToRad(CAMERA_FOV / 2));
+    const margin = pose.margin ?? 1.1;
+    const [w, h] = pose.fit;
+    const dByH = ((h * margin) / 2) / tanHalf;
+    const dByW = ((w * margin) / 2) / (tanHalf * aspect);
+    const d = Math.max(dByH, dByW);
+    const dir = new THREE.Vector3(...pose.dir).normalize();
+    return { pos: target.clone().addScaledVector(dir, d), target, up };
   };
 
   // 초기 위치: 부팅 화면과 맞물리는 근접 포즈
@@ -76,8 +100,9 @@ export function CameraRig() {
     camera.updateProjectionMatrix();
     if (useDeskStore.getState().phase === 'boot') {
       const p = closePose(size.width / size.height);
-      cam.current.pos.set(...p.position);
+      cam.current.pos.set(...(p.position ?? [0, 0, 0]));
       cam.current.target.set(...p.target);
+      cam.current.up.set(0, 1, 0);
       apply();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -104,7 +129,7 @@ export function CameraRig() {
         drag.active = false;
         return;
       }
-      if (!isDesk() || ev.button !== 0) return;
+      if (!isDesk() || ev.button !== 0 || useDeskStore.getState().dragging) return;
       drag.active = true;
       drag.moved = false;
       drag.x = ev.clientX;
@@ -123,6 +148,11 @@ export function CameraRig() {
       if (pinch.active && touches.size === 2) {
         const d = touchDist();
         if (d > 0) orbit.current.zoom = THREE.MathUtils.clamp(pinch.zoom * (pinch.dist / d), orbitDefaults.zoomMin, orbitDefaults.zoomMax);
+        return;
+      }
+      // 오브젝트를 끄는 중이면 시점을 돌리지 않는다. 포인터 다운 순서에 의존하지 않도록 여기서도 확인한다
+      if (useDeskStore.getState().dragging) {
+        drag.active = false;
         return;
       }
       if (!drag.active || !isDesk()) return;
@@ -166,11 +196,14 @@ export function CameraRig() {
     const req = state.cameraRequest;
     if (req) {
       const pose = req.pose === 'orbit' ? orbitPose(aspect) : req.pose === 'close' ? closePose(aspect) : req.pose;
+      const to = resolve(pose, aspect);
       tween.current = {
         fromPos: cam.current.pos.clone(),
         fromTarget: cam.current.target.clone(),
-        toPos: new THREE.Vector3(...pose.position),
-        toTarget: new THREE.Vector3(...pose.target),
+        fromUp: cam.current.up.clone(),
+        toPos: to.pos,
+        toTarget: to.target,
+        toUp: to.up,
         start: performance.now(),
         duration: reduceMotion.current ? 0 : req.duration,
         then: req.then,
@@ -180,8 +213,9 @@ export function CameraRig() {
 
     if (state.phase === 'boot') {
       const p = closePose(aspect);
-      cam.current.pos.set(...p.position);
+      cam.current.pos.set(...(p.position ?? [0, 0, 0]));
       cam.current.target.set(...p.target);
+      cam.current.up.set(0, 1, 0);
       apply();
       return;
     }
@@ -192,6 +226,7 @@ export function CameraRig() {
       const e = easeInOutCubic(k);
       cam.current.pos.lerpVectors(tw.fromPos, tw.toPos, e);
       cam.current.target.lerpVectors(tw.fromTarget, tw.toTarget, e);
+      cam.current.up.lerpVectors(tw.fromUp, tw.toUp, e);
       apply();
       if (k >= 1) {
         tween.current = null;
@@ -203,8 +238,9 @@ export function CameraRig() {
     if (state.phase === 'desk') {
       const p = orbitPose(aspect);
       const k = reduceMotion.current ? 1 : 0.12;
-      cam.current.pos.lerp(new THREE.Vector3(...p.position), k);
+      cam.current.pos.lerp(new THREE.Vector3(...(p.position ?? [0, 0, 0])), k);
       cam.current.target.lerp(new THREE.Vector3(...p.target), k);
+      cam.current.up.lerp(new THREE.Vector3(0, 1, 0), k);
       apply();
     }
   });

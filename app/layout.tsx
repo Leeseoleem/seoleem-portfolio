@@ -26,9 +26,20 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
+/**
+ * Pretendard. 핸드폰 화면과 XP 창처럼 현대 UI 글꼴이 필요한 곳에 쓴다.
+ * 파일을 직접 두지 않고 CDN의 동적 서브셋을 쓴다. 한글 전체(2MB대)를 미리 받지 않고
+ * 화면에 실제 쓰인 글자 묶음만 받아 오기 때문이다.
+ */
+const PRETENDARD_CSS = 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css';
+
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html lang="ko" className={`${stardust.variable} h-full`}>
+      <head>
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
+        <link rel="stylesheet" href={PRETENDARD_CSS} />
+      </head>
       <body className="min-h-full">{children}</body>
     </html>
   );

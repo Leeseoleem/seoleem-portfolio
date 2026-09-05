@@ -7,6 +7,7 @@ import { useDeskStore } from '@/stores/useDeskStore';
 import { scenePalette } from '@/lib/desk/palette';
 import { positions, SCREEN_CENTER } from '@/lib/desk/layout';
 import { lerpLight, nightMix } from '@/lib/desk/night';
+import { shadowDirty } from '@/lib/desk/shadows';
 import { prefersReducedMotion, sceneTime } from '@/lib/desk/runtime';
 
 /**
@@ -17,6 +18,7 @@ export function Room() {
   const scene = useThree((s) => s.scene);
   const gl = useThree((s) => s.gl);
   const shadowMix = useRef(-1);
+  const shadowAt = useRef(0);
   const wallMat = useRef<THREE.MeshStandardMaterial>(null);
   const floorMat = useRef<THREE.MeshStandardMaterial>(null);
   const ambient = useRef<THREE.AmbientLight>(null);
@@ -62,18 +64,23 @@ export function Room() {
       hemi.current.intensity = lerpLight('hemi', mix);
       hemi.current.color.copy(colors.hemiDay).lerp(colors.hemiNight, mix);
     }
-    if (fill.current) {
-      fill.current.intensity = lerpLight('fill', mix);
-      fill.current.castShadow = mix < 0.5;
-    }
+    // 그림자는 항상 켜둔다. 세기가 줄면 그림자도 같이 옅어지므로 따로 끌 이유가 없다
+    if (fill.current) fill.current.intensity = lerpLight('fill', mix);
     if (screenLight.current) {
       let s = lerpLight('screen', mix) * (1 + Math.sin(state.clock.elapsedTime * 9) * 0.05);
       if (phase === 'off') s *= 1 - Math.min(1, (sceneTime() - shutdownAt) / 1.9);
       screenLight.current.intensity = s;
     }
-    if (Math.abs(mix - shadowMix.current) > 0.02) {
+    // 조명이 바뀌었거나, 물건이 움직여서 다시 그려 달라는 요청이 있을 때만 그림자 맵을 갱신한다.
+    // 요청은 초당 20번까지만 받는다. 마우스를 끄는 동안 매 프레임 그림자 맵 두 장을 다시 그리면
+    // 그때만 유독 버벅인다. 요청 플래그는 처리될 때까지 남으므로 마지막 자리는 반드시 반영된다
+    const now = performance.now();
+    const wanted = shadowDirty.value || Math.abs(mix - shadowMix.current) > 0.02;
+    if (wanted && now - shadowAt.current >= 45) {
       gl.shadowMap.needsUpdate = true;
+      shadowDirty.value = false;
       shadowMix.current = mix;
+      shadowAt.current = now;
     }
     if (wallMat.current) wallMat.current.color.copy(colors.wallDay).lerp(colors.wallNight, mix);
     if (floorMat.current) floorMat.current.color.copy(colors.floorDay).lerp(colors.floorNight, mix);
@@ -97,14 +104,23 @@ export function Room() {
 
       <ambientLight ref={ambient} color={scenePalette.light.ambientDay} intensity={1.0} />
       <hemisphereLight ref={hemi} color={scenePalette.light.hemiSkyDay} groundColor={scenePalette.light.hemiGround} intensity={0.9} />
+      {/* 키 라이트. 스탠드가 있는 왼쪽 위에서 들어와 그림자가 오른쪽 아래로 떨어진다 */}
       <directionalLight
         ref={fill}
         color={scenePalette.light.fill}
-        intensity={1.3}
-        position={[2, 4, 3]}
+        intensity={2.4}
+        position={[-2.6, 4.5, 2.4]}
         castShadow
-        shadow-mapSize={[512, 512]}
-        shadow-bias={-0.0005}
+        shadow-mapSize={[2048, 2048]}
+        shadow-bias={-0.0003}
+        shadow-normalBias={0.03}
+        /* 그림자 카메라를 책상 주변만 덮게 조인다. 기본값(±5m)은 방 전체를 덮어 텍셀이 굵어진다 */
+        shadow-camera-left={-2.8}
+        shadow-camera-right={2.8}
+        shadow-camera-top={2.4}
+        shadow-camera-bottom={-2.4}
+        shadow-camera-near={1}
+        shadow-camera-far={12}
       />
       <pointLight
         ref={screenLight}

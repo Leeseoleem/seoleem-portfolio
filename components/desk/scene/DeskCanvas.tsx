@@ -16,6 +16,8 @@ import { Lamp } from './Lamp';
 import { Cat } from './Cat';
 import { MouseHole } from './MouseHole';
 import { Tower } from './Tower';
+import { Cables } from './Cables';
+import { Props } from './Props';
 import { CAMERA_FOV } from '@/lib/desk/layout';
 import { useDeskStore } from '@/stores/useDeskStore';
 
@@ -45,7 +47,7 @@ export function DeskCanvas() {
     <Canvas
       className="desk-canvas"
       frameloop={isBooting || stoppedAfterOff ? 'never' : isZoomed ? 'demand' : 'always'}
-      shadows={{ type: THREE.PCFShadowMap }}
+      shadows={{ type: THREE.PCFSoftShadowMap }}
       dpr={1}
       performance={{ min: 0.5 }}
       camera={{ fov: CAMERA_FOV, near: 0.02, far: 60, position: [0, 2.5, 4] }}
@@ -54,6 +56,11 @@ export function DeskCanvas() {
         gl.toneMapping = THREE.ACESFilmicToneMapping;
         gl.toneMappingExposure = 0.95;
         gl.outputColorSpace = THREE.SRGBColorSpace;
+        // 컨텍스트를 잃으면(GPU 리셋, 탭 과다 등) 캔버스가 하얗게 남는다. 오류 화면으로 넘긴다
+        gl.domElement.addEventListener('webglcontextlost', (e) => {
+          e.preventDefault();
+          useDeskStore.getState().setCrashed();
+        });
       }}
     >
       <CameraRig />
@@ -69,6 +76,8 @@ export function DeskCanvas() {
       <Cat />
       <MouseHole />
       <Tower />
+      <Cables />
+      <Props />
     </Canvas>
   );
 }

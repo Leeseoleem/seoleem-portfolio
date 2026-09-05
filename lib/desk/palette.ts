@@ -3,27 +3,46 @@
 
 export const scenePalette = {
   room: {
-    wallDay: '#e6c9b4',
+    // 책상보다 한 단계 어둡고 탁하게. 밝은 책상이 벽에 묻히지 않게 하는 바탕이다
+    wallDay: '#cdb5a1',
     wallNight: '#2b3552',
-    floorDay: '#c09a74',
+    floorDay: '#a07b58',
     floorNight: '#3b322f',
-    backgroundDay: '#e6c9b4',
+    backgroundDay: '#cdb5a1',
     backgroundNight: '#1c2338',
   },
   furniture: {
-    wood: '#d9b587',
-    woodDark: '#bf9666',
+    // 화이트 워시 우드. 실제 작업 책상을 따른다. 대비는 벽을 한 단계 내리고 그림자로 만든다
+    wood: '#ece3d4',
+    woodDark: '#d6cbb8',
     beige: '#d9d2c0',
     beigeDark: '#b9b2a0',
+    // 모니터 껍데기. 오래된 플라스틱처럼 베이지보다 살짝 누렇다
+    crt: '#ddd3bb',
+    crtSlot: '#8f8878',
     black: '#14141a',
     paper: '#f2ede2',
     kraft: '#b98a5a',
     ceramic: '#e8e2d0',
     white: '#f4f1ea',
     vent: '#a9a08c',
-    keys: '#cdc6b4',
-    coffee: '#4a2b16',
-    cable: '#2a2a2e',
+    coffee: '#33190c',
+    steam: '#d8d2ca',
+    clip: '#a7afb8',
+    // 케이블. 흰 책상 위에서 검은 선은 먹선처럼 튀어서, 책상보다 한 단계 어두운 회색으로 둔다
+    cable: '#c6bfb2',
+  },
+  // 연필
+  pencil: {
+    body: '#d9b04c',
+    wood: '#e6cfa4',
+    graphite: '#33302c',
+    ferrule: '#c9c4b8',
+    eraser: '#e2a0a5',
+  },
+  // 책상 위 마우스(입력장치). 쥐구멍의 생쥐는 아래 mouse 항목이다
+  pointer: {
+    wheel: '#eceae2',
   },
   lamp: {
     bulbOff: '#3a3226',
@@ -36,7 +55,7 @@ export const scenePalette = {
     ambientNight: '#8fa4ff',
     hemiSkyDay: '#fff0e0',
     hemiSkyNight: '#7f93d8',
-    hemiGround: '#b08868',
+    hemiGround: '#8c7259',
     fill: '#fff4e6',
     screenGlow: '#7fb6ff',
   },
@@ -50,8 +69,6 @@ export const scenePalette = {
     ribbon: '#d8574a',
     labelPaper: '#f4efe4',
     labelBorder: '#c9c1b0',
-    labelInk: '#2a2a2a',
-    labelMuted: '#6b6b6b',
   },
   cat: {
     fur: '#8b9099',
@@ -78,26 +95,47 @@ export const canvasPalette = {
     text: '#ffffff',
     intro: '#c9c9c9',
     footer: '#9a9a9a',
-    footerBrand: '#d0d0d0',
     barBorder: '#8a8a8a',
     barTop: '#6da2ff',
     barBottom: '#1d4fd1',
-    flag: ['#f35325', '#81bc06', '#05a6f0', '#ffba08'],
+    // 로고 네 칸. 윈도우 깃발 자리에 쓰는 대표 툴 넷: React, Next.js, TypeScript, Figma
+    tiles: {
+      react: { bg: '#20232a', fg: '#61dafb' },
+      next: { bg: '#000000', fg: '#ffffff', edge: '#4a4a4a' },
+      ts: { bg: '#3178c6', fg: '#ffffff' },
+      figma: { bg: '#1e1e1e', shapes: ['#f24e1e', '#a259ff', '#0acf83', '#ff7262', '#1abcfe'] },
+    },
   },
-  desktop: {
-    skyTop: '#2a6fd6',
-    skyMid: '#8ec5f0',
-    skyBottom: '#cfe7f7',
-    hillFar: '#5aa53a',
-    hillNear: '#3f8a2c',
-    taskbarTop: '#3a80f0',
-    taskbarMid: '#245edb',
-    taskbarBottom: '#1b44a8',
-    startTop: '#5fbf4f',
-    startBottom: '#2e8a2a',
-    tray: '#1a9be6',
-    iconLabel: '#ffffff',
-    icons: ['#f7c948', '#5b9cf6', '#e9eef5', '#b8c4d0'],
+  // 책상 윗면 나무결. 바탕은 scenePalette.furniture.wood와 같아야 둥근 모서리와 이어진다
+  wood: {
+    base: '#ece3d4',
+    grainDark: '#d9cbb6',
+    grainLight: '#f6f0e6',
+    seam: '#cfc1ab',
+  },
+  // 모니터 베젤에 붙인 포스트잇
+  sticky: {
+    yellow: '#fbe66e',
+    pink: '#f8b7c6',
+    ink: '#3b3a36',
+  },
+  // 공책 표지 가죽 결. 바탕은 scenePalette.furniture.kraft에서 시작한다
+  leather: {
+    base: '#b98a5a',
+    dark: '#8f6538',
+    light: '#d3a877',
+  },
+  // 키보드 상판에 그리는 키 배열
+  keyboard: {
+    base: '#a8a190',
+    key: '#e6e0d0',
+    keyEdge: '#9c9584',
+  },
+  // 마우스 껍데기에 새기는 선. 셸 표면 텍스처로 그린다
+  pointer: {
+    body: '#dcd6c6',
+    line: '#8c8574',
+    slot: '#6f6a5c',
   },
   shutdown: {
     top: '#3b6fd6',

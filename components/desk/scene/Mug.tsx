@@ -8,9 +8,9 @@ import { scenePalette } from '@/lib/desk/palette';
 import { positions, TOP } from '@/lib/desk/layout';
 import { getSound } from '@/lib/desk/sound';
 
-const STEAM_N = 7;
-const STEAM_RISE = 0.5;
-const STEAM_LOOP = 3.2;
+const STEAM_N = 10;
+const STEAM_RISE = 0.55;
+const STEAM_LOOP = 3.4;
 
 function makeSteamTexture(): THREE.CanvasTexture {
   const c = document.createElement('canvas');
@@ -19,8 +19,8 @@ function makeSteamTexture(): THREE.CanvasTexture {
   const ctx = c.getContext('2d');
   if (ctx) {
     const g = ctx.createRadialGradient(32, 32, 2, 32, 32, 30);
-    g.addColorStop(0, 'rgba(255,255,255,0.55)');
-    g.addColorStop(0.6, 'rgba(255,255,255,0.18)');
+    g.addColorStop(0, 'rgba(255,255,255,0.75)');
+    g.addColorStop(0.55, 'rgba(255,255,255,0.28)');
     g.addColorStop(1, 'rgba(255,255,255,0)');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, 64, 64);
@@ -53,9 +53,9 @@ export function Mug() {
       const k = (t / STEAM_LOOP + s.phase) % 1;
       const sway = Math.sin(t * 1.6 + s.wobble) * 0.035 * k;
       sp.position.set(mx + sway + s.drift * k, TOP + 0.24 + k * STEAM_RISE, mz);
-      const size = 0.08 + k * 0.16;
+      const size = 0.1 + k * 0.2;
       sp.scale.set(size, size, 1);
-      (sp.material as THREE.SpriteMaterial).opacity = Math.sin(k * Math.PI) * 0.55;
+      (sp.material as THREE.SpriteMaterial).opacity = Math.sin(k * Math.PI) * 0.75;
     });
   });
 
@@ -79,10 +79,17 @@ export function Mug() {
         <torusGeometry args={[0.062, 0.017, 10, 24, Math.PI]} />
         <meshStandardMaterial color={scenePalette.furniture.ceramic} roughness={0.35} />
       </mesh>
-      {/* 커피 */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[mx, TOP + 0.2, mz]}>
+      {/* 커피. 컵이 속 빈 원통이라 이 면이 그림자를 만들어야 바닥 그림자가 고리로 뚫리지 않는다.
+          단면 재질은 그림자를 뒷면으로 그리는데 이 면은 위를 보고 있어 잘려나가므로 양면으로 지정한다 */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[mx, TOP + 0.2, mz]} castShadow>
         <circleGeometry args={[0.106, 32]} />
-        <meshStandardMaterial color={scenePalette.furniture.coffee} roughness={0.2} metalness={0.05} />
+        <meshStandardMaterial
+          color={scenePalette.furniture.coffee}
+          /* 액체 표면. 거의 거울처럼 매끈해야 조명이 한 점으로 맺힌다 */
+          roughness={0.08}
+          metalness={0.1}
+          shadowSide={THREE.DoubleSide}
+        />
       </mesh>
       </Interactive>
       {seeds.map((_, i) => (
@@ -92,7 +99,8 @@ export function Mug() {
             sprites.current[i] = el;
           }}
         >
-          <spriteMaterial map={steamTex} transparent depthWrite={false} opacity={0} />
+          {/* 흰 벽·흰 책상 위에서는 순백 김이 안 보인다. 살짝 회색을 섞어 배경보다 한 톤 어둡게 */}
+          <spriteMaterial map={steamTex} color={scenePalette.furniture.steam} transparent depthWrite={false} opacity={0} />
         </sprite>
       ))}
     </group>

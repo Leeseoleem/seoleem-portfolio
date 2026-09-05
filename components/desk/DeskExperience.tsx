@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { BootOverlay } from './BootOverlay';
 import { Hud } from './Hud';
 import { OffScreen } from './OffScreen';
+import { ErrorScreen } from './ErrorScreen';
 import { useDeskStore } from '@/stores/useDeskStore';
 import { getSound } from '@/lib/desk/sound';
 
@@ -14,9 +15,10 @@ const DeskCanvas = dynamic(() => import('./scene/DeskCanvas').then((m) => m.Desk
   loading: () => <div className="desk-canvas-loading" aria-hidden="true" />,
 });
 
-/** 책상 씬 전체: 3D 캔버스 + 부팅 오버레이 + HUD + 종료 화면 */
+/** 책상 씬 전체: 3D 캔버스 + 부팅 오버레이 + HUD + 종료 화면 + 오류 화면 */
 export function DeskExperience() {
   const setSound = useDeskStore((s) => s.setSound);
+  const crashed = useDeskStore((s) => s.crashed);
 
   // 첫 사용자 제스처에서 오디오를 열고, 저장된 효과음 설정을 스토어에 반영한다
   useEffect(() => {
@@ -38,6 +40,8 @@ export function DeskExperience() {
       <BootOverlay />
       <Hud />
       <OffScreen />
+      {/* WebGL 컨텍스트가 죽으면 캔버스가 하얗게 남는다. 그 위를 오류 화면으로 덮는다 */}
+      {crashed && <ErrorScreen code="webgl" />}
     </main>
   );
 }
