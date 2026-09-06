@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import { getSound } from '@/lib/desk/sound';
 
 /**
  * 공책을 펼쳤을 때 드러난 속지 위에 얹히는 DOM. 디자인 작업 목록이 들어갈 자리다.
@@ -9,6 +10,7 @@ import { useRef, useState } from 'react';
  * 지금 들어 있는 건 넘김 동작 확인용 임시 종이다.
  * 이 화면은 이미 3D 공간에 비스듬히 놓인 DOM이라, 그 위에서 CSS 3D 회전을 한 번 더 거는 셈이다.
  * 원근이 제대로 잡히는지 확인하고 실제 내용을 얹는다.
+ * 장이 실제로 넘어갈 때(끌어서 놓았을 때, 스크롤이 한 장 분량을 넘었을 때) 서류와 같은 종이 소리를 낸다.
  */
 const PAGES = [
   { id: '01', tone: 'a' },
@@ -43,7 +45,10 @@ export function NotebookPages() {
   const onUp = () => {
     if (!dragging) return;
     setDragging(false);
-    setPos((p) => clampPos(Math.round(p)));
+    const settled = clampPos(Math.round(pos));
+    // 반쯤 넘기다 놓아 제자리로 돌아가면 소리가 없다. 장이 실제로 바뀔 때만 난다
+    if (settled !== start.current.pos) getSound().play('pageflip');
+    setPos(settled);
   };
 
   // 가로 스크롤로도 넘긴다. 트랙패드는 deltaX, 휠 마우스는 shift + deltaY로 들어온다
@@ -52,8 +57,11 @@ export function NotebookPages() {
     if (!dx) return;
     wheel.current += dx;
     if (Math.abs(wheel.current) < TURN_DISTANCE) return;
-    setPos((p) => clampPos(Math.round(p) + Math.sign(wheel.current)));
+    const next = clampPos(Math.round(pos) + Math.sign(wheel.current));
     wheel.current = 0;
+    if (next === Math.round(pos)) return;
+    getSound().play('pageflip');
+    setPos(next);
   };
 
   const front = Math.floor(pos);
