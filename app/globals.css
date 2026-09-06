@@ -46,26 +46,29 @@
   --xp-border: #0831d9;
   --xp-desktop: #3a6ea5;
   --xp-text: #000000;
-  --xp-sky-top: #2a6fd6;
-  --xp-sky-mid: #8ec5f0;
-  --xp-sky-bottom: #cfe7f7;
-  --xp-hill-far: #5aa53a;
-  --xp-hill-near: #3f8a2c;
-  --xp-taskbar-top: #3a80f0;
+  --xp-menu-head-top: #2b5fd4;
+  --xp-menu-head-bottom: #1c48b6;
+  --xp-menu-foot: #3b73e0;
+  --xp-menu-edge: #1a44a8;
+  --xp-menu-hover: #316ac5;
+  --xp-power: #d9412a;
+  --xp-taskbar-top: #3a8ff0;
   --xp-taskbar-mid: #245edb;
-  --xp-taskbar-bottom: #1b44a8;
-  --xp-start-top: #5fbf4f;
-  --xp-start-bottom: #2e8a2a;
-  --xp-tray: #1a9be6;
-  --xp-icon-shadow: rgba(0, 0, 0, 0.15);
+  --xp-taskbar-bottom: #1a45ab;
+  --xp-taskbar-line: #6fb2f7;
+  --xp-start-top: #5cc253;
+  --xp-start-mid: #3fa63d;
+  --xp-start-bottom: #369a35;
+  --xp-start-deep: #287f28;
+  --xp-tray-top: #1fb0f4;
+  --xp-tray-mid: #1494e6;
+  --xp-tray-bottom: #0f7fd2;
+  --xp-tray-edge: #0b4fa8;
+  --xp-icon-select: rgba(28, 80, 190, 0.38);
   --xp-flag-a: #f35325;
   --xp-flag-b: #81bc06;
   --xp-flag-c: #05a6f0;
   --xp-flag-d: #ffba08;
-  --xp-icon-a: #f7c948;
-  --xp-icon-b: #5b9cf6;
-  --xp-icon-c: #e9eef5;
-  --xp-icon-d: #b8c4d0;
   --xp-title-idle-from: #7e97c8;
   --xp-title-idle-to: #a9bde1;
   --xp-skel: #e3e3e3;
@@ -554,8 +557,22 @@ body {
   height: 100%;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(var(--xp-sky-top), var(--xp-sky-mid) 55%, var(--xp-sky-bottom));
+  background: #2a6fd6;
   color: var(--xp-title-fg);
+  /* XP는 Tahoma를 썼다. 픽셀 글꼴은 부팅 화면과 HUD에 남기고 바탕화면은 창과 같은 글꼴을 쓴다 */
+  font-family: var(--font-ui);
+}
+
+/* 배경화면. 미리 흐려 둔 이미지다. 매 프레임 변형되는 화면이라 CSS blur 대신 파일에서 흐린다.
+   background-image로는 이 층에서 그려지지 않아 img 요소로 깐다 */
+.xp__wall {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
 }
 
 /* CRT 유리. 확대 화면 DOM은 3D 깊이 판정을 받지 않아 3D 유리판을 앞에 둘 수 없으므로 CSS로 얹는다.
@@ -571,13 +588,6 @@ body {
     radial-gradient(ellipse 72% 68% at 50% 50%, rgba(0, 0, 0, 0) 62%, rgba(0, 0, 0, 0.16) 100%);
 }
 
-.xp__hills {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
 .xp__icons {
   position: absolute;
   top: 32px;
@@ -591,13 +601,13 @@ body {
 }
 
 .xp-icon {
-  width: 92px;
+  width: 96px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 4px;
-  border: none;
+  gap: 6px;
+  padding: 6px 4px 5px;
+  border: 1px solid transparent;
   border-radius: 3px;
   background: transparent;
   color: inherit;
@@ -605,36 +615,24 @@ body {
   cursor: pointer;
 }
 
+/* 고른 아이콘은 XP처럼 반투명한 파란 판이 그림과 이름을 함께 덮는다 */
 .xp-icon:hover,
 .xp-icon:focus-visible {
   outline: none;
-  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.35);
+  background: var(--xp-icon-select);
 }
 
-.xp-icon__tile {
-  width: 44px;
-  height: 40px;
-  border-radius: 4px;
-  border-bottom: 10px solid var(--xp-icon-shadow);
-  box-sizing: border-box;
-}
-
-.xp-icon__tile--a {
-  background: var(--xp-icon-a);
-}
-.xp-icon__tile--b {
-  background: var(--xp-icon-b);
-}
-.xp-icon__tile--c {
-  background: var(--xp-icon-c);
-}
-.xp-icon__tile--d {
-  background: var(--xp-icon-d);
+.xp-icon__pic {
+  display: block;
+  width: 48px;
+  height: 48px;
 }
 
 .xp-icon__label {
   font-size: 15px;
-  line-height: 1;
+  line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
 .xp__taskbar {
@@ -647,32 +645,61 @@ body {
   z-index: 10000;
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: linear-gradient(var(--xp-taskbar-top), var(--xp-taskbar-mid) 10%, var(--xp-taskbar-bottom));
+  gap: 10px;
+  border-top: 1px solid var(--xp-taskbar-line);
+  background: linear-gradient(var(--xp-taskbar-top) 0%, var(--xp-taskbar-mid) 14%, var(--xp-taskbar-mid) 78%, var(--xp-taskbar-bottom) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
 
+/* 시작 단추. 오른쪽 끝만 둥글고, 위 절반이 밝은 두 단 그라데이션이다 */
 .xp-start {
   height: 100%;
-  padding: 0 22px 0 12px;
-  border-radius: 0 8px 8px 0;
-  background: linear-gradient(var(--xp-start-top), var(--xp-start-bottom));
-  font-size: 20px;
-  font-weight: 800;
+  padding: 0 22px 0 10px;
+  border: none;
+  border-radius: 0 12px 12px 0;
+  color: var(--xp-title-fg);
+  font: inherit;
+  cursor: pointer;
+  background: linear-gradient(var(--xp-start-top) 0%, var(--xp-start-mid) 48%, var(--xp-start-bottom) 52%, var(--xp-start-deep) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset -3px 0 4px rgba(0, 0, 0, 0.22), 1px 0 2px rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
+.xp-start:hover,
+.xp-start:focus-visible {
+  outline: none;
+  background: linear-gradient(#6fd066 0%, #4db44a 48%, #43a941 52%, #2f8a2f 100%);
+}
+
+/* 메뉴가 열려 있으면 눌린 상태로 보인다 */
+.xp-start.is-open {
+  background: linear-gradient(#2f8a2f 0%, #369a35 50%, #3fa63d 100%);
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.35);
+}
+
+.xp-start__text {
+  font-size: 20px;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.45);
+}
+
+/* 깃발. 네 조각이 바람에 휘어진 것처럼 살짝 기울어 있다 */
 .xp-start__flag {
   display: grid;
-  grid-template-columns: 9px 9px;
-  grid-template-rows: 9px 9px;
-  gap: 3px;
+  grid-template-columns: 10px 10px;
+  grid-template-rows: 10px 10px;
+  gap: 2px;
+  transform: skewY(-8deg) rotate(-4deg);
 }
 
 .xp-start__flag i {
   display: block;
-  border-radius: 2px;
+  border-radius: 3px 4px 3px 4px;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 .xp-start__flag i:nth-child(1) {
   background: var(--xp-flag-a);
@@ -687,17 +714,181 @@ body {
   background: var(--xp-flag-d);
 }
 
+/* 트레이. 왼쪽 경계에 어두운 선과 밝은 선이 나란히 들고, 시계는 가운데 */
 .xp__tray {
   height: 100%;
-  min-width: 120px;
+  min-width: 132px;
   margin-left: auto;
-  padding: 0 20px;
-  background: var(--xp-tray);
+  padding: 0 22px;
+  border-left: 1px solid var(--xp-tray-edge);
+  box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  background: linear-gradient(var(--xp-tray-top) 0%, var(--xp-tray-mid) 50%, var(--xp-tray-bottom) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
   flex: none;
+}
+
+/* ---------- 시작 메뉴 ---------- */
+.xp-menu-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 9999;
+  border: none;
+  background: transparent;
+  cursor: default;
+}
+
+/* 작업 표시줄 바로 위에 붙어 열린다. 위쪽 모서리만 둥근 XP 모양 */
+.xp-menu {
+  position: absolute;
+  left: 0;
+  bottom: 40px;
+  z-index: 10000;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--xp-menu-edge);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  background: #ffffff;
+  color: var(--xp-text);
+  overflow: hidden;
+}
+
+.xp-menu__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 64px;
+  padding: 0 14px;
+  background: linear-gradient(var(--xp-menu-head-top), var(--xp-menu-head-bottom));
+  color: var(--xp-title-fg);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.xp-menu__avatar {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  border-radius: 4px;
+  background: #e9eef5;
+}
+
+.xp-menu__avatar .xp-icon__pic {
+  width: 32px;
+  height: 32px;
+}
+
+.xp-menu__user {
+  font-size: 17px;
+  font-weight: 700;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+.xp-menu__list {
+  margin: 0;
+  padding: 8px 6px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.xp-menu__item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.xp-menu__item .xp-icon__pic {
+  width: 28px;
+  height: 28px;
+}
+
+.xp-menu__item:hover,
+.xp-menu__item:focus-visible {
+  outline: none;
+  background: var(--xp-menu-hover);
+  color: var(--xp-title-fg);
+}
+
+.xp-menu__foot {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 10px;
+  background: linear-gradient(var(--xp-menu-foot), var(--xp-menu-head-bottom));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.xp-menu__power {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--xp-title-fg);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.xp-menu__power:hover,
+.xp-menu__power:focus-visible {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* 빨간 전원 표시. 원과 위쪽 틈 */
+.xp-menu__power-icon {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(#f07a5f, var(--xp-power));
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+.xp-menu__power-icon::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid #ffffff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  box-sizing: content-box;
+}
+
+.xp-menu__power-icon::after {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 3px;
+  width: 2px;
+  height: 7px;
+  background: #ffffff;
 }
 
 /* 열려 있는 창 목록 */
@@ -715,14 +906,16 @@ body {
 
 .xp-task {
   max-width: 180px;
-  height: 30px;
+  height: 28px;
   padding: 0 12px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.3);
   border-radius: 3px;
-  background: linear-gradient(rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.06));
+  background: linear-gradient(#4a8ff2, #2f6fe0 60%, #2760c8);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
   color: var(--xp-title-fg);
   font: inherit;
-  font-size: 15px;
+  font-size: 14px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -732,13 +925,13 @@ body {
 .xp-task:hover,
 .xp-task:focus-visible {
   outline: none;
-  background: linear-gradient(rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.14));
+  background: linear-gradient(#5c9cf6, #3d7ee8 60%, #336fd6);
 }
 
 /* 지금 앞에 나와 있는 창은 눌린 것처럼 보인다 */
 .xp-task.is-active {
-  background: rgba(0, 0, 0, 0.22);
-  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.35);
+  background: linear-gradient(#1c47a9, #1f4fb8);
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.45);
 }
 
 /* ---------- 모니터 안의 창 ---------- */
@@ -871,11 +1064,9 @@ body {
 .xp-list__icon {
   flex: none;
   width: 26px;
-  height: 22px;
-  border-radius: 3px;
-  border-bottom: 5px solid var(--xp-icon-shadow);
-  background: var(--xp-icon-a);
-  box-sizing: border-box;
+  height: 26px;
+  border-radius: 6px;
+  object-fit: cover;
 }
 
 .xp-list__name {

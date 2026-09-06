@@ -18,10 +18,13 @@ export interface AppDef {
   size: [number, number];
 }
 
-/** 바탕화면에 놓이는 아이콘. tone은 아이콘 타일 색이다 */
+/** 바탕화면 아이콘 그림 이름. 실제 그림은 components/desk/surfaces/xp-icons.tsx에 있다 */
+export type XpIconName = 'about' | 'projects' | 'resume' | 'trash';
+
+/** 바탕화면에 놓이는 아이콘. icon은 어떤 그림을 그릴지다 */
 export interface DesktopIcon extends AppDef {
   label: string;
-  tone: 'a' | 'b' | 'c' | 'd';
+  icon: XpIconName;
 }
 
 /**
@@ -39,10 +42,10 @@ export const projects: AppDef[] = projectContents.map((p) => ({
 
 /** 바탕화면 아이콘 순서. 처음 온 사람이 위에서부터 읽으니 소개가 맨 위다 */
 export const desktopIcons: DesktopIcon[] = [
-  { id: 'about', label: '소개', title: '소개 - 읽어보기', kind: 'article', tone: 'b', size: [520, 400] },
-  { id: 'projects', label: '프로젝트', title: '내 프로젝트', kind: 'folder', tone: 'a', size: [560, 400] },
-  { id: 'resume', label: '이력서', title: '이력서 - 미리보기', kind: 'article', tone: 'c', size: [520, 400] },
-  { id: 'trash', label: '휴지통', title: '휴지통', kind: 'empty', tone: 'd', size: [420, 260] },
+  { id: 'about', label: '소개', title: '소개 - 읽어보기', kind: 'article', icon: 'about', size: [520, 400] },
+  { id: 'projects', label: '프로젝트', title: '내 프로젝트', kind: 'folder', icon: 'projects', size: [560, 400] },
+  { id: 'resume', label: '이력서', title: '이력서 - 미리보기', kind: 'article', icon: 'resume', size: [520, 400] },
+  { id: 'trash', label: '휴지통', title: '휴지통', kind: 'empty', icon: 'trash', size: [420, 260] },
 ];
 
 /** id로 창 정보를 찾는다. 바탕화면 아이콘과 프로젝트를 한 곳에서 본다 */

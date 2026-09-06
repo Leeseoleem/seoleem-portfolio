@@ -1,10 +1,14 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { desktopIcons } from '@/lib/desk/xp-apps';
+import { useDeskStore } from '@/stores/useDeskStore';
+import { getSound } from '@/lib/desk/sound';
+import { sceneTime } from '@/lib/desk/runtime';
 import { findProject, projectContents } from '@/lib/desk/content/projects';
 import { XpWindow } from './XpWindow';
 import { ProjectWindow } from './ProjectWindow';
+import { XpIcon } from './xp-icons';
 import { useWindows, type WindowState } from './window-state';
 import { useClock } from './use-clock';
 
@@ -22,20 +26,35 @@ export function MonitorScreen() {
   const { time: clock } = useClock();
   const screen = useRef<HTMLDivElement>(null);
   const { wins, activeId, open, focus, close, minimize, toggleMax, toggleFromTaskbar, move, setPage } = useWindows();
+  const [startOpen, setStartOpen] = useState(false);
+  const powerOff = useDeskStore((s) => s.powerOff);
+
+  /** 시작 메뉴에서 고른 것을 열고 메뉴를 닫는다 */
+  const openFromStart = (id: string) => {
+    setStartOpen(false);
+    open(id);
+  };
+
+  /** 본체의 전원 단추와 같은 종료 절차. 소리도 같다 */
+  const shutDown = () => {
+    setStartOpen(false);
+    getSound().play('click');
+    window.setTimeout(() => getSound().play('shutdown'), 250);
+    powerOff(sceneTime());
+  };
 
   return (
     <div className="xp" ref={screen}>
-      <svg className="xp__hills" viewBox="0 0 1024 768" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M0 560 C250 420 520 640 780 500 C900 440 980 470 1024 520 L1024 768 L0 768 Z" fill="var(--xp-hill-far)" />
-        <path d="M0 640 C300 560 600 700 1024 600 L1024 768 L0 768 Z" fill="var(--xp-hill-near)" />
-      </svg>
+      {/* 배경화면. CSS background-image는 3D로 변형된 이 층에서 그려지지 않아 img로 깐다 */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img className="xp__wall" src="/xp/bliss.webp" alt="" draggable={false} />
 
       <ul className="xp__icons">
         {desktopIcons.map((icon) => (
           <li key={icon.id}>
             {/* 3D 화면 너머로 누르는 것이라 실제 XP와 달리 한 번 누르면 열린다 */}
             <button type="button" className="xp-icon" onClick={() => open(icon.id)}>
-              <span className={`xp-icon__tile xp-icon__tile--${icon.tone}`} />
+              <XpIcon name={icon.icon} />
               <span className="xp-icon__label">{icon.label}</span>
             </button>
           </li>
@@ -60,16 +79,53 @@ export function MonitorScreen() {
           </XpWindow>
         ))}
 
+      {startOpen && (
+        <>
+          {/* 메뉴 밖을 누르면 닫힌다. 실제 XP와 같다 */}
+          <button type="button" className="xp-menu-backdrop" aria-label="시작 메뉴 닫기" onClick={() => setStartOpen(false)} />
+          <nav id="xp-start-menu" className="xp-menu" aria-label="시작 메뉴">
+            <header className="xp-menu__head">
+              <span className="xp-menu__avatar" aria-hidden="true">
+                <XpIcon name="resume" />
+              </span>
+              <span className="xp-menu__user">seoleem</span>
+            </header>
+            <ul className="xp-menu__list">
+              {desktopIcons.map((icon) => (
+                <li key={icon.id}>
+                  <button type="button" className="xp-menu__item" onClick={() => openFromStart(icon.id)}>
+                    <XpIcon name={icon.icon} />
+                    <span>{icon.title}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <footer className="xp-menu__foot">
+              <button type="button" className="xp-menu__power" onClick={shutDown}>
+                <span className="xp-menu__power-icon" aria-hidden="true" />
+                컴퓨터 끄기
+              </button>
+            </footer>
+          </nav>
+        </>
+      )}
+
       <div className="xp__taskbar">
-        <span className="xp-start">
+        <button
+          type="button"
+          className={`xp-start${startOpen ? ' is-open' : ''}`}
+          onClick={() => setStartOpen((v) => !v)}
+          aria-expanded={startOpen}
+          aria-controls="xp-start-menu"
+        >
           <span className="xp-start__flag" aria-hidden="true">
             <i />
             <i />
             <i />
             <i />
           </span>
-          start
-        </span>
+          <span className="xp-start__text">start</span>
+        </button>
 
         {/* 열려 있는 창 목록. 내려둔 창도 여기 남아 있어야 다시 꺼낼 수 있다 */}
         <ul className="xp-tasks">
@@ -110,7 +166,9 @@ function WindowBody({
         {projectContents.map((p) => (
           <li key={p.id}>
             <button type="button" className="xp-list__row" onClick={() => onOpen(p.id)}>
-              <span className="xp-list__icon" />
+              {/* 실제 앱 아이콘. 3D 안에서 확대되는 DOM이라 next/image 축소본 대신 원본을 쓴다 */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="xp-list__icon" src={`/icons/${p.id}.png`} alt="" />
               <span className="xp-list__name">{p.name}</span>
               <span className="xp-list__sub">{p.tagline}</span>
             </button>
