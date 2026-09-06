@@ -25,6 +25,8 @@ export interface WindowState {
   z: number;
   minimized: boolean;
   maximized: boolean;
+  /** 장을 넘기는 창(프로젝트)의 현재 장. 창을 내렸다 올려도 읽던 자리가 남는다 */
+  page: number;
 }
 
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
@@ -75,6 +77,7 @@ export function useWindows() {
           z,
           minimized: false,
           maximized: false,
+          page: 0,
         },
       ];
     });
@@ -125,5 +128,9 @@ export function useWindows() {
     );
   };
 
-  return { wins, activeId, open, focus, close, minimize, toggleMax, toggleFromTaskbar, move };
+  const setPage = (id: string, page: number) => {
+    setWins((ws) => ws.map((w) => (w.id === id ? { ...w, page } : w)));
+  };
+
+  return { wins, activeId, open, focus, close, minimize, toggleMax, toggleFromTaskbar, move, setPage };
 }

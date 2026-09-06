@@ -1,9 +1,11 @@
 'use client';
 
 import { useRef } from 'react';
-import { desktopIcons, projects, type AppKind } from '@/lib/desk/xp-apps';
+import { desktopIcons } from '@/lib/desk/xp-apps';
+import { findProject, projectContents } from '@/lib/desk/content/projects';
 import { XpWindow } from './XpWindow';
-import { useWindows } from './window-state';
+import { ProjectWindow } from './ProjectWindow';
+import { useWindows, type WindowState } from './window-state';
 import { useClock } from './use-clock';
 
 /**
@@ -14,12 +16,12 @@ import { useClock } from './use-clock';
  * 색·간격은 globals.css의 `--xp-*` 토큰을 쓴다.
  *
  * 바탕화면 아이콘을 누르면 창이 열리고, 열린 창은 작업 표시줄에 쌓인다.
- * 창 안의 글은 아직 골격이라, 실제 내용은 lib/desk/xp-apps.ts에 채우면 된다.
+ * 프로젝트 창의 글은 lib/desk/content/projects.ts에서 온다. 소개·이력서·휴지통은 아직 골격이다.
  */
 export function MonitorScreen() {
   const { time: clock } = useClock();
   const screen = useRef<HTMLDivElement>(null);
-  const { wins, activeId, open, focus, close, minimize, toggleMax, toggleFromTaskbar, move } = useWindows();
+  const { wins, activeId, open, focus, close, minimize, toggleMax, toggleFromTaskbar, move, setPage } = useWindows();
 
   return (
     <div className="xp" ref={screen}>
@@ -54,7 +56,7 @@ export function MonitorScreen() {
             onToggleMax={() => toggleMax(win.id)}
             onClose={() => close(win.id)}
           >
-            <WindowBody kind={win.kind} onOpen={open} />
+            <WindowBody win={win} active={activeId === win.id} onOpen={open} onPage={(p) => setPage(win.id, p)} />
           </XpWindow>
         ))}
 
@@ -90,16 +92,27 @@ export function MonitorScreen() {
   );
 }
 
-/** 창 안쪽. 실제 글이 들어오기 전까지는 자리만 잡아 둔 골격이다 */
-function WindowBody({ kind, onOpen }: { kind: AppKind; onOpen: (id: string) => void }) {
-  if (kind === 'folder') {
+/** 창 안쪽. 프로젝트는 장 넘김 창으로, 나머지는 글이 들어오기 전까지 자리만 잡아 둔 골격으로 그린다 */
+function WindowBody({
+  win,
+  active,
+  onOpen,
+  onPage,
+}: {
+  win: WindowState;
+  active: boolean;
+  onOpen: (id: string) => void;
+  onPage: (page: number) => void;
+}) {
+  if (win.kind === 'folder') {
     return (
       <ul className="xp-list">
-        {projects.map((p) => (
+        {projectContents.map((p) => (
           <li key={p.id}>
             <button type="button" className="xp-list__row" onClick={() => onOpen(p.id)}>
               <span className="xp-list__icon" />
-              <span>{p.title}</span>
+              <span className="xp-list__name">{p.name}</span>
+              <span className="xp-list__sub">{p.tagline}</span>
             </button>
           </li>
         ))}
@@ -107,13 +120,17 @@ function WindowBody({ kind, onOpen }: { kind: AppKind; onOpen: (id: string) => v
     );
   }
 
-  if (kind === 'empty') {
+  if (win.kind === 'project') {
+    const project = findProject(win.id);
+    if (project) return <ProjectWindow project={project} page={win.page} active={active} onPage={onPage} />;
+  }
+
+  if (win.kind === 'empty') {
     return <p className="xp-empty">비어 있음</p>;
   }
 
   return (
     <div className="xp-doc">
-      {kind === 'project' && <span className="xp-doc__shot" />}
       <span className="xp-doc__line xp-doc__line--title" />
       <span className="xp-doc__line" />
       <span className="xp-doc__line" />

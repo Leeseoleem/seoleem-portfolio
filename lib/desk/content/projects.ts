@@ -21,16 +21,20 @@ export const fitpl: ProjectContent = {
     {
       kind: 'intro',
       title: '프로젝트 소개',
+      summary: '"카페 → 식사 → 산책"처럼 큰 흐름을 고르면 AI가 세부 장소와 이동 루트를 구성합니다.',
+      stack: ['React', 'TypeScript', 'Zustand', 'TanStack Query', 'React Native WebView'],
+      links: projectLinks.fitpl,
+      shots: [{ label: '일정 스타일 선택' }, { label: 'AI가 구성한 일정 상세' }],
+    },
+    {
+      kind: 'overview',
+      title: '개요',
       meta: [
         { label: '기간', value: '2025.05 ~ 진행 중' },
         { label: '팀', value: ['프론트엔드 2인', '백엔드 2인'] },
         { label: '역할', value: ['핵심 일정 플로우, 인증 화면 전담', '공통 UI 구조 설계', 'Android WebView 앱 연동, 출시'] },
         { label: '상태', value: ['Google Play 출시', 'v2.0.0 배포'] },
       ],
-      summary: '"카페 → 식사 → 산책"처럼 큰 흐름을 고르면 AI가 세부 장소와 이동 루트를 구성합니다.',
-      stack: ['React', 'TypeScript', 'Zustand', 'TanStack Query', 'React Native WebView'],
-      links: projectLinks.fitpl,
-      shots: [{ label: '일정 스타일 선택' }, { label: 'AI가 구성한 일정 상세' }],
     },
     {
       kind: 'diagram',
@@ -82,17 +86,21 @@ export const garachato: ProjectContent = {
     {
       kind: 'intro',
       title: '프로젝트 소개',
+      summary: 'TJ와 금영의 수록곡과 차트 데이터를 수집해 일본 노래방 곡을 검색하고 순위를 확인할 수 있는 서비스입니다.',
+      stack: ['Next.js', 'TypeScript', 'Supabase', 'Gemini API', 'Vercel Cron'],
+      links: projectLinks.garachato,
+      shots: [{ label: '통합 검색' }, { label: 'Apps-in-Toss 미니앱' }],
+    },
+    {
+      kind: 'overview',
+      title: '개요',
       meta: [
         { label: '기간', value: '2026.02 ~ 운영 중' },
         { label: '형태', value: '개인 프로젝트' },
         { label: '역할', value: ['기획, 디자인, 프론트엔드', '데이터 파이프라인, 배포, 운영'] },
         { label: '상태', value: ['웹 운영', 'Apps-in-Toss 운영'] },
       ],
-      summary: 'TJ와 금영의 수록곡과 차트 데이터를 수집해 일본 노래방 곡을 검색하고 순위를 확인할 수 있는 서비스입니다.',
-      stack: ['Next.js', 'TypeScript', 'Supabase', 'Gemini API', 'Vercel Cron'],
-      links: projectLinks.garachato,
-      shots: [{ label: '통합 검색' }, { label: 'Apps-in-Toss 미니앱' }],
-      badge: '스토어 리뷰 요청 → 2일 만에 신곡 알림 반영',
+      note: '스토어 리뷰 요청 → 2일 만에 신곡 알림 반영',
     },
     {
       kind: 'diagram',
@@ -154,16 +162,20 @@ export const urido: ProjectContent = {
     {
       kind: 'intro',
       title: '프로젝트 소개',
+      summary: '무엇을 할지 정하는 과정을 룰렛이나 카드 뽑기 같은 놀이로 만들고, 함께 정한 결과를 기록하는 모바일 앱입니다.',
+      stack: ['React Native (Expo)', 'TypeScript', 'Expo Router', 'NativeWind v4', 'TanStack Query', 'Reanimated'],
+      links: projectLinks.urido,
+      shots: [{ label: '홈' }, { label: '챌린지 선택' }],
+    },
+    {
+      kind: 'overview',
+      title: '개요',
       meta: [
         { label: '기간', value: '2026.06 ~ 진행 중' },
         { label: '팀', value: ['프론트엔드 1인', '백엔드 1인'] },
         { label: '역할', value: ['PO 겸 Frontend Developer', '기획, UX 설계, 프론트엔드 전담'] },
         { label: '상태', value: '소셜 로그인, API 연동 단계' },
       ],
-      summary: '무엇을 할지 정하는 과정을 룰렛이나 카드 뽑기 같은 놀이로 만들고, 함께 정한 결과를 기록하는 모바일 앱입니다.',
-      stack: ['React Native (Expo)', 'TypeScript', 'Expo Router', 'NativeWind v4', 'TanStack Query', 'Reanimated'],
-      links: projectLinks.urido,
-      shots: [{ label: '홈' }, { label: '챌린지 선택' }],
     },
     {
       kind: 'diagram',
