@@ -2,12 +2,12 @@
  * 모니터 프로젝트 창에 들어가는 글의 모양.
  *
  * 프로젝트 하나는 창 하나로 열리고, 창 안에서 장을 넘긴다.
- * 장은 네 종류만 있다. 소개, 서비스 구조도, Engineering Case, 자유 서술.
+ * 장은 세 종류만 있다. 소개, 서비스 구조도, Engineering Case.
  * 글은 lib/desk/content/projects.ts에 데이터로만 두고, 그리는 쪽은 종류별로 한 번만 만든다.
  * 문구가 바뀌면 데이터 파일만 고치면 된다.
  */
 
-export type ProjectId = 'fitpl' | 'garachato' | 'urido' | 'chaesigeodi';
+export type ProjectId = 'fitpl' | 'garachato' | 'urido';
 
 /** 소개 장의 메타 표 한 줄. 값이 여러 개면 줄을 나눠 그린다 */
 export interface MetaRow {
@@ -59,16 +59,7 @@ export interface CasePage {
   result: string;
 }
 
-/** 케이스 형식이 맞지 않는 글. 채식어디의 팀장 경험 같은 것 */
-export interface NotePage {
-  kind: 'note';
-  title: string;
-  heading: string;
-  paragraphs: string[];
-  links?: ExternalLink[];
-}
-
-export type ProjectPage = IntroPage | DiagramPage | CasePage | NotePage;
+export type ProjectPage = IntroPage | DiagramPage | CasePage;
 
 export interface ProjectContent {
   id: ProjectId;

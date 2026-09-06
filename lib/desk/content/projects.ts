@@ -3,6 +3,7 @@ import type { ProjectContent } from './types';
 
 /**
  * 프로젝트 창의 글. docs/content-brief.md 5장을 그대로 옮긴 것이다.
+ * 채식어디는 이력서 PDF의 Activities에만 두고 여기서는 다루지 않는다.
  * 수치와 사실은 이력서·포트폴리오 최종본에서 검증된 것만 쓴다. 여기서 새로 만들지 않는다.
  *
  * 대표 화면 이미지는 아직 없어서 src 없이 이름만 적어 두었다. 파일이 오면 src만 채운다.
@@ -214,40 +215,8 @@ export const urido: ProjectContent = {
   ],
 };
 
-export const chaesigeodi: ProjectContent = {
-  id: 'chaesigeodi',
-  name: '채식어디',
-  slug: 'chaesigeodi',
-  tagline: '원재료 OCR 기반 채식 판별 앱',
-  pages: [
-    {
-      kind: 'intro',
-      title: '프로젝트 소개',
-      meta: [
-        { label: '기간', value: '2024.03 ~ 2024.10' },
-        { label: '성격', value: ['졸업 프로젝트', '4인 팀'] },
-        { label: '역할', value: ['팀장', 'Frontend Developer'] },
-      ],
-      summary: '원재료명을 OCR로 읽어 채식 타입별 섭취 가능 여부를 안내하는 모바일 앱입니다. 회원가입을 제외한 전체 화면을 구현했습니다.',
-      stack: [],
-      links: projectLinks.chaesigeodi,
-      shots: [{ label: '대표 화면' }],
-    },
-    {
-      kind: 'note',
-      title: '팀장 경험',
-      heading: '7개월 팀 프로젝트 완주',
-      paragraphs: [
-        '작업 지연이 반복되자 기존 역할 분담을 유지하기보다 팀원별 실제 수행 가능한 범위를 다시 확인하고 작업을 재분배했습니다.',
-        '화면과 기능 기준도 문서로 정리해 구현 방향을 맞췄고, 4인 팀으로 7개월 프로젝트를 끝까지 완주했습니다.',
-      ],
-      links: projectLinks.chaesigeodi,
-    },
-  ],
-};
-
 /** 폴더에 보이는 순서. 브리프 4장의 순서 근거를 따른다 */
-export const projectContents: ProjectContent[] = [fitpl, garachato, urido, chaesigeodi];
+export const projectContents: ProjectContent[] = [fitpl, garachato, urido];
 
 export function findProject(id: string): ProjectContent | undefined {
   return projectContents.find((p) => p.id === id);

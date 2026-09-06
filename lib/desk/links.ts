@@ -11,16 +11,14 @@ export const links = {
 } as const;
 
 /**
- * 프로젝트 소개 장에 붙는 외부 링크.
- * 핏플의 Google Play, 가라챠토의 Live와 Apps-in-Toss 주소는 아직 받지 못해 비워 두었다.
- * 주소가 오면 여기만 채우면 창에 바로 나온다.
+ * 프로젝트 소개 장에 붙는 외부 링크. 주소는 이력서 PDF에 걸린 것과 같다.
+ * 우리두는 아직 출시 전이라 링크가 없다.
  */
 export const projectLinks: Record<ProjectId, ExternalLink[]> = {
-  fitpl: [],
-  garachato: [],
-  urido: [],
-  chaesigeodi: [
-    { label: 'GitHub', href: 'https://github.com/VRRS-Project-Team-GitPage' },
-    { label: 'Demo Video', href: 'https://www.youtube.com/watch?v=PUEc9VYo3kM' },
+  fitpl: [{ label: 'Google Play', href: 'https://play.google.com/store/apps/details?id=com.bluehp.fitpl' }],
+  garachato: [
+    { label: 'Live', href: 'https://garachato-karaoke-chart.vercel.app/' },
+    { label: 'Apps-in-Toss', href: 'https://minion.toss.im/9pLio5R4' },
   ],
+  urido: [],
 };
