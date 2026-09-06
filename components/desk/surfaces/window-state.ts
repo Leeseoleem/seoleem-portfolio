@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { create } from 'zustand';
 import { findApp, type AppKind } from '@/lib/desk/xp-apps';
 
 /** 모니터 화면 기준 크기. 창 좌표는 전부 이 안의 값이다 */
@@ -29,6 +29,19 @@ export interface WindowState {
   page: number;
 }
 
+interface WindowStore {
+  wins: WindowState[];
+  activeId: string | null;
+  open: (id: string) => void;
+  focus: (id: string) => void;
+  close: (id: string) => void;
+  minimize: (id: string) => void;
+  toggleMax: (id: string) => void;
+  toggleFromTaskbar: (id: string) => void;
+  move: (id: string, x: number, y: number) => void;
+  setPage: (id: string, page: number) => void;
+}
+
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
 /** 맨 앞으로 보낼 때 줄 겹침 순서 */
@@ -48,75 +61,80 @@ function topmost(list: WindowState[]) {
  *
  * 창 목록과 지금 활성인 창만 들고 있으면 작업 표시줄은 그걸 그대로 비추면 된다.
  * 겹침 순서는 z를 계속 키우는 방식이라, 앞으로 가져오는 것과 새로 여는 것이 같은 동작이 된다.
+ * 모니터 밖(핸드폰 앱 타일)에서도 창을 열어야 해서 컴포넌트 상태가 아니라 스토어다.
  */
-export function useWindows() {
-  const [wins, setWins] = useState<WindowState[]>([]);
-  const [activeId, setActiveId] = useState<string | null>(null);
+export const useWindowStore = create<WindowStore>((set, get) => ({
+  wins: [],
+  activeId: null,
 
   /** 이미 열려 있으면 앞으로 가져오고, 없으면 새로 만든다 */
-  const open = (id: string) => {
+  open: (id) => {
     const def = findApp(id);
     if (!def) return;
-    setWins((ws) => {
-      const z = nextZ(ws);
-      if (ws.some((w) => w.id === id)) {
-        return ws.map((w) => (w.id === id ? { ...w, z, minimized: false } : w));
+    set((s) => {
+      const z = nextZ(s.wins);
+      if (s.wins.some((w) => w.id === id)) {
+        return { wins: s.wins.map((w) => (w.id === id ? { ...w, z, minimized: false } : w)), activeId: id };
       }
       const [w, h] = def.size;
-      const step = ws.length % 5;
-      return [
-        ...ws,
-        {
-          id,
-          title: def.title,
-          kind: def.kind,
-          x: 96 + step * CASCADE,
-          y: 56 + step * CASCADE,
-          w,
-          h,
-          z,
-          minimized: false,
-          maximized: false,
-          page: 0,
-        },
-      ];
+      const step = s.wins.length % 5;
+      return {
+        wins: [
+          ...s.wins,
+          {
+            id,
+            title: def.title,
+            kind: def.kind,
+            x: 96 + step * CASCADE,
+            y: 56 + step * CASCADE,
+            w,
+            h,
+            z,
+            minimized: false,
+            maximized: false,
+            page: 0,
+          },
+        ],
+        activeId: id,
+      };
     });
-    setActiveId(id);
-  };
+  },
 
-  const focus = (id: string) => {
+  focus: (id) => {
+    const { wins, activeId } = get();
     if (activeId === id && !wins.find((w) => w.id === id)?.minimized) return;
-    setWins((ws) => ws.map((w) => (w.id === id ? { ...w, z: nextZ(ws), minimized: false } : w)));
-    setActiveId(id);
-  };
+    set((s) => ({
+      wins: s.wins.map((w) => (w.id === id ? { ...w, z: nextZ(s.wins), minimized: false } : w)),
+      activeId: id,
+    }));
+  },
 
-  const close = (id: string) => {
-    const rest = wins.filter((w) => w.id !== id);
-    setWins(rest);
-    if (activeId === id) setActiveId(topmost(rest));
-  };
+  close: (id) =>
+    set((s) => {
+      const rest = s.wins.filter((w) => w.id !== id);
+      return { wins: rest, activeId: s.activeId === id ? topmost(rest) : s.activeId };
+    }),
 
-  const minimize = (id: string) => {
-    const rest = wins.map((w) => (w.id === id ? { ...w, minimized: true } : w));
-    setWins(rest);
-    if (activeId === id) setActiveId(topmost(rest));
-  };
+  minimize: (id) =>
+    set((s) => {
+      const rest = s.wins.map((w) => (w.id === id ? { ...w, minimized: true } : w));
+      return { wins: rest, activeId: s.activeId === id ? topmost(rest) : s.activeId };
+    }),
 
-  const toggleMax = (id: string) => {
-    setWins((ws) => ws.map((w) => (w.id === id ? { ...w, maximized: !w.maximized } : w)));
-  };
+  toggleMax: (id) => set((s) => ({ wins: s.wins.map((w) => (w.id === id ? { ...w, maximized: !w.maximized } : w)) })),
 
   /** 작업 표시줄 버튼. 활성인 창을 다시 누르면 내려간다 */
-  const toggleFromTaskbar = (id: string) => {
+  toggleFromTaskbar: (id) => {
+    const { wins, activeId, minimize, focus } = get();
     const win = wins.find((w) => w.id === id);
     if (!win) return;
     if (!win.minimized && activeId === id) minimize(id);
     else focus(id);
-  };
+  },
 
-  const move = (id: string, x: number, y: number) => {
-    setWins((ws) =>
-      ws.map((w) =>
+  move: (id, x, y) =>
+    set((s) => ({
+      wins: s.wins.map((w) =>
         w.id === id
           ? {
               ...w,
@@ -125,12 +143,12 @@ export function useWindows() {
             }
           : w,
       ),
-    );
-  };
+    })),
 
-  const setPage = (id: string, page: number) => {
-    setWins((ws) => ws.map((w) => (w.id === id ? { ...w, page } : w)));
-  };
+  setPage: (id, page) => set((s) => ({ wins: s.wins.map((w) => (w.id === id ? { ...w, page } : w)) })),
+}));
 
-  return { wins, activeId, open, focus, close, minimize, toggleMax, toggleFromTaskbar, move, setPage };
+/** MonitorScreen이 쓰는 이름. 스토어를 그대로 돌려준다 */
+export function useWindows() {
+  return useWindowStore();
 }

@@ -24,3 +24,12 @@ export const projectLinks: Record<ProjectId, ExternalLink[]> = {
   ],
   urido: [],
 };
+
+/**
+ * 폰 앱 타일을 눌렀을 때 갈 곳. 출시된 서비스는 실제 서비스로 보낸다.
+ * 여기 없는 프로젝트(우리두, 출시 전)는 모니터의 프로젝트 창을 연다.
+ */
+export const phoneTileHref: Partial<Record<ProjectId, string>> = {
+  fitpl: projectLinks.fitpl[0].href,
+  garachato: projectLinks.garachato[0].href,
+};

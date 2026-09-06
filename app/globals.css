@@ -1838,6 +1838,7 @@ body {
   background: transparent;
   color: var(--phone-ink);
   font: inherit;
+  text-decoration: none;
   cursor: pointer;
 }
 

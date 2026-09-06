@@ -2,8 +2,12 @@
 
 import type { ReactNode } from 'react';
 import { useClock } from './use-clock';
-import { links } from '@/lib/desk/links';
+import { links, phoneTileHref } from '@/lib/desk/links';
 import { projectContents } from '@/lib/desk/content/projects';
+import { useWindowStore } from './window-state';
+import { useDeskStore } from '@/stores/useDeskStore';
+import { zoomPoses } from '@/lib/desk/layout';
+import { getSound } from '@/lib/desk/sound';
 
 /**
  * 핸드폰 화면. 책상 뷰와 확대 뷰가 같은 DOM을 본다.
@@ -30,6 +34,19 @@ function DockIcon({ children }: { children: ReactNode }) {
 
 export function PhoneScreen() {
   const { time } = useClock();
+  const openWindow = useWindowStore((s) => s.open);
+  const zoomTo = useDeskStore((s) => s.zoomTo);
+
+  /**
+   * 출시 전 프로젝트의 앱 타일. 폰 안에 프로젝트 화면을 따로 만들지 않고 모니터 창을 연 뒤 카메라를 모니터로 보낸다.
+   * 같은 내용을 두 벌 관리하지 않으려는 결정이다. 창은 먼저 열어 두어야 카메라가 닿았을 때 이미 떠 있다.
+   */
+  const openProject = (id: string) => {
+    getSound().play('click');
+    openWindow(id);
+    zoomTo('monitor', zoomPoses.monitor);
+  };
+
   return (
     <div className="home">
       <div className="home__status">
@@ -56,20 +73,35 @@ export function PhoneScreen() {
         </div>
       </section>
 
-      {/* 앱. 프로젝트마다 실제 앱 아이콘 타일 하나. 누르면 모니터의 프로젝트 창으로 넘긴다 (연결은 다음 단계) */}
+      {/* 앱. 프로젝트마다 실제 앱 아이콘 타일 하나. 실제 앱처럼 출시된 서비스는 그 서비스로 열리고,
+          아직 출시 전인 것은 모니터의 프로젝트 창으로 넘긴다 */}
       <ul className="apps" aria-label="프로젝트">
-        {projectContents.map((p) => (
-          <li key={p.id}>
-            <button type="button" className="app" aria-label={`${p.name} 프로젝트 보기`}>
+        {projectContents.map((p) => {
+          const href = phoneTileHref[p.id];
+          const tile = (
+            <>
               <span className="app__tile">
                 {/* 3D 안에서 확대되는 DOM이라 next/image 축소본 대신 원본을 쓴다 */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={`/icons/${p.id}.png`} alt="" draggable={false} />
               </span>
               <span className="app__name">{p.name}</span>
-            </button>
-          </li>
-        ))}
+            </>
+          );
+          return (
+            <li key={p.id}>
+              {href ? (
+                <a className="app" href={href} target="_blank" rel="noreferrer" aria-label={`${p.name} 열기`}>
+                  {tile}
+                </a>
+              ) : (
+                <button type="button" className="app" aria-label={`${p.name} 프로젝트 보기`} onClick={() => openProject(p.id)}>
+                  {tile}
+                </button>
+              )}
+            </li>
+          );
+        })}
       </ul>
 
       <div className="home__dots" aria-hidden="true">
