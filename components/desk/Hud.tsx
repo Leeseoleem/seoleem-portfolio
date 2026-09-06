@@ -159,7 +159,7 @@ export function Hud() {
               <p className="ps__line">
                 <span className="ps__prompt">{PROMPT}</span> whoami
               </p>
-              <p className="ps__out">seoleem · Frontend Developer</p>
+              <p className="ps__out">seoleem / Frontend Developer</p>
               <p className="ps__line">
                 <span className="ps__prompt">{PROMPT}</span>{' '}
                 <button type="button" className="ps__cmd" onClick={toggleSound}>
