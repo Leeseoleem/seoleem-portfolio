@@ -1,4 +1,5 @@
 import { projectContents } from '@/lib/desk/content/projects';
+import { trashItems } from '@/lib/desk/content/trash';
 
 /**
  * 모니터 화면 안에서 창으로 열리는 것들의 목록.
@@ -8,7 +9,7 @@ import { projectContents } from '@/lib/desk/content/projects';
  */
 
 /** 창 안에 무엇을 그릴지 */
-export type AppKind = 'folder' | 'project' | 'article' | 'empty';
+export type AppKind = 'folder' | 'project' | 'article' | 'trash';
 
 export interface AppDef {
   id: string;
@@ -45,7 +46,7 @@ export const desktopIcons: DesktopIcon[] = [
   { id: 'about', label: '소개', title: '소개 - 읽어보기', kind: 'article', icon: 'about', size: [560, 440] },
   { id: 'projects', label: '프로젝트', title: '내 프로젝트', kind: 'folder', icon: 'projects', size: [560, 400] },
   { id: 'resume', label: '이력서', title: '이력서 - 미리보기', kind: 'article', icon: 'resume', size: [520, 400] },
-  { id: 'trash', label: '휴지통', title: '휴지통', kind: 'empty', icon: 'trash', size: [420, 260] },
+  { id: 'trash', label: '휴지통', title: `휴지통 (${trashItems.length}개 항목)`, kind: 'trash', icon: 'trash', size: [680, 380] },
 ];
 
 /** id로 창 정보를 찾는다. 바탕화면 아이콘과 프로젝트를 한 곳에서 본다 */

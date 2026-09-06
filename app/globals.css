@@ -1132,12 +1132,80 @@ body {
   width: 40%;
 }
 
-.xp-empty {
+/* 휴지통. 탐색기의 자세히 보기처럼 표로 놓는다 */
+.xp-trash {
+  margin: -12px;
+}
+
+.xp-trash__note {
   margin: 0;
-  padding: 24px 0;
-  text-align: center;
-  font-size: 15px;
-  color: var(--xp-face-shadow);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--xp-line);
+  background: var(--xp-face);
+  font-size: 13px;
+  color: var(--xp-text-weak);
+}
+
+/* XP 목록 보기의 표. 머리글은 회색 단추 모양, 행은 얇은 선으로 나눈다 */
+.xp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.xp-table th {
+  padding: 6px 12px;
+  border-right: 1px solid var(--xp-line);
+  border-bottom: 1px solid var(--xp-face-shadow);
+  background: linear-gradient(#ffffff, var(--xp-face));
+  font-weight: 400;
+  text-align: left;
+  color: var(--xp-text-weak);
+  white-space: nowrap;
+}
+
+.xp-table th:last-child {
+  border-right: none;
+}
+
+.xp-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--xp-line);
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.xp-table__project {
+  width: 96px;
+  border-right: 1px solid var(--xp-line);
+  white-space: nowrap;
+}
+
+.xp-table__name {
+  width: 190px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.xp-table__reason {
+  color: var(--xp-text-weak);
+}
+
+/* 프로젝트 이름. 링크 모양이고 누르면 프로젝트 창으로 간다 */
+.xp-table__link {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--xp-link);
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.xp-table__link:hover,
+.xp-table__link:focus-visible {
+  outline: none;
+  text-decoration: underline;
 }
 
 /* ---------- XP 대화상자 부품 ---------- */

@@ -7,6 +7,7 @@ import { getSound } from '@/lib/desk/sound';
 import { sceneTime } from '@/lib/desk/runtime';
 import { findProject, projectContents } from '@/lib/desk/content/projects';
 import { about } from '@/lib/desk/content/about';
+import { trashItems, trashNote } from '@/lib/desk/content/trash';
 import { XpWindow } from './XpWindow';
 import { ProjectWindow } from './ProjectWindow';
 import { XpIcon } from './xp-icons';
@@ -21,7 +22,7 @@ import { useClock } from './use-clock';
  * 색·간격은 globals.css의 `--xp-*` 토큰을 쓴다.
  *
  * 바탕화면 아이콘을 누르면 창이 열리고, 열린 창은 작업 표시줄에 쌓인다.
- * 프로젝트와 소개 창의 글은 lib/desk/content/에서 온다. 이력서·휴지통은 아직 골격이다.
+ * 프로젝트, 소개, 휴지통 창의 글은 lib/desk/content/에서 온다. 이력서는 아직 골격이다.
  */
 export function MonitorScreen() {
   const { time: clock } = useClock();
@@ -195,8 +196,49 @@ function WindowBody({
     );
   }
 
-  if (win.kind === 'empty') {
-    return <p className="xp-empty">비어 있음</p>;
+  if (win.kind === 'trash') {
+    // 실제 휴지통의 자세히 보기. 프로젝트, 이름, 이유 세 칸의 표다.
+    // 같은 프로젝트가 이어지면 프로젝트 칸을 세로로 합쳐 한 번만 적는다
+    return (
+      <div className="xp-trash">
+        <p className="xp-trash__note">{trashNote}</p>
+        <table className="xp-table">
+          <thead>
+            <tr>
+              <th scope="col">프로젝트</th>
+              <th scope="col">이름</th>
+              <th scope="col">이유</th>
+            </tr>
+          </thead>
+          <tbody>
+            {trashItems.map((item, i) => {
+              const first = i === 0 || trashItems[i - 1].project !== item.project;
+              let span = 0;
+              if (first) {
+                while (i + span < trashItems.length && trashItems[i + span].project === item.project) span += 1;
+              }
+              const from = findProject(item.project);
+              return (
+                <tr key={item.title}>
+                  {first && (
+                    <td className="xp-table__project" rowSpan={span}>
+                      {/* 누르면 그 프로젝트 창이 열린다 */}
+                      {from && (
+                        <button type="button" className="xp-table__link" onClick={() => onOpen(from.id)}>
+                          {from.name}
+                        </button>
+                      )}
+                    </td>
+                  )}
+                  <td className="xp-table__name">{item.title}</td>
+                  <td className="xp-table__reason">{item.reason}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    );
   }
 
   return (
