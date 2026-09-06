@@ -6,7 +6,7 @@ import type { ProjectContent } from './types';
  * 채식어디는 이력서 PDF의 Activities에만 두고 여기서는 다루지 않는다.
  * 수치와 사실은 이력서·포트폴리오 최종본에서 검증된 것만 쓴다. 여기서 새로 만들지 않는다.
  *
- * 대표 화면 이미지는 아직 없어서 src 없이 이름만 적어 두었다. 파일이 오면 src만 채운다.
+ * 대표 화면은 public/shots/에 있는 기기 목업 이미지다. 투명 배경이라 그대로 놓는다.
  */
 
 /** 구조도를 소스 안에서 보기 좋게 적기 위해 앞뒤 빈 줄만 걷어낸다 */
@@ -24,7 +24,10 @@ export const fitpl: ProjectContent = {
       summary: '"카페 → 식사 → 산책"처럼 큰 흐름을 고르면 AI가 세부 장소와 이동 루트를 구성합니다.',
       stack: ['React', 'TypeScript', 'Zustand', 'TanStack Query', 'React Native WebView'],
       links: projectLinks.fitpl,
-      shots: [{ label: '일정 스타일 선택' }, { label: 'AI가 구성한 일정 상세' }],
+      shots: [
+        { label: '메인', src: '/shots/fitpl-1.webp' },
+        { label: '일정 상세', src: '/shots/fitpl-2.webp' },
+      ],
     },
     {
       kind: 'overview',
@@ -89,7 +92,10 @@ export const garachato: ProjectContent = {
       summary: 'TJ와 금영의 수록곡과 차트 데이터를 수집해 일본 노래방 곡을 검색하고 순위를 확인할 수 있는 서비스입니다.',
       stack: ['Next.js', 'TypeScript', 'Supabase', 'Gemini API', 'Vercel Cron'],
       links: projectLinks.garachato,
-      shots: [{ label: '통합 검색' }, { label: 'Apps-in-Toss 미니앱' }],
+      shots: [
+        { label: 'Apps-in-Toss 미니앱', src: '/shots/garachato-1.webp' },
+        { label: '웹 (모바일)', src: '/shots/garachato-2.webp' },
+      ],
     },
     {
       kind: 'overview',
@@ -165,7 +171,10 @@ export const urido: ProjectContent = {
       summary: '무엇을 할지 정하는 과정을 룰렛이나 카드 뽑기 같은 놀이로 만들고, 함께 정한 결과를 기록하는 모바일 앱입니다.',
       stack: ['React Native (Expo)', 'TypeScript', 'Expo Router', 'NativeWind v4', 'TanStack Query', 'Reanimated'],
       links: projectLinks.urido,
-      shots: [{ label: '홈' }, { label: '챌린지 선택' }],
+      shots: [
+        { label: '홈', src: '/shots/urido-1.webp' },
+        { label: '룰렛', src: '/shots/urido-2.webp' },
+      ],
     },
     {
       kind: 'overview',

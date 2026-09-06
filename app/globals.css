@@ -1109,19 +1109,21 @@ body {
   gap: 6px;
 }
 
-.pj-shot img,
-.pj-shot__empty {
+/* 기기 틀까지 들어 있는 투명 배경 목업이라 자르거나 둥글리지 않고 그대로 놓는다 */
+.pj-shot img {
   display: block;
   width: 100%;
-  aspect-ratio: 9 / 19.5;
-  border-radius: 8px;
-  object-fit: cover;
-  background: var(--xp-skel);
+  height: auto;
 }
 
 /* 아직 이미지가 없는 자리. 점선으로 비어 있음을 드러낸다 */
 .pj-shot__empty {
+  display: block;
+  width: 100%;
+  aspect-ratio: 9 / 19.5;
   border: 1px dashed var(--xp-skel-strong);
+  border-radius: 8px;
+  background: var(--xp-skel);
   box-sizing: border-box;
 }
 
