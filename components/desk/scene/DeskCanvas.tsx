@@ -47,7 +47,8 @@ export function DeskCanvas() {
     <Canvas
       className="desk-canvas"
       frameloop={isBooting || stoppedAfterOff ? 'never' : isZoomed ? 'demand' : 'always'}
-      shadows={{ type: THREE.PCFSoftShadowMap }}
+      // PCFSoftShadowMap은 three가 폐기했고 내부에서 PCFShadowMap으로 바뀌어 돌아간다. 같은 결과를 경고 없이 쓴다
+      shadows={{ type: THREE.PCFShadowMap }}
       dpr={1}
       performance={{ min: 0.5 }}
       camera={{ fov: CAMERA_FOV, near: 0.02, far: 60, position: [0, 2.5, 4] }}
