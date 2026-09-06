@@ -17,6 +17,9 @@
   --brand-accent: #245edb;
   --brand-glow: #7be08a;
   --brand-paper: #f4efe4;
+  /* 부팅·종료 화면. CRT가 꺼진 검정과 수축하는 흰 선이라 브랜드 잉크색과 따로 둔다 */
+  --crt-black: #000000;
+  --crt-white: #ffffff;
 
   --radius-xs: 2px;
   --radius-sm: 3px;
@@ -44,7 +47,8 @@
   --xp-title-to: #3d8aee;
   --xp-title-fg: #ffffff;
   --xp-border: #0831d9;
-  --xp-desktop: #3a6ea5;
+  /* 배경화면(bliss) 밑에 깔리는 바탕색. 이미지가 늦게 오면 이 색이 보인다 */
+  --xp-desktop: #2a6fd6;
   --xp-text: #000000;
   --xp-menu-head-top: #2b5fd4;
   --xp-menu-head-bottom: #1c48b6;
@@ -52,6 +56,8 @@
   --xp-menu-edge: #1a44a8;
   --xp-menu-hover: #316ac5;
   --xp-power: #d9412a;
+  --xp-power-light: #f07a5f;
+  --xp-menu-avatar: #e9eef5;
   --xp-taskbar-top: #3a8ff0;
   --xp-taskbar-mid: #245edb;
   --xp-taskbar-bottom: #1a45ab;
@@ -60,6 +66,22 @@
   --xp-start-mid: #3fa63d;
   --xp-start-bottom: #369a35;
   --xp-start-deep: #287f28;
+  --xp-start-lit-top: #6fd066;
+  --xp-start-lit-mid: #4db44a;
+  --xp-start-lit-mid2: #43a941;
+  --xp-start-lit-bottom: #2f8a2f;
+  --xp-task-top: #4a8ff2;
+  --xp-task-mid: #2f6fe0;
+  --xp-task-bottom: #2760c8;
+  --xp-task-lit-top: #5c9cf6;
+  --xp-task-lit-mid: #3d7ee8;
+  --xp-task-lit-bottom: #336fd6;
+  --xp-task-active-top: #1c47a9;
+  --xp-task-active-bottom: #1f4fb8;
+  --xp-close-top: #f08b78;
+  --xp-close-bottom: #d4381a;
+  --xp-close-lit-top: #ff9f8c;
+  --xp-close-lit-bottom: #e84526;
   --xp-tray-top: #1fb0f4;
   --xp-tray-mid: #1494e6;
   --xp-tray-bottom: #0f7fd2;
@@ -80,11 +102,36 @@
   --xp-group-legend: #0046d5;
   --xp-btn-border: #003c74;
   --xp-btn-hover: #f8b330;
+  --xp-btn-mid: #ecebe5;
+  --xp-btn-bottom: #d8d0c4;
   --xp-code-bg: #1e1e1e;
   --xp-code-fg: #d4d4d4;
   --xp-code-muted: #8a8a8a;
   --xp-code-fence: #161616;
   --xp-code-rule: #3a3a3a;
+
+  /* 바탕화면 아이콘 픽토그램(components/desk/surfaces/xp-icons.tsx). SVG가 style로 읽는다 */
+  --xpi-folder-back-top: #e6b43a;
+  --xpi-folder-back-bottom: #c8921f;
+  --xpi-folder-front-top: #ffe28a;
+  --xpi-folder-front-mid: #f8cf5e;
+  --xpi-folder-front-bottom: #e7b23c;
+  --xpi-folder-edge: #fff1bd;
+  --xpi-page-top: #ffffff;
+  --xpi-page-bottom: #e4eaf2;
+  --xpi-page-line: #8ea2be;
+  --xpi-page-fold: #cfd9e6;
+  --xpi-page-text: #5b7fb5;
+  --xpi-page-rule: #c9d5e5;
+  --xpi-photo-top: #7fb2f0;
+  --xpi-photo-bottom: #3f7fd6;
+  --xpi-photo-fg: #eaf2ff;
+  --xpi-bin-light: #eef4fa;
+  --xpi-bin-mid: #c9d8e8;
+  --xpi-bin-dark: #9db1c8;
+  --xpi-bin-line: #7f95ad;
+  --xpi-bin-lid: #dfe8f2;
+  --xpi-bin-arrow: #3f9d3a;
 
   /* 핸드폰 UI (토스 스타일). 실제 값은 폰 UI 작업에서 확정한다 */
   --toss-bg: #ffffff;
@@ -183,7 +230,7 @@ body {
   position: fixed;
   inset: 0;
   z-index: 10;
-  background: #000;
+  background: var(--crt-black);
 }
 
 .boot-canvas-host {
@@ -444,7 +491,7 @@ body {
   position: fixed;
   inset: 0;
   z-index: 20;
-  background: #000;
+  background: var(--crt-black);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -462,7 +509,7 @@ body {
   top: 50%;
   height: 2px;
   width: 100%;
-  background: #fff;
+  background: var(--crt-white);
   transform: translate(-50%, -50%) scaleX(1);
   box-shadow: var(--shadow-crt);
   transition:
@@ -559,7 +606,7 @@ body {
   height: 100%;
   position: relative;
   overflow: hidden;
-  background: #2a6fd6;
+  background: var(--xp-desktop);
   color: var(--xp-title-fg);
   /* XP는 Tahoma를 썼다. 픽셀 글꼴은 부팅 화면과 HUD에 남기고 바탕화면은 창과 같은 글꼴을 쓴다 */
   font-family: var(--font-ui);
@@ -673,12 +720,12 @@ body {
 .xp-start:hover,
 .xp-start:focus-visible {
   outline: none;
-  background: linear-gradient(#6fd066 0%, #4db44a 48%, #43a941 52%, #2f8a2f 100%);
+  background: linear-gradient(var(--xp-start-lit-top) 0%, var(--xp-start-lit-mid) 48%, var(--xp-start-lit-mid2) 52%, var(--xp-start-lit-bottom) 100%);
 }
 
 /* 메뉴가 열려 있으면 눌린 상태로 보인다 */
 .xp-start.is-open {
-  background: linear-gradient(#2f8a2f 0%, #369a35 50%, #3fa63d 100%);
+  background: linear-gradient(var(--xp-start-lit-bottom) 0%, var(--xp-start-bottom) 50%, var(--xp-start-mid) 100%);
   box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.35);
 }
 
@@ -757,7 +804,7 @@ body {
   border: 1px solid var(--xp-menu-edge);
   border-bottom: none;
   border-radius: 8px 8px 0 0;
-  background: #ffffff;
+  background: var(--xp-face-light);
   color: var(--xp-text);
   overflow: hidden;
 }
@@ -781,7 +828,7 @@ body {
   justify-content: center;
   border: 2px solid rgba(255, 255, 255, 0.85);
   border-radius: 4px;
-  background: #e9eef5;
+  background: var(--xp-menu-avatar);
 }
 
 .xp-menu__avatar .xp-icon__pic {
@@ -869,7 +916,7 @@ body {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: linear-gradient(#f07a5f, var(--xp-power));
+  background: linear-gradient(var(--xp-power-light), var(--xp-power));
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
 }
 
@@ -880,7 +927,7 @@ body {
   top: 5px;
   width: 8px;
   height: 8px;
-  border: 2px solid #ffffff;
+  border: 2px solid var(--xp-face-light);
   border-top-color: transparent;
   border-radius: 50%;
   box-sizing: content-box;
@@ -893,7 +940,7 @@ body {
   top: 3px;
   width: 2px;
   height: 7px;
-  background: #ffffff;
+  background: var(--xp-face-light);
 }
 
 /* 열려 있는 창 목록 */
@@ -915,7 +962,7 @@ body {
   padding: 0 12px;
   border: 1px solid rgba(0, 0, 0, 0.3);
   border-radius: 3px;
-  background: linear-gradient(#4a8ff2, #2f6fe0 60%, #2760c8);
+  background: linear-gradient(var(--xp-task-top), var(--xp-task-mid) 60%, var(--xp-task-bottom));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
   color: var(--xp-title-fg);
   font: inherit;
@@ -930,12 +977,12 @@ body {
 .xp-task:hover,
 .xp-task:focus-visible {
   outline: none;
-  background: linear-gradient(#5c9cf6, #3d7ee8 60%, #336fd6);
+  background: linear-gradient(var(--xp-task-lit-top), var(--xp-task-lit-mid) 60%, var(--xp-task-lit-bottom));
 }
 
 /* 지금 앞에 나와 있는 창은 눌린 것처럼 보인다 */
 .xp-task.is-active {
-  background: linear-gradient(#1c47a9, #1f4fb8);
+  background: linear-gradient(var(--xp-task-active-top), var(--xp-task-active-bottom));
   box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.45);
 }
 
@@ -1010,12 +1057,12 @@ body {
 }
 
 .xpw__btn--close {
-  background: linear-gradient(#f08b78, #d4381a);
+  background: linear-gradient(var(--xp-close-top), var(--xp-close-bottom));
 }
 
 .xpw__btn--close:hover,
 .xpw__btn--close:focus-visible {
-  background: linear-gradient(#ff9f8c, #e84526);
+  background: linear-gradient(var(--xp-close-lit-top), var(--xp-close-lit-bottom));
 }
 
 .xpw__body {
@@ -1023,7 +1070,7 @@ body {
   min-height: 0;
   padding: 12px;
   border: 1px solid var(--xp-face-shadow);
-  background: #ffffff;
+  background: var(--xp-face-light);
   overflow: auto;
 }
 
@@ -1162,7 +1209,7 @@ body {
   padding: 6px 12px;
   border-right: 1px solid var(--xp-line);
   border-bottom: 1px solid var(--xp-face-shadow);
-  background: linear-gradient(#ffffff, var(--xp-face));
+  background: linear-gradient(var(--xp-face-light), var(--xp-face));
   font-weight: 400;
   text-align: left;
   color: var(--xp-text-weak);
@@ -1241,7 +1288,7 @@ body {
   padding: 4px 14px;
   border: 1px solid var(--xp-btn-border);
   border-radius: 3px;
-  background: linear-gradient(#ffffff, #ecebe5 86%, #d8d0c4);
+  background: linear-gradient(var(--xp-face-light), var(--xp-btn-mid) 86%, var(--xp-btn-bottom));
   color: var(--xp-text);
   font: inherit;
   font-size: 13px;
@@ -1365,7 +1412,7 @@ body {
   padding: 3px 9px;
   border: 1px solid var(--xp-group-line);
   border-radius: 3px;
-  background: #ffffff;
+  background: var(--xp-face-light);
   font-size: 13px;
 }
 
@@ -1944,9 +1991,30 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #ffffff;
+  background: var(--xp-face-light);
   color: var(--xp-text);
   font-family: var(--font-ui);
+}
+
+/* 끝에서 더 넘기려 하면 종이가 그 방향으로 살짝 튕기고 돌아온다. 순환하지 않는다는 신호다 */
+.sheet.is-bump-right {
+  animation: sheet-bump-right 0.22s ease-out;
+}
+
+.sheet.is-bump-left {
+  animation: sheet-bump-left 0.22s ease-out;
+}
+
+@keyframes sheet-bump-right {
+  30% {
+    transform: translateX(-6px);
+  }
+}
+
+@keyframes sheet-bump-left {
+  30% {
+    transform: translateX(6px);
+  }
 }
 
 /* 종이는 이미 하얗게 된 뒤라 바탕은 바로 놓이고, 글(PDF)과 단추만 스르륵 나타난다 */
@@ -2029,11 +2097,10 @@ body {
   border-color: var(--xp-text-weak);
 }
 
-/* 끝 쪽에서는 흐려지고 눌리지 않는다. 등장 애니메이션이 opacity를 쥐고 있어 색으로 흐리게 한다 */
-.sheet__arrow:disabled {
+/* 끝 쪽에서는 흐려진다. 누르면 넘어가는 대신 종이가 튕기므로 단추 자체는 살려 둔다 */
+.sheet__arrow[aria-disabled='true'] {
   color: var(--xp-line);
   border-color: var(--xp-line);
-  cursor: default;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2044,6 +2111,7 @@ body {
     transition: none;
   }
 
+  .sheet,
   .sheet__page,
   .sheet__file,
   .sheet__arrow {

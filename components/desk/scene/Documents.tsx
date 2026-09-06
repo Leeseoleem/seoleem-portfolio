@@ -210,7 +210,7 @@ function Sheet({
       receiveShadow
     >
       <planeGeometry args={[PAPER_W, PAPER_H]} />
-      <meshStandardMaterial ref={matRef} map={texture} roughness={0.95} emissive="#ffffff" emissiveIntensity={0} />
+      <meshStandardMaterial ref={matRef} map={texture} roughness={0.95} emissive={scenePalette.furniture.bleach} emissiveIntensity={0} />
     </mesh>
   );
 }

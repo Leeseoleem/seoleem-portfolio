@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useDeskStore } from '@/stores/useDeskStore';
 import { BOOT_DURATION, SCREEN_H, SCREEN_W, drawBoot } from '@/lib/desk/screen-canvas';
+import { canvasPalette } from '@/lib/desk/palette';
 import { getCanvasFont, getScreenCanvas, getScreenContext, sceneTime } from '@/lib/desk/runtime';
 
 /**
@@ -16,7 +17,9 @@ export function BootOverlay() {
   const host = useRef<HTMLDivElement>(null);
   const done = useRef(false);
 
+  // 부팅 화면이 뜰 때마다 캔버스를 붙인다. 전원을 껐다 다시 켜면 이 오버레이가 다시 마운트되기 때문이다
   useEffect(() => {
+    if (phase !== 'boot') return;
     const el = host.current;
     if (!el) return;
     const canvas = getScreenCanvas();
@@ -24,7 +27,7 @@ export function BootOverlay() {
     return () => {
       if (canvas.parentNode === el) el.removeChild(canvas);
     };
-  }, []);
+  }, [phase]);
 
   const complete = () => {
     if (done.current) return;
@@ -32,7 +35,7 @@ export function BootOverlay() {
     // 부팅이 끝나면 화면 내용은 MonitorScreen(DOM)이 맡는다. 캔버스는 비워만 둔다
     const ctx = getScreenContext();
     if (ctx) {
-      ctx.fillStyle = '#000000';
+      ctx.fillStyle = canvasPalette.boot.background;
       ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
     }
     // 접속음은 여기서 내지 않는다. 아직 사용자가 화면을 건드리기 전이라 소리가 대기했다가
@@ -43,6 +46,8 @@ export function BootOverlay() {
   // 부팅 애니메이션 루프. 2D 캔버스만 그리므로 3D가 멈춰 있어도 부드럽게 돈다
   useEffect(() => {
     if (phase !== 'boot') return;
+    // 다시 켤 때는 지난 부팅의 완료 표시를 지워야 이번 부팅도 끝낼 수 있다
+    done.current = false;
     const ctx = getScreenContext();
     let raf = 0;
     const tick = () => {

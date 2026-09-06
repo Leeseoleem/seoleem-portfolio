@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Interactive } from './Interactive';
-import { scenePalette } from '@/lib/desk/palette';
+import { canvasPalette, scenePalette } from '@/lib/desk/palette';
 import { positions, TOP } from '@/lib/desk/layout';
 import { getSound } from '@/lib/desk/sound';
 
@@ -19,9 +19,9 @@ function makeSteamTexture(): THREE.CanvasTexture {
   const ctx = c.getContext('2d');
   if (ctx) {
     const g = ctx.createRadialGradient(32, 32, 2, 32, 32, 30);
-    g.addColorStop(0, 'rgba(255,255,255,0.75)');
-    g.addColorStop(0.55, 'rgba(255,255,255,0.28)');
-    g.addColorStop(1, 'rgba(255,255,255,0)');
+    g.addColorStop(0, canvasPalette.steam.core);
+    g.addColorStop(0.55, canvasPalette.steam.mid);
+    g.addColorStop(1, canvasPalette.steam.edge);
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, 64, 64);
   }
