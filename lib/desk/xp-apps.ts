@@ -42,7 +42,7 @@ export const projects: AppDef[] = projectContents.map((p) => ({
 
 /** 바탕화면 아이콘 순서. 처음 온 사람이 위에서부터 읽으니 소개가 맨 위다 */
 export const desktopIcons: DesktopIcon[] = [
-  { id: 'about', label: '소개', title: '소개 - 읽어보기', kind: 'article', icon: 'about', size: [520, 400] },
+  { id: 'about', label: '소개', title: '소개 - 읽어보기', kind: 'article', icon: 'about', size: [560, 440] },
   { id: 'projects', label: '프로젝트', title: '내 프로젝트', kind: 'folder', icon: 'projects', size: [560, 400] },
   { id: 'resume', label: '이력서', title: '이력서 - 미리보기', kind: 'article', icon: 'resume', size: [520, 400] },
   { id: 'trash', label: '휴지통', title: '휴지통', kind: 'empty', icon: 'trash', size: [420, 260] },

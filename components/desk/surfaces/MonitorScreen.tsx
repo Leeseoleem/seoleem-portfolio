@@ -6,6 +6,7 @@ import { useDeskStore } from '@/stores/useDeskStore';
 import { getSound } from '@/lib/desk/sound';
 import { sceneTime } from '@/lib/desk/runtime';
 import { findProject, projectContents } from '@/lib/desk/content/projects';
+import { about } from '@/lib/desk/content/about';
 import { XpWindow } from './XpWindow';
 import { ProjectWindow } from './ProjectWindow';
 import { XpIcon } from './xp-icons';
@@ -20,7 +21,7 @@ import { useClock } from './use-clock';
  * 색·간격은 globals.css의 `--xp-*` 토큰을 쓴다.
  *
  * 바탕화면 아이콘을 누르면 창이 열리고, 열린 창은 작업 표시줄에 쌓인다.
- * 프로젝트 창의 글은 lib/desk/content/projects.ts에서 온다. 소개·이력서·휴지통은 아직 골격이다.
+ * 프로젝트와 소개 창의 글은 lib/desk/content/에서 온다. 이력서·휴지통은 아직 골격이다.
  */
 export function MonitorScreen() {
   const { time: clock } = useClock();
@@ -181,6 +182,17 @@ function WindowBody({
   if (win.kind === 'project') {
     const project = findProject(win.id);
     if (project) return <ProjectWindow project={project} page={win.page} active={active} onPage={onPage} />;
+  }
+
+  if (win.id === 'about') {
+    return (
+      <article className="xp-about">
+        <h2 className="xp-about__heading">{about.heading}</h2>
+        {about.paragraphs.map((text) => (
+          <p key={text}>{text}</p>
+        ))}
+      </article>
+    );
   }
 
   if (win.kind === 'empty') {

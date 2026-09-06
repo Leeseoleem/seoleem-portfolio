@@ -1090,6 +1090,25 @@ body {
   opacity: 0.85;
 }
 
+/* 소개 창. 메모장처럼 흰 종이 위의 글. 첫 문장이 제목이고 나머지는 단락 */
+.xp-about {
+  padding: 14px 16px 8px;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.xp-about__heading {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+
+.xp-about p {
+  margin: 0 0 14px;
+}
+
 /* 글이 들어오기 전까지 자리만 잡아 두는 골격 */
 .xp-doc {
   display: flex;
