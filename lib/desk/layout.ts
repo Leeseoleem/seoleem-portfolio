@@ -36,19 +36,29 @@ export const PAPER_X = -PAPER_IN / 2;
 export const COVER_T = 0.006;
 export const PAPER_H = 0.034;
 
+/**
+ * 방의 크기. 책상(4.2m)보다 양옆으로 1.1m씩 넓고, 뒷벽에서 앞으로 ROOM_DEPTH만큼 바닥이 깔린다.
+ * 카메라는 이 안에서만 움직여야 한다. 옆벽 밖으로 나가면 벽 뒷면이 시야를 가린다.
+ * 궤도 반지름 최대(radius × zoomMax) × sin(yawMax)가 ROOM_HALF_W보다 작도록 아래 값들을 함께 맞춘다.
+ */
+export const ROOM_HALF_W = 3.2;
+export const ROOM_DEPTH = 6.5;
+export const ROOM_H = 3.0;
+
 /** 책상 뷰 궤도 카메라 기본값 */
 export const orbitDefaults = {
   target: [0, DESK_Y + 0.2, -0.1] as [number, number, number],
   radius: 4.25,
   yaw: 0,
   pitch: 0.52,
-  zoom: 0.78,
-  yawMin: -0.9,
-  yawMax: 0.9,
+  zoom: 0.74,
+  yawMin: -0.8,
+  yawMax: 0.8,
   pitchMin: 0.1,
   pitchMax: 0.78,
   zoomMin: 0.55,
-  zoomMax: 1.12,
+  // 4.25 × 1.0 × sin(0.8) ≈ 3.05 < ROOM_HALF_W
+  zoomMax: 1.0,
 };
 
 
