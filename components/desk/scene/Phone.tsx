@@ -28,7 +28,15 @@ export function Phone() {
         <planeGeometry args={SCREEN} />
         <meshBasicMaterial color={scenePalette.furniture.black} toneMapped={false} />
       </mesh>
-      <ZoomSurface deskView target="phone" size={SCREEN} pixels={SCREEN_PX} position={[0, TOP + 0.024, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <ZoomSurface
+        deskView
+        hideWhileOtherZoomed
+        target="phone"
+        size={SCREEN}
+        pixels={SCREEN_PX}
+        position={[0, TOP + 0.024, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+      >
         <PhoneScreen />
       </ZoomSurface>
       {/* 전면 카메라 */}

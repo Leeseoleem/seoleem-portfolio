@@ -8,7 +8,7 @@
 
 export type SfxName =
   | 'chime' | 'whoosh' | 'click' | 'tap' | 'lightFlicker'
-  | 'mouseClick' | 'keys' | 'purr' | 'squeak' | 'shutdown' | 'drink';
+  | 'mouseClick' | 'keys' | 'purr' | 'squeak' | 'shutdown' | 'drink' | 'pageflip';
 
 const STORAGE_KEY = 'seoleem-sound';
 
@@ -21,7 +21,7 @@ const SFX_VERSION = '2';
  * 파일을 새로 넣으면 이 목록에도 추가한다.
  */
 const SFX_FILES: SfxName[] = [
-  'chime', 'tap', 'lightFlicker', 'mouseClick', 'keys', 'purr', 'shutdown', 'drink',
+  'chime', 'tap', 'lightFlicker', 'mouseClick', 'keys', 'purr', 'shutdown', 'drink', 'pageflip',
 ];
 
 class SoundEngine {
@@ -252,6 +252,10 @@ class SoundEngine {
       case 'squeak':
         this.tone(ctx, 2600, t, 0.07, 'sine', 0.05);
         this.tone(ctx, 3200, t + 0.08, 0.09, 'sine', 0.05);
+        break;
+      case 'pageflip':
+        // 파일이 없을 때의 대체음. 종이 스치는 짧은 잡음
+        this.crackle(ctx, t, 3);
         break;
       case 'whoosh': {
         const len = 0.7;

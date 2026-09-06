@@ -109,11 +109,12 @@ export const zoomPoses = {
     up: [-Math.sin(NOTEBOOK_YAW), 0, -Math.cos(NOTEBOOK_YAW)] as [number, number, number],
   },
   docs: {
-    // 맨 위 장 기준이다. 가운데 장에 맞추면 실제로 보이는 종이와 각도·자리가 어긋난다
-    target: [positions.docs[0] + 0.04, TOP + 0.012, positions.docs[2] + 0.03] as [number, number, number],
+    // 맨 위 장 기준이다. 가운데 장에 맞추면 실제로 보이는 종이와 각도·자리가 어긋난다.
+    // 확대하면 맨 위 장이 5cm 들리고 여백까지 커지므로(Documents.tsx) 그 높이와 크기에 맞춘다
+    target: [positions.docs[0] + 0.04, TOP + 0.062, positions.docs[2] + 0.03] as [number, number, number],
     dir: tiltToward(DOCS_FAN, 0.24),
-    fit: [0.6, 0.84] as [number, number],
-    margin: 1.16,
+    fit: [0.704, 0.92] as [number, number],
+    margin: 1.1,
     up: [-Math.sin(DOCS_FAN), 0, -Math.cos(DOCS_FAN)] as [number, number, number],
   },
 } satisfies Record<string, CameraPose>;
