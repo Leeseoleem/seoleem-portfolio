@@ -63,8 +63,9 @@ function OffSequence() {
     <div className={`off-screen${shown ? ' is-visible' : ''}`}>
       <div className={`off-line${stage === 'collapse' || stage === 'closing' ? ' is-collapsed' : ''}`} />
       <div className={`closing${stage === 'closing' ? ' is-visible' : ''}`} aria-hidden={stage !== 'closing'}>
-        <p className="closing-title">긍정적인 검토를 기다리겠습니다.</p>
-        <p className="closing-sub">감사합니다.</p>
+        {/* 마지막 줄은 이력서 맺음말과 같은 문장이다. 이 페이지의 주 방문자는 채용 담당자라 이렇게 두었다 */}
+        <p className="closing-title">여기까지 봐주셔서 감사합니다.</p>
+        <p className="closing-sub">긍정적인 검토를 기다리겠습니다.</p>
         <PowerButton label="다시 켜기" onClick={restart} />
         <p className="closing-hint">seoleem desk</p>
       </div>
