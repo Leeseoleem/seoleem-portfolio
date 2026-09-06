@@ -31,8 +31,8 @@ const BAND_Y = BODY_Y - (OPEN_H + BEZEL_H) / 4;
 const NOTES: Array<{ color: string; arrow: number; position: [number, number, number]; tilt: number }> = [
   // 오른쪽 위: 화면을 가리키는 화살표(왼쪽)
   { color: canvasPalette.sticky.yellow, arrow: Math.PI, position: [0.71, BODY_Y + 0.33, LED_Z + 0.003], tilt: -0.07 },
-  // 왼쪽 아래: 책상 위 물건들을 가리키는 화살표(왼쪽 아래)
-  { color: canvasPalette.sticky.pink, arrow: Math.PI * 0.72, position: [-0.71, BODY_Y - 0.26, LED_Z + 0.003], tilt: 0.09 },
+  // 왼쪽, 바탕화면 휴지통 아이콘 높이: 책상 뷰에서는 공책을, 확대 뷰에서는 왼쪽 아래 HUD를 가리키는 화살표(왼쪽 아래)
+  { color: canvasPalette.sticky.pink, arrow: Math.PI * 0.72, position: [-0.71, BODY_Y - 0.07, LED_Z + 0.003], tilt: 0.09 },
 ];
 const NOTE_SIZE = 0.105;
 const NOTE_TEX = 256;

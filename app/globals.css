@@ -241,7 +241,8 @@ body {
 /* ---------- HUD: 파워셸 창 ---------- */
 .ps {
   position: fixed;
-  right: var(--space-5);
+  /* 왼쪽 아래. 모니터 왼쪽의 메모지 화살표가 이 창을 가리키는 방향이다 */
+  left: var(--space-5);
   bottom: var(--space-5);
   z-index: 6;
   width: 300px;

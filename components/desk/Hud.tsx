@@ -9,7 +9,7 @@ const PROMPT = 'PS D:\\seoleem>';
 const TITLE = 'seoleem - profile.ps1';
 
 /**
- * 화면 오른쪽 아래에 항상 떠 있는 HUD. XP 시절 파워셸 창 모양이다.
+ * 화면 왼쪽 아래에 항상 떠 있는 HUD. XP 시절 파워셸 창 모양이다.
  *
  * 중간에 들어온 사람도 이게 누구 사이트인지 바로 알 수 있어야 하고,
  * 효과음을 끌 방법이 어디엔가는 있어야 한다. 둘 다 여기서 해결한다.
@@ -25,7 +25,7 @@ export function Hud() {
   // 좁은 화면에서는 접힌 채 시작한다. 펼쳐진 창이 3D 씬의 절반을 가리기 때문이다.
   // 부팅 중에는 이 창이 그려지지 않아 서버 렌더와 어긋날 일이 없다
   const [collapsed, setCollapsed] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches);
-  /** 사용자가 옮긴 자리. null이면 CSS의 기본 자리(오른쪽 아래)를 쓴다 */
+  /** 사용자가 옮긴 자리. null이면 CSS의 기본 자리(왼쪽 아래)를 쓴다 */
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   /** 밖으로 나간 창을 도로 들일 때만 켜는 스냅 연출 */
   const [snapping, setSnapping] = useState(false);
@@ -132,7 +132,7 @@ export function Hud() {
           ref={panel}
           // 확대 중에는 화면을 가리지 않게 흐려 둔다. 마우스를 올리면 다시 진해진다
           className={`ps${snapping ? ' is-snapping' : ''}${phase === 'zoomed' ? ' is-dim' : ''}`}
-          style={pos ? { left: pos.x, top: pos.y, right: 'auto', bottom: 'auto' } : undefined}
+          style={pos ? { left: pos.x, top: pos.y, bottom: 'auto' } : undefined}
           aria-label="seoleem 포트폴리오 안내"
         >
           {/* 타이틀바를 잡아 창을 옮긴다 */}
