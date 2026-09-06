@@ -153,7 +153,7 @@ export const deskObstacles: Obstacle[] = [
   { x: positions.mug[0], z: positions.mug[2], halfW: 0.15, halfD: 0.15 },
   { x: positions.notebook[0], z: positions.notebook[2], halfW: 0.44, halfD: 0.52 },
   { x: positions.docs[0], z: positions.docs[2], halfW: 0.33, halfD: 0.45 },
-  { x: positions.phone[0], z: positions.phone[2], halfW: 0.17, halfD: 0.34 },
+  { x: positions.phone[0], z: positions.phone[2], halfW: 0.18, halfD: 0.34 },
   // 모니터. 받침뿐 아니라 본체까지 막는다. 본체가 빠지면 마우스가 그 밑으로 들어가 화면에서 사라진다
   { x: 0, z: -0.45, halfW: 0.75, halfD: 0.5 },
   { x: positions.lampBase[0], z: positions.lampBase[2], halfW: 0.2, halfD: 0.2 },

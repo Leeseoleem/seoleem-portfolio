@@ -2,12 +2,14 @@ import type { ExternalLink, ProjectId } from '@/lib/desk/content/types';
 
 /**
  * 바깥으로 나가는 링크. 핸드폰 독과 프로젝트 창이 쓴다.
- * 주소는 한 곳에서만 관리한다. velog·linkedin은 실제 주소로 바꿔야 한다.
+ * 주소는 한 곳에서만 관리하고, 이력서 PDF에 걸린 것과 같은 값이다.
+ * LinkedIn 주소에는 한글이 들어 있어 퍼센트 인코딩된 형태로 둔다.
  */
 export const links = {
   github: 'https://github.com/Leeseoleem',
-  velog: 'https://velog.io/@seoleem',
-  linkedin: 'https://www.linkedin.com/in/seoleem',
+  velog: 'https://velog.io/@leeseoleem1014',
+  linkedin: 'https://www.linkedin.com/in/%EC%84%9C%EB%A6%BC-%EC%9D%B4-84944a355',
+  email: 'mailto:leeseorim0029@gmail.com',
 } as const;
 
 /**

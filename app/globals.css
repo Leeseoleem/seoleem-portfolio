@@ -103,9 +103,10 @@
   --phone-bg-light: #f6f7f9;
   --phone-ink: #1f2226;
   --phone-ink-weak: #7b8088;
-  --phone-card: #2a2c31;
+  --phone-card: #24262b;
   --phone-card-fg: #f2f3f5;
-  --phone-card-fg-weak: rgba(242, 243, 245, 0.62);
+  --phone-card-fg-weak: rgba(242, 243, 245, 0.6);
+  --phone-card-chip: rgba(255, 255, 255, 0.08);
   --phone-shadow-dark: rgba(31, 34, 38, 0.14);
   --phone-shadow-light: rgba(255, 255, 255, 0.95);
 
@@ -1753,8 +1754,8 @@ body {
 /* 어두운 소개 카드. 화면의 유일한 짙은 덩어리라 시선이 여기 모인다 */
 .card {
   margin-top: 26px;
-  padding: 22px 22px 20px;
-  border-radius: 22px;
+  padding: 24px 24px 22px;
+  border-radius: 14px;
   background: var(--phone-card);
   color: var(--phone-card-fg);
   box-shadow:
@@ -1766,40 +1767,43 @@ body {
   margin: 0;
 }
 
+/* 핸들. 대문자 자간 벌림 없이 작게 */
 .card__eyebrow {
   font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-weight: 500;
   color: var(--phone-card-fg-weak);
 }
 
 .card__title {
-  margin-top: 8px;
+  margin-top: 6px;
   font-size: 24px;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
+/* 본문은 단어 중간에서 줄이 갈리지 않게 한다 */
 .card__body {
-  margin-top: 10px;
+  margin-top: 14px;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.6;
   color: var(--phone-card-fg-weak);
+  word-break: keep-all;
 }
 
+/* 스택. 선 없는 옅은 칩 */
 .card__meta {
-  margin-top: 16px;
+  margin-top: 18px;
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
 .card__meta span {
   padding: 5px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(242, 243, 245, 0.18);
-  font-size: 12px;
+  border-radius: 6px;
+  background: var(--phone-card-chip);
+  font-size: 11px;
   font-weight: 600;
   color: var(--phone-card-fg);
 }
@@ -1812,6 +1816,15 @@ body {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 18px 12px;
+}
+
+/* 실제 앱 아이콘. 타일 모서리에 맞춰 둥글게 자른다 */
+.app__tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  object-fit: cover;
 }
 
 .app {
@@ -1831,7 +1844,7 @@ body {
 .app__tile {
   width: 62px;
   height: 62px;
-  border-radius: 18px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1897,7 +1910,7 @@ body {
   bottom: 26px;
   display: flex;
   justify-content: center;
-  gap: 26px;
+  gap: 22px;
 }
 
 .dock__item {
