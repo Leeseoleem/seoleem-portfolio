@@ -18,15 +18,30 @@ const TURN_DISTANCE = 300;
 
 export function DocumentSheets() {
   const [page, setPage] = useState(1);
+  /** 끝에서 더 넘기려 했을 때 종이가 튕기는 방향. 0이면 가만히 */
+  const [bump, setBump] = useState<-1 | 0 | 1>(0);
   const wheel = useRef(0);
+  const bumpTimer = useRef(0);
   const last = RESUME.pages;
   const prev = page > 1 ? page - 1 : null;
   const next = page < last ? page + 1 : null;
 
+  /**
+   * n쪽으로 간다. 범위를 벗어나면 넘어가지 않고 그 방향으로 살짝 튕긴다.
+   * 순환시키지 않는 대신 "여기가 끝"을 몸으로 알린다.
+   */
   const go = (n: number) => {
+    if (n < 1 || n > last) {
+      setBump(n < 1 ? -1 : 1);
+      window.clearTimeout(bumpTimer.current);
+      bumpTimer.current = window.setTimeout(() => setBump(0), 220);
+      return;
+    }
     getSound().play('pageflip');
     setPage(n);
   };
+
+  useEffect(() => () => window.clearTimeout(bumpTimer.current), []);
 
   // 공책처럼 가로 스크롤로도 넘긴다. 트랙패드는 deltaX, 휠 마우스는 shift + deltaY로 들어온다
   const onWheel = (e: React.WheelEvent<HTMLDivElement>) => {
@@ -36,14 +51,21 @@ export function DocumentSheets() {
     if (Math.abs(wheel.current) < TURN_DISTANCE) return;
     const n = page + Math.sign(wheel.current);
     wheel.current = 0;
-    if (n >= 1 && n <= last) go(n);
+    go(n);
   };
 
   // 확대 상태에서만 이 컴포넌트가 떠 있으므로 방향키는 그때만 붙는다
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      const n = e.key === 'ArrowLeft' ? page - 1 : e.key === 'ArrowRight' ? page + 1 : 0;
-      if (n < 1 || n > last) return;
+      const dir = e.key === 'ArrowLeft' ? -1 : e.key === 'ArrowRight' ? 1 : 0;
+      if (!dir) return;
+      const n = page + dir;
+      if (n < 1 || n > last) {
+        setBump(dir);
+        window.clearTimeout(bumpTimer.current);
+        bumpTimer.current = window.setTimeout(() => setBump(0), 220);
+        return;
+      }
       getSound().play('pageflip');
       setPage(n);
     };
@@ -52,7 +74,7 @@ export function DocumentSheets() {
   }, [page, last]);
 
   return (
-    <div className="sheet" onWheel={onWheel}>
+    <div className={`sheet${bump ? (bump < 0 ? ' is-bump-left' : ' is-bump-right') : ''}`} onWheel={onWheel}>
       {/* 3D 안에서 확대되는 DOM이라 next/image 축소본 대신 원본을 쓴다 */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img className="sheet__page" src={RESUME.page(page)} alt={`이력서 ${page}쪽`} draggable={false} />
@@ -73,8 +95,8 @@ export function DocumentSheets() {
       <button
         type="button"
         className="sheet__arrow sheet__arrow--prev"
-        onClick={() => prev && go(prev)}
-        disabled={!prev}
+        onClick={() => go(page - 1)}
+        aria-disabled={!prev}
         aria-label="이전 쪽"
       >
         ‹
@@ -82,8 +104,8 @@ export function DocumentSheets() {
       <button
         type="button"
         className="sheet__arrow sheet__arrow--next"
-        onClick={() => next && go(next)}
-        disabled={!next}
+        onClick={() => go(page + 1)}
+        aria-disabled={!next}
         aria-label="다음 쪽"
       >
         ›
