@@ -12,6 +12,7 @@ import { scenePalette } from '@/lib/desk/palette';
 import { COVER_D, COVER_T, COVER_W, NOTEBOOK_YAW, PAPER_D, PAPER_H, PAPER_W, PAPER_X, positions, TOP, zoomPoses } from '@/lib/desk/layout';
 import { createRoundedBoxGeometry } from '@/lib/desk/geometry';
 import { drawLeather } from '@/lib/desk/leather';
+import { drawNotebookLabel, LABEL_TEX_H, LABEL_TEX_W, scriptFontFamily } from '@/lib/desk/notebook-label';
 import { requestShadowUpdate } from '@/lib/desk/shadows';
 import { smoothstep } from '@/lib/desk/math';
 import { prefersReducedMotion } from '@/lib/desk/runtime';
@@ -99,6 +100,41 @@ export function Notebook() {
   const coverGeo = useMemo(() => createRoundedBoxGeometry(COVER_W, COVER_T, COVER_D, 0.004), []);
   useEffect(() => () => coverGeo.dispose(), [coverGeo]);
 
+  // 표지 라벨. 속지 표지와 같은 필기체로 제목을 쓴다
+  const label = useMemo(() => {
+    const c = document.createElement('canvas');
+    c.width = LABEL_TEX_W;
+    c.height = LABEL_TEX_H;
+    const ctx = c.getContext('2d');
+    if (ctx) drawNotebookLabel(ctx, LABEL_TEX_W, LABEL_TEX_H);
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.anisotropy = 4;
+    return tex;
+  }, []);
+  useEffect(() => () => label.dispose(), [label]);
+
+  // 필기체는 웹 글꼴이라 첫 그림에는 대체 글꼴로 나온다. 글꼴이 도착하면 한 번 더 그린다
+  useEffect(() => {
+    const family = scriptFontFamily();
+    if (!document.fonts?.load) return;
+    let alive = true;
+    document.fonts
+      .load(`64px ${family}`)
+      .then(() => {
+        if (!alive) return;
+        const ctx = (label.image as HTMLCanvasElement).getContext('2d');
+        if (!ctx) return;
+        drawNotebookLabel(ctx, LABEL_TEX_W, LABEL_TEX_H);
+        label.needsUpdate = true;
+        invalidate();
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [label, invalidate]);
+
   useFrame((_, delta) => {
     const { phase, zoomed } = useDeskStore.getState();
     const target = zoomed === 'notebook' && (phase === 'zoomed' || phase === 'transition') ? 1 : 0;
@@ -155,14 +191,14 @@ export function Notebook() {
         <mesh geometry={coverGeo} position={[COVER_W / 2, 0, 0]} castShadow receiveShadow>
           <meshStandardMaterial map={leather} bumpMap={leather} bumpScale={0.002} roughness={0.72} />
         </mesh>
-        {/* 표지에 붙인 빈 라벨. 테두리 판 위에 안쪽 종이를 얹어 두 겹으로 만든다 */}
+        {/* 표지에 붙인 라벨. 테두리 판 위에 안쪽 종이를 얹어 두 겹으로 만들고, 종이에 제목을 쓴다 */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[COVER_W / 2, COVER_T / 2 + 0.0005, -0.12]}>
           <planeGeometry args={[0.34, 0.14]} />
           <meshStandardMaterial color={scenePalette.notebook.labelBorder} roughness={0.95} side={THREE.DoubleSide} />
         </mesh>
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[COVER_W / 2, COVER_T / 2 + 0.0007, -0.12]}>
           <planeGeometry args={[0.326, 0.126]} />
-          <meshStandardMaterial color={scenePalette.notebook.labelPaper} roughness={0.95} side={THREE.DoubleSide} />
+          <meshStandardMaterial map={label} roughness={0.95} side={THREE.DoubleSide} />
         </mesh>
       </group>
       {/* 펼쳐진 속지 위에 얹히는 DOM. 디자인 시안이 여기 들어간다 */}

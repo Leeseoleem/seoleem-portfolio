@@ -108,6 +108,12 @@ export const canvasPalette = {
       figma: { bg: '#1e1e1e', shapes: ['#f24e1e', '#a259ff', '#0acf83', '#ff7262', '#1abcfe'] },
     },
   },
+  // 공책 표지 라벨. 종이색은 scenePalette.notebook.labelPaper와 같아야 테두리와 이어진다
+  notebookLabel: {
+    paper: '#f4efe4',
+    grain: 'rgba(43, 40, 36, 0.03)',
+    ink: '#2b2824',
+  },
   // 책상 윗면 나무결. 바탕은 scenePalette.furniture.wood와 같아야 둥근 모서리와 이어진다
   wood: {
     base: '#ece3d4',
