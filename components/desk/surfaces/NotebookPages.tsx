@@ -83,7 +83,6 @@ export function NotebookPages() {
     if (e.button !== 0) return;
     stopTurn();
     start.current = { x: e.clientX, pos: live.current };
-    live.current = pos;
     moved.current = false;
     setDragging(true);
   };
@@ -111,7 +110,6 @@ export function NotebookPages() {
       window.removeEventListener('pointerup', onUp);
       window.removeEventListener('pointercancel', onUp);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dragging]);
 
   // 가로 스크롤로도 넘긴다. 트랙패드는 deltaX, 휠 마우스는 shift + deltaY로 들어온다
@@ -121,9 +119,11 @@ export function NotebookPages() {
     stopTurn();
     wheel.current += dx;
     if (Math.abs(wheel.current) < TURN_DISTANCE) return;
-    const next = clampPos(Math.round(pos) + Math.sign(wheel.current));
+    // 애니메이션을 끊은 직후에는 pos가 아직 한 프레임 전 값이라 지금 위치(live)를 기준으로 센다
+    const here = Math.round(live.current);
+    const next = clampPos(here + Math.sign(wheel.current));
     wheel.current = 0;
-    if (next === Math.round(pos)) return;
+    if (next === here) return;
     getSound().play('pageflip');
     apply(next);
   };
@@ -172,14 +172,18 @@ export function NotebookPages() {
   };
 
   const front = Math.floor(pos);
+  /** 마지막 장까지 넘겨 뒤표지가 드러났는지 */
+  const atEnd = pos > PAGES.length - 0.5;
 
   return (
     <div className={`nb${dragging ? ' nb--grabbing' : ''}`} onPointerDown={onDown} onWheel={onWheel}>
-      {/* 뒤표지. 장을 다 넘기면 드러난다 */}
+      {/* 뒤표지. 장을 다 넘기면 드러난다. 그 전에는 단추를 두지 않는다. 덮여 있어도 탭 순서에는 남기 때문이다 */}
       <div className="nb__end">
-        <button type="button" className="nb__end-btn" onClick={() => jump(0)}>
-          처음으로
-        </button>
+        {atEnd && (
+          <button type="button" className="nb__end-btn" onClick={() => jump(0)}>
+            처음으로
+          </button>
+        )}
       </div>
       {PAGES.map((page, i) => {
         // 이 장이 얼마나 넘어갔는지. 0이 덮인 상태, 1이 완전히 넘어간 상태
@@ -190,6 +194,9 @@ export function NotebookPages() {
         // 이 DOM은 drei가 씬 카메라에 맞춰 준 3D 변환(y축이 뒤집힌 거울상) 안에 있어서,
         // 브라우저가 앞뒤를 거꾸로 판정해 내용이 있는 앞면을 숨기고 빈 뒷면만 그린다
         const showBack = t >= 0.5;
+        // 지금 장과 그다음 장만 그린다. 더 뒤의 장은 위 장에 완전히 덮여 보이지 않는데,
+        // 살려 두면 탭 순서가 화면에 없는 단추 수십 개를 지나간다. 옆의 인덱스 탭은 장 밖이라 그대로 둔다
+        const covered = i > front + 1;
         return (
           <div
             key={i}
@@ -200,7 +207,7 @@ export function NotebookPages() {
               pointerEvents: t > 0 && t < 1 ? 'none' : undefined,
             }}
           >
-            <div className="nb__face nb__face--front" style={{ visibility: showBack ? 'hidden' : 'visible' }}>
+            <div className="nb__face nb__face--front" style={{ visibility: showBack || covered ? 'hidden' : 'visible' }}>
               {page.kind === 'cover' && <Cover page={page} pageNo={i + 1} total={PAGES.length} onJump={jump} />}
               {page.kind === 'section' && (
                 <Section page={page} pageNo={i + 1} total={PAGES.length} contents={notebookSection(PAGES, i)} onJump={jump} />
@@ -208,7 +215,7 @@ export function NotebookPages() {
               {page.kind === 'board' && <Board page={page} pageNo={i + 1} total={PAGES.length} onOpen={open} />}
               <span className="nb__shade" style={{ opacity: shade }} />
             </div>
-            <div className="nb__face nb__face--back" style={{ visibility: showBack ? 'visible' : 'hidden' }}>
+            <div className="nb__face nb__face--back" style={{ visibility: showBack && !covered ? 'visible' : 'hidden' }}>
               <span className="nb__shade nb__shade--back" style={{ opacity: shade }} />
             </div>
             {/* 인덱스 탭. 프로젝트가 시작하는 장의 오른쪽 가장자리에 붙어 있고, 장이 넘어가면 장과 함께 왼쪽으로 간다 */}
