@@ -65,7 +65,11 @@ export function PhoneScreen() {
       <section className="card" aria-label="소개">
         <p className="card__eyebrow">seoleem</p>
         <p className="card__title">Frontend Developer</p>
-        <p className="card__body">반복되는 문제를 구조로 해결합니다. 웹과 앱을 직접 출시합니다.</p>
+        <p className="card__body">
+          문제가 반복되면 눈앞의 수정에 그치지 않고 구조를 다시 봅니다.
+          <br />
+          실제 동작과 데이터를 확인해 판단하고, 출시와 운영까지 책임지는 프론트엔드 개발자입니다.
+        </p>
         <div className="card__meta">
           <span>React</span>
           <span>TypeScript</span>
