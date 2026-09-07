@@ -82,11 +82,22 @@ export function Monitor() {
   const bezel = useMemo(() => createFrameGeometry(BEZEL_W, BEZEL_H, OPEN_W, OPEN_H, BEZEL_D), []);
   useEffect(() => () => bezel.dispose(), [bezel]);
 
+  /** 종료 연출을 그린 뒤인지. 다시 켜면 화면 텍스처와 LED를 되돌려야 한다 */
+  const wasOff = useRef(false);
   useFrame(() => {
     const { phase, shutdownAt } = useDeskStore.getState();
     // 부팅 화면은 BootOverlay가, 책상·확대 화면은 MonitorScreen(DOM)이 맡는다.
     // 여기서 그리는 건 종료 연출뿐이다
-    if (phase !== 'off') return;
+    if (phase !== 'off') {
+      if (wasOff.current) {
+        // 다시 켜진 뒤 첫 프레임. 부팅이 끝나며 비워 둔 캔버스를 올리고 LED를 켠다
+        wasOff.current = false;
+        texture.needsUpdate = true;
+        if (ledMat.current) ledMat.current.color.set(scenePalette.led.on);
+      }
+      return;
+    }
+    wasOff.current = true;
     const ctx = getScreenContext();
     if (!ctx) return;
     const k = Math.min(1, (sceneTime() - shutdownAt) / 1.9);

@@ -40,6 +40,8 @@ interface WindowStore {
   toggleFromTaskbar: (id: string) => void;
   move: (id: string, x: number, y: number) => void;
   setPage: (id: string, page: number) => void;
+  /** 모든 창을 닫는다. 전원을 껐다 다시 켤 때 쓴다 */
+  closeAll: () => void;
 }
 
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
@@ -146,6 +148,8 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
     })),
 
   setPage: (id, page) => set((s) => ({ wins: s.wins.map((w) => (w.id === id ? { ...w, page } : w)) })),
+
+  closeAll: () => set({ wins: [], activeId: null }),
 }));
 
 /** MonitorScreen이 쓰는 이름. 스토어를 그대로 돌려준다 */

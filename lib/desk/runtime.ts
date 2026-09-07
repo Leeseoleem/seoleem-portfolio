@@ -7,11 +7,19 @@ import { SCREEN_H, SCREEN_W } from './screen-canvas';
  * - 캔버스 폰트: next/font/local이 만든 실제 font-family 이름을 CSS 변수에서 읽는다.
  */
 
-const t0 = typeof performance !== 'undefined' ? performance.now() : 0;
+let t0 = typeof performance !== 'undefined' ? performance.now() : 0;
 
-/** 페이지 스크립트가 로드된 뒤 흐른 시간(초) */
+/** 씬이 켜진 뒤 흐른 시간(초). 처음에는 스크립트 로드 시각, 다시 켤 때는 그 시각이 0이다 */
 export function sceneTime(): number {
   return (performance.now() - t0) / 1000;
+}
+
+/**
+ * 씬 시계를 0으로 되돌린다. 전원을 껐다 다시 켤 때 부팅 화면이 이 시계로 진행되므로,
+ * 되돌리지 않으면 부팅이 시작하자마자 끝난 것으로 본다. 종료 시각(shutdownAt)은 그 전에 -1로 지워져 있어야 한다.
+ */
+export function resetSceneClock(): void {
+  t0 = performance.now();
 }
 
 let screenCanvas: HTMLCanvasElement | null = null;
