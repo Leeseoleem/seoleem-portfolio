@@ -7,11 +7,13 @@ import {
   fullSrc,
   notebookIndex,
   notebookPages,
+  notebookSection,
   type BoardPage,
   type CoverPage,
   type NotebookFrame,
   type NotebookIndexEntry,
   type NotebookRow,
+  type SectionPage,
 } from '@/lib/desk/content/notebook';
 
 /**
@@ -33,7 +35,7 @@ const CLICK_SLOP = 6;
 
 /** 장 안쪽 치수. CSS의 .nbp 값과 같아야 프레임 줄이 판 폭을 꼭 채운다 */
 const PAGE_W = 720;
-const PAGE_PAD = 32;
+const PAGE_PAD = 40;
 const PLATE_PAD = 20;
 const FRAME_GAP = 16;
 const PLATE_W = PAGE_W - PAGE_PAD * 2 - PLATE_PAD * 2;
@@ -48,6 +50,8 @@ export function NotebookPages() {
   /** 넘어간 정도. 정수 부분이 넘어간 장 수, 소수 부분이 지금 넘기는 중인 장의 진행도다 */
   const [pos, setPos] = useState(0);
   const [dragging, setDragging] = useState(false);
+  /** 목차로 여러 장을 넘기는 중. 이때는 CSS 전환을 끄고 한 장씩 직접 돌린다 */
+  const [turning, setTurning] = useState(false);
   const [viewing, setViewing] = useState<Viewing | null>(null);
   const start = useRef({ x: 0, pos: 0 });
   /** 끌고 있는 동안의 현재 위치. 놓을 때 상태 갱신 함수 안에서 소리를 내지 않으려고 따로 든다 */
@@ -55,12 +59,30 @@ export function NotebookPages() {
   const moved = useRef(false);
   const wheel = useRef(0);
 
+  const anim = useRef(0);
+
   const clampPos = (v: number) => Math.min(PAGES.length, Math.max(0, v));
+
+  /** 넘김 애니메이션을 멈춘다. 끌기나 스크롤이 들어오면 바로 끊는다 */
+  const stopTurn = () => {
+    if (!anim.current) return;
+    cancelAnimationFrame(anim.current);
+    anim.current = 0;
+    setTurning(false);
+  };
+
+  const apply = (v: number) => {
+    live.current = v;
+    setPos(v);
+  };
+
+  useEffect(() => () => { if (anim.current) cancelAnimationFrame(anim.current); }, []);
 
   // 끌기. 포인터 캡처를 쓰지 않고 창에 리스너를 건다. 캡처를 걸면 프레임 단추의 click이 오지 않는다
   const onDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0) return;
-    start.current = { x: e.clientX, pos };
+    stopTurn();
+    start.current = { x: e.clientX, pos: live.current };
     live.current = pos;
     moved.current = false;
     setDragging(true);
@@ -72,15 +94,14 @@ export function NotebookPages() {
       if (Math.abs(dx) > CLICK_SLOP) moved.current = true;
       // 한 번 끌어서 넘길 수 있는 건 한 장까지다. 거리에 그대로 비례시키면 여러 장이 한꺼번에 넘어간다
       const limited = Math.min(1, Math.max(-1, dx / TURN_DISTANCE));
-      live.current = clampPos(start.current.pos + limited);
-      setPos(live.current);
+      apply(clampPos(start.current.pos + limited));
     };
     const onUp = () => {
       setDragging(false);
       const settled = clampPos(Math.round(live.current));
       // 반쯤 넘기다 놓아 제자리로 돌아가면 소리가 없다. 장이 실제로 바뀔 때만 난다
-      if (settled !== start.current.pos) getSound().play('pageflip');
-      setPos(settled);
+      if (settled !== Math.round(start.current.pos)) getSound().play('pageflip');
+      apply(settled);
     };
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
@@ -97,13 +118,14 @@ export function NotebookPages() {
   const onWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     const dx = e.deltaX || (e.shiftKey ? e.deltaY : 0);
     if (!dx) return;
+    stopTurn();
     wheel.current += dx;
     if (Math.abs(wheel.current) < TURN_DISTANCE) return;
     const next = clampPos(Math.round(pos) + Math.sign(wheel.current));
     wheel.current = 0;
     if (next === Math.round(pos)) return;
     getSound().play('pageflip');
-    setPos(next);
+    apply(next);
   };
 
   /** 프레임을 눌렀다. 끌다가 놓은 것이면 열지 않는다 */
@@ -113,20 +135,52 @@ export function NotebookPages() {
     setViewing({ frames, index });
   };
 
-  /** 목차나 인덱스 탭으로 특정 장까지 한 번에 넘긴다 */
+  /**
+   * 목차나 인덱스 탭으로 먼 장까지 간다. 위치를 한 번에 옮기지 않고 시간에 따라 이어서 옮긴다.
+   * 한 번에 옮기면 모든 장이 동시에 돌아, 목적지 장이 먼저 드러난 채로 그 위에서 종이가 펄럭인다.
+   * 이어서 옮기면 언제나 한 장만 돌고 있어 실제로 여러 장을 주르륵 넘기는 모양이 된다.
+   */
   const jump = (page: number) => {
     if (moved.current) return;
-    const next = clampPos(page);
-    if (next === Math.round(pos)) return;
+    stopTurn();
+    const from = live.current;
+    const to = clampPos(page);
+    const dist = Math.abs(to - from);
+    if (dist < 0.01) return;
     getSound().play('pageflip');
-    setPos(next);
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      apply(to);
+      return;
+    }
+    // 한 장에 약 110ms. 멀리 갈수록 길어지되 1.4초를 넘기지 않는다
+    const dur = Math.min(1400, 260 + dist * 110);
+    const t0 = performance.now();
+    setTurning(true);
+    const step = (now: number) => {
+      const k = Math.min(1, (now - t0) / dur);
+      const e = k < 0.5 ? 4 * k * k * k : 1 - (-2 * k + 2) ** 3 / 2;
+      apply(from + (to - from) * e);
+      if (k < 1) {
+        anim.current = requestAnimationFrame(step);
+        return;
+      }
+      anim.current = 0;
+      setTurning(false);
+      getSound().play('pageflip');
+    };
+    anim.current = requestAnimationFrame(step);
   };
 
   const front = Math.floor(pos);
 
   return (
     <div className={`nb${dragging ? ' nb--grabbing' : ''}`} onPointerDown={onDown} onWheel={onWheel}>
-      <p className="nb__end">마지막 장입니다.</p>
+      {/* 뒤표지. 장을 다 넘기면 드러난다 */}
+      <div className="nb__end">
+        <button type="button" className="nb__end-btn" onClick={() => jump(0)}>
+          처음으로
+        </button>
+      </div>
       {PAGES.map((page, i) => {
         // 이 장이 얼마나 넘어갔는지. 0이 덮인 상태, 1이 완전히 넘어간 상태
         const t = Math.min(1, Math.max(0, pos - i));
@@ -139,7 +193,7 @@ export function NotebookPages() {
         return (
           <div
             key={i}
-            className={`nb__leaf${dragging ? '' : ' nb__leaf--eased'}`}
+            className={`nb__leaf${dragging || turning ? '' : ' nb__leaf--eased'}`}
             style={{
               transform: `rotateY(${-180 * t}deg)`,
               zIndex: i === front ? PAGES.length + 1 : PAGES.length - i,
@@ -147,11 +201,11 @@ export function NotebookPages() {
             }}
           >
             <div className="nb__face nb__face--front" style={{ visibility: showBack ? 'hidden' : 'visible' }}>
-              {page.kind === 'cover' ? (
-                <Cover page={page} pageNo={i + 1} total={PAGES.length} onJump={jump} />
-              ) : (
-                <Board page={page} pageNo={i + 1} total={PAGES.length} onOpen={open} />
+              {page.kind === 'cover' && <Cover page={page} pageNo={i + 1} total={PAGES.length} onJump={jump} />}
+              {page.kind === 'section' && (
+                <Section page={page} pageNo={i + 1} total={PAGES.length} contents={notebookSection(PAGES, i)} onJump={jump} />
               )}
+              {page.kind === 'board' && <Board page={page} pageNo={i + 1} total={PAGES.length} onOpen={open} />}
               <span className="nb__shade" style={{ opacity: shade }} />
             </div>
             <div className="nb__face nb__face--back" style={{ visibility: showBack ? 'visible' : 'hidden' }}>
@@ -169,7 +223,7 @@ export function NotebookPages() {
   );
 }
 
-/** 장 위아래의 작은 글줄. 위에는 프로젝트 이름, 아래에는 장 번호 */
+/** 장 바닥의 작은 글줄. 왼쪽에 프로젝트 이름, 오른쪽에 쪽번호 */
 function Running({ left, pageNo, total }: { left: string; pageNo: number; total: number }) {
   return (
     <p className="nbp__running">
@@ -181,28 +235,78 @@ function Running({ left, pageNo, total }: { left: string; pageNo: number; total:
   );
 }
 
-/** 표지. 가운데에 필기체 제목과 한 줄 설명, 바닥에 프로젝트 목차 */
+/** 표지. 필기체 제목과 한 줄 아래로 프로젝트 목차가 붙는다 */
 function Cover({ page, pageNo, total, onJump }: { page: CoverPage; pageNo: number; total: number; onJump: (page: number) => void }) {
   return (
     <div className="nbp">
-      <Running left="seoleem" pageNo={pageNo} total={total} />
-      <div className="nbp__cover">
-        <h2 className="nbp__cover-title">{page.title}</h2>
-        <p className="nbp__caption">{page.caption}</p>
+      <div className="nbp__body">
+        <div className="nbp__cover">
+          <h2 className="nbp__cover-title">{page.title}</h2>
+          <p className="nbp__caption">{page.caption}</p>
+        </div>
+        <ol className="nbp__toc nbp__toc--projects">
+          {INDEX.map((e) => (
+            <li key={e.projectId}>
+              <button type="button" className="nbp__toc-row" onClick={() => onJump(e.page)}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className="nbp__toc-icon" src={`/icons/${e.projectId}.png`} alt="" draggable={false} />
+                <span className="nbp__toc-name">{e.project}</span>
+                <span className="nbp__toc-page">{String(e.page + 1).padStart(2, '0')}</span>
+                <Chevron />
+              </button>
+            </li>
+          ))}
+        </ol>
       </div>
-      <ol className="nbp__toc">
-        {INDEX.map((e) => (
-          <li key={e.projectId}>
-            <button type="button" className="nbp__toc-row" onClick={() => onJump(e.page)}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="nbp__toc-icon" src={`/icons/${e.projectId}.png`} alt="" draggable={false} />
-              <span className="nbp__toc-name">{e.project}</span>
-              <span className="nbp__toc-leader" aria-hidden="true" />
-              <span className="nbp__toc-page">{String(e.page + 1).padStart(2, '0')}</span>
-            </button>
-          </li>
-        ))}
-      </ol>
+      <Running left="seoleem" pageNo={pageNo} total={total} />
+    </div>
+  );
+}
+
+/** 목차 줄 끝의 꺾쇠. 누르면 그 장으로 간다는 표시다 */
+function Chevron() {
+  return (
+    <svg className="nbp__toc-more" viewBox="0 0 8 13" fill="none" aria-hidden="true">
+      <path d="M1.5 1.5 6.5 6.5 1.5 11.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/** 프로젝트 간지. 로고와 이름, 그 프로젝트 안의 목차만 둔다 */
+function Section({
+  page,
+  pageNo,
+  total,
+  contents,
+  onJump,
+}: {
+  page: SectionPage;
+  pageNo: number;
+  total: number;
+  contents: { title: string; page: number }[];
+  onJump: (page: number) => void;
+}) {
+  return (
+    <div className="nbp">
+      <div className="nbp__body">
+        <div className="nbp__section-head">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="nbp__section-icon" src={`/icons/${page.projectId}.png`} alt="" draggable={false} />
+          <h2 className="nbp__section-name">{page.project}</h2>
+        </div>
+        <ol className="nbp__toc">
+          {contents.map((c) => (
+            <li key={c.page}>
+              <button type="button" className="nbp__toc-row" onClick={() => onJump(c.page)}>
+                <span className="nbp__toc-name">{c.title}</span>
+                <span className="nbp__toc-page">{String(c.page + 1).padStart(2, '0')}</span>
+                <Chevron />
+              </button>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <Running left={page.project} pageNo={pageNo} total={total} />
     </div>
   );
 }
@@ -241,17 +345,15 @@ function Board({
 }) {
   return (
     <div className="nbp">
-      <Running left={page.project} pageNo={pageNo} total={total} />
       <header className="nbp__head">
         <h2 className="nbp__title">{page.title}</h2>
       </header>
       <div className="nbp__plate">
-        {page.rows.length === 0 && <p className="nbp__empty">화면 시안을 정리하고 있습니다.</p>}
         {page.rows.map((row, i) => (
           <Row key={i} row={row} onOpen={onOpen} />
         ))}
       </div>
-      {page.rows.length > 0 && <p className="nbp__hint">이미지를 누르면 크게 볼 수 있습니다.</p>}
+      <Running left={page.project} pageNo={pageNo} total={total} />
     </div>
   );
 }

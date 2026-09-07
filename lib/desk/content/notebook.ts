@@ -41,6 +41,13 @@ export interface CoverPage {
   caption: string;
 }
 
+/** 프로젝트 간지. 번호와 이름, 그 프로젝트 안의 목차만 있는 장이다 */
+export interface SectionPage {
+  kind: 'section';
+  projectId: ProjectId;
+  project: string;
+}
+
 export interface BoardPage {
   kind: 'board';
   /** 프로젝트 id. 인덱스 탭과 목차의 아이콘(/icons/{id}.png)을 찾는 데 쓴다 */
@@ -48,11 +55,11 @@ export interface BoardPage {
   project: string;
   /** 이 장이 무엇을 보여 주는지. 컴포넌트, 화면 시안 등 */
   title: string;
-  /** 비어 있으면 자료를 준비 중인 장이다. 판에 안내 문장만 나온다 */
+  /** 이 장에 놓이는 프레임 줄 */
   rows: NotebookRow[];
 }
 
-export type NotebookPage = CoverPage | BoardPage;
+export type NotebookPage = CoverPage | SectionPage | BoardPage;
 
 /** 목차와 인덱스 탭 한 줄. 프로젝트가 시작하는 장의 번호(0부터)를 든다 */
 export interface NotebookIndexEntry {
@@ -62,12 +69,35 @@ export interface NotebookIndexEntry {
   page: number;
 }
 
-/** 프로젝트마다 첫 장을 찾는다. 표지의 목차와 옆의 인덱스 탭이 같은 목록을 쓴다 */
+/** 프로젝트마다 첫 장(간지)을 찾는다. 표지의 목차와 옆의 인덱스 탭이 같은 목록을 쓴다 */
 export function notebookIndex(pages: NotebookPage[]): NotebookIndexEntry[] {
   const out: NotebookIndexEntry[] = [];
   pages.forEach((p, i) => {
-    if (p.kind === 'board' && !out.some((e) => e.projectId === p.projectId)) out.push({ projectId: p.projectId, project: p.project, page: i });
+    if (p.kind !== 'cover' && !out.some((e) => e.projectId === p.projectId)) out.push({ projectId: p.projectId, project: p.project, page: i });
   });
+  return out;
+}
+
+/** 간지에 놓이는 그 프로젝트의 목차 한 줄 */
+export interface NotebookSectionEntry {
+  title: string;
+  /** 그 제목이 처음 나오는 장. 0부터 센다 */
+  page: number;
+}
+
+/**
+ * 간지 다음에 오는 자기 프로젝트의 장들을 훑어 목차를 만든다.
+ * 제목이 같은 장이 이어지면(컴포넌트 두 장처럼) 한 줄로 묶고 첫 장 번호를 든다.
+ */
+export function notebookSection(pages: NotebookPage[], from: number): NotebookSectionEntry[] {
+  const head = pages[from];
+  if (head?.kind !== 'section') return [];
+  const out: NotebookSectionEntry[] = [];
+  for (let i = from + 1; i < pages.length; i += 1) {
+    const p = pages[i];
+    if (p.kind !== 'board' || p.projectId !== head.projectId) break;
+    if (out[out.length - 1]?.title !== p.title) out.push({ title: p.title, page: i });
+  }
   return out;
 }
 
@@ -87,7 +117,49 @@ export const notebookPages: NotebookPage[] = [
   {
     kind: 'cover',
     title: 'Design Notes',
-    caption: '프로젝트별로 Figma에서 직접 디자인한 화면 시안에 대한 기록',
+    caption: '프로젝트별로 직접 디자인한 화면과 컴포넌트에 대한 기록',
+  },
+  // 프로젝트 순서는 이력서와 같다(핏플, 가라챠토, 우리두). 프로젝트마다 간지 한 장으로 열고 시안이 이어진다
+  {
+    kind: 'section',
+    projectId: 'fitpl',
+    project: '핏플',
+  },
+  // 핏플 2.x. Figma 시안 없이 코드에서 만든 버전이라, 완성된 앱의 토큰과 화면을 보드로 정리했다(decision-backlog B07).
+  // 토큰을 먼저, 화면은 앱 흐름(가입 → 홈 → 일정 만들기 → 일정 상세) 순서로 둔다
+  {
+    kind: 'board',
+    projectId: 'fitpl',
+    project: '핏플',
+    title: '디자인 토큰 (2.x)',
+    rows: [{ frames: [fitplBoard('tokens', 'color, typography, spacing', 4800, 2800)] }],
+  },
+  {
+    kind: 'board',
+    projectId: 'fitpl',
+    project: '핏플',
+    title: '화면 (2.x)',
+    rows: [{ frames: [fitplBoard('auth', 'auth', 5344, 3876)] }],
+  },
+  {
+    kind: 'board',
+    projectId: 'fitpl',
+    project: '핏플',
+    title: '화면 (2.x)',
+    rows: [{ frames: [fitplBoard('home', 'home', 1104, 2058)], height: 640 }],
+  },
+  {
+    kind: 'board',
+    projectId: 'fitpl',
+    project: '핏플',
+    title: '화면 (2.x)',
+    // 두 보드가 같은 높이(2058)라 폭을 다 쓰면 각 282px, 둘을 세로로 놓아도 판 안에 든다
+    rows: [{ frames: [fitplBoard('plan', 'plan', 4496, 2058)] }, { frames: [fitplBoard('route', 'route', 4496, 2058)] }],
+  },
+  {
+    kind: 'section',
+    projectId: 'garachato',
+    project: '가라챠토',
   },
   {
     kind: 'board',
@@ -132,36 +204,10 @@ export const notebookPages: NotebookPage[] = [
       },
     ],
   },
-  // 핏플 2.x. Figma 시안 없이 코드에서 만든 버전이라, 완성된 앱의 토큰과 화면을 보드로 정리했다(decision-backlog B07).
-  // 토큰을 먼저, 화면은 앱 흐름(가입 → 홈 → 일정 만들기 → 일정 상세) 순서로 둔다
   {
-    kind: 'board',
-    projectId: 'fitpl',
-    project: '핏플',
-    title: '디자인 토큰 (2.x)',
-    rows: [{ frames: [fitplBoard('tokens', 'color, typography, spacing', 4800, 2800)] }],
-  },
-  {
-    kind: 'board',
-    projectId: 'fitpl',
-    project: '핏플',
-    title: '화면 (2.x)',
-    rows: [{ frames: [fitplBoard('auth', 'auth', 5344, 3876)] }],
-  },
-  {
-    kind: 'board',
-    projectId: 'fitpl',
-    project: '핏플',
-    title: '화면 (2.x)',
-    rows: [{ frames: [fitplBoard('home', 'home', 1104, 2058)], height: 640 }],
-  },
-  {
-    kind: 'board',
-    projectId: 'fitpl',
-    project: '핏플',
-    title: '화면 (2.x)',
-    // 두 보드가 같은 높이(2058)라 폭을 다 쓰면 각 282px, 둘을 세로로 놓아도 판 안에 든다
-    rows: [{ frames: [fitplBoard('plan', 'plan', 4496, 2058)] }, { frames: [fitplBoard('route', 'route', 4496, 2058)] }],
+    kind: 'section',
+    projectId: 'urido',
+    project: '우리두',
   },
   // 우리두. Figma 탭 순서(common, auth, home, challenge, uri, calendar, my)대로 컴포넌트 보드를 먼저, 화면 시안 보드를 뒤에 둔다.
   // 보드는 탭 하나를 통째로 내보낸 것이라 크기가 제멋대로다. 세로로 긴 보드는 높이를 정해 판 안에 넣는다

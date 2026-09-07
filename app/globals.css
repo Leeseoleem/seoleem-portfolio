@@ -181,6 +181,8 @@
   --nb-ink-weak: #7d776d;
   --nb-ink-faint: #ada79c;
   --nb-rule: rgba(43, 40, 36, 0.16);
+  /* 목차 줄에 손을 얹었을 때 */
+  --nb-row-hover: rgba(43, 40, 36, 0.05);
   --nb-frame-line: rgba(43, 40, 36, 0.12);
   --nb-shadow: rgba(43, 40, 36, 0.5);
   /* 옆에 붙는 인덱스 탭. 프로젝트 순서대로 돌려 쓰는 종이 색 셋 */
@@ -1680,12 +1682,16 @@ body {
 }
 
 /* ---------- 공책 장 내용 ---------- */
-/* 다이어리 한 장. 글자는 네 단계다: 러닝 헤드와 이름표 11, 본문 14, 장 제목 22, 표지 제목은 필기체 64.
-   치수(패딩 32, 판 패딩 20, 프레임 간격 16)는 NotebookPages.tsx의 상수와 같아야 한다 */
+/*
+ * 짜임은 iOS 화면 규칙을 따른다. 왼쪽 한 줄에 모든 글이 맞춰 서고, 큰 제목 하나가 장을 이끈다.
+ * 글자는 다섯 단계뿐이다(34 제목, 17 본문, 15 보조, 13 머리글과 쪽번호, 12 이름표).
+ * 크기와 굵기와 색만으로 층을 나누고 선이나 장식은 쓰지 않는다.
+ * 치수(가장자리 40, 판 안쪽 20, 프레임 간격 16)는 NotebookPages.tsx의 상수와 같아야 한다.
+ */
 .nbp {
   position: absolute;
   inset: 0;
-  padding: 32px;
+  padding: 40px;
   display: flex;
   flex-direction: column;
   color: var(--nb-ink);
@@ -1693,51 +1699,53 @@ body {
   text-align: left;
 }
 
-/* 러닝 헤드. 왼쪽 프로젝트 이름, 오른쪽 장 번호, 아래로 가는 선 하나. 장마다 같은 자리다 */
+/* 장 바닥. 왼쪽에 프로젝트 이름, 오른쪽에 쪽번호. 선은 긋지 않는다 */
 .nbp__running {
-  margin: 0 0 28px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--nb-rule);
+  /* 언제나 장 바닥에 붙는다. 내용이 짧아도 자리가 흔들리지 않는다 */
+  margin: auto 0 0;
+  padding-top: 28px;
+  flex: none;
   display: flex;
   justify-content: space-between;
-  font-size: 11px;
-  line-height: 16px;
+  font-size: 13px;
+  line-height: 18px;
   font-weight: 600;
-  letter-spacing: 0.04em;
   color: var(--nb-ink-weak);
   font-variant-numeric: tabular-nums;
 }
 
 .nbp__head {
-  margin-bottom: 20px;
+  margin: 0 0 28px;
 }
 
+/* 큰 제목. 장을 이끄는 단 하나의 글줄이다 */
 .nbp__title {
   margin: 0;
-  font-size: 22px;
-  line-height: 30px;
+  font-size: 34px;
+  line-height: 41px;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 .nbp__caption {
-  margin: 6px 0 0;
-  font-size: 14px;
-  line-height: 22px;
+  margin: 8px 0 0;
+  font-size: 17px;
+  line-height: 24px;
   color: var(--nb-ink-weak);
   word-break: keep-all;
 }
 
-/* 화면을 얹는 판. 어두운 화면이 밝은 종이에 바로 놓이면 따로 떠 보여서 한 단계 어두운 판을 깐다 */
+/*
+ * 화면을 얹는 판. 어두운 화면이 밝은 종이에 바로 놓이면 따로 떠 보여서 한 단계 어두운 판을 깐다.
+ * 판은 장 높이를 채우지 않고 담긴 화면만큼만 차지한다. 빈 판을 크게 벌려 두면 화면이 그 안에서 미아가 된다.
+ */
 .nbp__plate {
-  flex: 1;
-  min-height: 0;
+  flex: none;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 20px;
+  gap: 24px;
   padding: 20px;
-  border-radius: 12px;
+  border-radius: 16px;
   background: var(--nb-plate);
 }
 
@@ -1760,7 +1768,7 @@ body {
   border: 0;
   background: none;
   cursor: zoom-in;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 .nbp__frame-btn:focus-visible {
@@ -1771,14 +1779,14 @@ body {
 .nbp__frame img {
   display: block;
   width: 100%;
-  border-radius: 6px;
+  border-radius: 8px;
   outline: 1px solid var(--nb-frame-line);
   user-select: none;
 }
 
 .nbp__frame-label {
   margin-top: 8px;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 16px;
   color: var(--nb-ink-weak);
   white-space: nowrap;
@@ -1786,55 +1794,79 @@ body {
   text-overflow: ellipsis;
 }
 
-.nbp__empty {
-  margin: 0;
-  text-align: center;
-  font-size: 14px;
-  line-height: 22px;
-  color: var(--nb-ink-faint);
+/*
+ * 표지와 간지의 본문. 제목과 목차를 한 덩어리로 묶어 장 가운데에 놓되,
+ * 아래쪽 여백을 조금 더 두어 눈으로 보기에 가운데가 되게 한다. 글은 왼쪽 한 줄에 맞춰 선다.
+ */
+.nbp__body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-bottom: 48px;
 }
 
-.nbp__hint {
-  margin: 16px 0 0;
-  font-size: 11px;
-  line-height: 16px;
-  color: var(--nb-ink-faint);
-}
-
-/* 표지. 제목은 한가운데, 목차는 바닥 */
-.nbp__cover {
-  margin: auto 0;
-  text-align: center;
-}
-
+/* 표지와 간지. 왼쪽 맞춤이다. 가운데 정렬은 쓰지 않는다 */
 .nbp__cover-title {
   margin: 0;
   font-family: var(--font-script), 'Segoe Script', 'Bradley Hand', cursive;
   font-size: 64px;
-  line-height: 1.15;
+  /* 필기체는 아래로 뻗는 획이 길다. 줄 높이를 좁게 주면 아래 글줄과 겹친다 */
+  line-height: 1.5;
   font-weight: 400;
-  letter-spacing: 0.01em;
 }
 
 .nbp__cover .nbp__caption {
-  margin: 20px auto 0;
-  max-width: 400px;
+  margin-top: 14px;
 }
 
-/* 목차. 아이콘, 이름, 점선, 장 번호가 한 줄이다. 누르면 그 장으로 넘어간다 */
+.nbp__cover {
+  margin-bottom: 32px;
+}
+
+/* 간지 머리. 로고와 이름이 한 줄에 선다 */
+.nbp__section-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.nbp__section-icon {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 13px;
+  outline: 1px solid var(--nb-frame-line);
+  user-select: none;
+}
+
+.nbp__section-name {
+  margin: 0;
+  font-size: 34px;
+  line-height: 41px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* 목차. 한 덩어리 판 위에 줄을 얹고 줄 사이는 머리글자 자리부터 그은 실선으로 나눈다 */
 .nbp__toc {
   margin: 0;
-  padding: 16px 0 0;
+  padding: 0;
   list-style: none;
-  border-top: 1px solid var(--nb-rule);
+  border-radius: 16px;
+  background: var(--nb-plate);
+  overflow: hidden;
 }
 
 .nbp__toc-row {
   width: 100%;
+  min-height: 60px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 0;
+  gap: 16px;
+  padding: 0 20px;
   border: 0;
   background: none;
   color: inherit;
@@ -1843,38 +1875,57 @@ body {
   cursor: pointer;
 }
 
-.nbp__toc-row:hover .nbp__toc-name {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+.nbp__toc li + li .nbp__toc-row {
+  border-top: 1px solid var(--nb-rule);
+}
+
+/* 아이콘이 있는 줄은 글자 자리부터 선을 긋는다 */
+.nbp__toc--projects li + li .nbp__toc-row {
+  border-top-color: transparent;
+  background-image: linear-gradient(var(--nb-rule), var(--nb-rule));
+  background-repeat: no-repeat;
+  background-size: calc(100% - 80px) 1px;
+  background-position: 80px 0;
+}
+
+.nbp__toc-row:hover {
+  background-color: var(--nb-row-hover);
+}
+
+.nbp__toc-row:focus-visible {
+  outline: 2px solid var(--nb-ink);
+  outline-offset: -2px;
 }
 
 .nbp__toc-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 7px;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 10px;
   outline: 1px solid var(--nb-frame-line);
   user-select: none;
 }
 
 .nbp__toc-name {
-  font-size: 15px;
-  line-height: 22px;
-  font-weight: 600;
-}
-
-.nbp__toc-leader {
   flex: 1;
-  height: 0;
-  margin: 0 4px;
-  border-bottom: 1px dotted var(--nb-ink-faint);
-  transform: translateY(4px);
+  min-width: 0;
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 400;
 }
 
 .nbp__toc-page {
-  font-size: 14px;
-  line-height: 22px;
+  font-size: 15px;
+  line-height: 20px;
   color: var(--nb-ink-weak);
   font-variant-numeric: tabular-nums;
+}
+
+.nbp__toc-more {
+  flex: none;
+  width: 8px;
+  height: 13px;
+  color: var(--nb-ink-faint);
 }
 
 /* 인덱스 탭. 장 오른쪽 가장자리 밖으로 튀어나온 색 종이. 장이 넘어가면 장과 함께 왼쪽으로 간다 */
@@ -2027,15 +2078,35 @@ body {
   cursor: default;
 }
 
+/* 뒤표지. 장을 다 넘기면 드러난다. 되돌아갈 단추 하나만 둔다 */
 .nb__end {
   position: absolute;
   inset: 0;
-  margin: 0;
   display: grid;
   place-items: center;
-  font-size: 14px;
-  color: var(--nb-ink-faint);
   font-family: var(--font-ui);
+}
+
+.nb__end-btn {
+  min-height: 44px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--nb-plate);
+  color: var(--nb-ink);
+  font-family: inherit;
+  font-size: 17px;
+  line-height: 24px;
+  cursor: pointer;
+}
+
+.nb__end-btn:hover {
+  background: var(--nb-back);
+}
+
+.nb__end-btn:focus-visible {
+  outline: 2px solid var(--nb-ink);
+  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
