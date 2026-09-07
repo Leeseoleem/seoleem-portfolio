@@ -31,6 +31,8 @@ export const scenePalette = {
     clip: '#a7afb8',
     // 케이블. 흰 책상 위에서 검은 선은 먹선처럼 튀어서, 책상보다 한 단계 어두운 회색으로 둔다
     cable: '#c6bfb2',
+    // 서류가 확대되며 하얘질 때 더하는 발광색. 톤매핑을 거쳐 DOM의 흰색과 만나야 하므로 순백이다
+    bleach: '#ffffff',
   },
   // 연필
   pencil: {
@@ -106,6 +108,12 @@ export const canvasPalette = {
       figma: { bg: '#1e1e1e', shapes: ['#f24e1e', '#a259ff', '#0acf83', '#ff7262', '#1abcfe'] },
     },
   },
+  // 공책 표지 라벨. 종이색은 scenePalette.notebook.labelPaper와 같아야 테두리와 이어진다
+  notebookLabel: {
+    paper: '#f4efe4',
+    grain: 'rgba(43, 40, 36, 0.03)',
+    ink: '#2b2824',
+  },
   // 책상 윗면 나무결. 바탕은 scenePalette.furniture.wood와 같아야 둥근 모서리와 이어진다
   wood: {
     base: '#ece3d4',
@@ -113,11 +121,19 @@ export const canvasPalette = {
     grainLight: '#f6f0e6',
     seam: '#cfc1ab',
   },
-  // 모니터 베젤에 붙인 포스트잇
+  // 모니터 베젤에 붙인 포스트잇. shade는 아래쪽을 살짝 어둡게 해 종이가 들린 느낌을 낸다
   sticky: {
     yellow: '#fbe66e',
     pink: '#f8b7c6',
     ink: '#3b3a36',
+    shadeFrom: 'rgba(0,0,0,0)',
+    shadeTo: 'rgba(0,0,0,0.12)',
+  },
+  // 머그 김. 가운데가 진하고 가장자리로 사라지는 흰 점 하나를 스프라이트로 쓴다
+  steam: {
+    core: 'rgba(255,255,255,0.75)',
+    mid: 'rgba(255,255,255,0.28)',
+    edge: 'rgba(255,255,255,0)',
   },
   // 공책 표지 가죽 결. 바탕은 scenePalette.furniture.kraft에서 시작한다
   leather: {

@@ -1,23 +1,27 @@
 /**
  * 효과음 레이어.
  * - 기본은 Web Audio로 합성한 소리다. 외부 파일 없이 동작한다.
- * - `public/sounds/<이름>.mp3` 파일이 있으면 그 파일을 대신 재생한다. 파일이 없으면(404) 합성음으로 돌아간다.
+ * - `public/sounds/<이름>.mp3` 파일이 있으면 그 파일을 대신 재생한다. 파일 목록은 SFX_FILES에 적고, 거기 없는 소리는 합성음으로 난다.
  * - 브라우저 정책상 첫 사용자 제스처 전에는 소리를 낼 수 없다. `unlock()`은 pointerdown/keydown에서 호출한다.
  * - 파일은 페이지 로드 직후 미리 받아두고(prefetch) 제스처 시점에 디코딩한다. 첫 클릭부터 파일 소리가 나게 하기 위함이다.
  */
 
 export type SfxName =
   | 'chime' | 'whoosh' | 'click' | 'tap' | 'lightFlicker'
-  | 'mouseClick' | 'keys' | 'purr' | 'squeak' | 'shutdown' | 'drink';
+  | 'mouseClick' | 'keys' | 'purr' | 'squeak' | 'shutdown' | 'drink' | 'pageflip';
 
 const STORAGE_KEY = 'seoleem-sound';
 
 // 파일을 교체하면 이 값을 올린다. 브라우저 캐시에 남은 옛 파일을 계속 쓰는 것을 막는다.
 const SFX_VERSION = '2';
 
-const SFX_NAMES: SfxName[] = [
-  'chime', 'whoosh', 'click', 'tap', 'lightFlicker',
-  'mouseClick', 'keys', 'purr', 'squeak', 'shutdown', 'drink',
+/**
+ * public/sounds에 실제 파일이 있는 소리만 적는다. 여기 없는 이름은 합성음으로만 난다.
+ * 없는 파일까지 요청하면 매 로드마다 404가 찍혀서 진짜 오류를 가린다.
+ * 파일을 새로 넣으면 이 목록에도 추가한다.
+ */
+const SFX_FILES: SfxName[] = [
+  'chime', 'tap', 'lightFlicker', 'mouseClick', 'keys', 'purr', 'shutdown', 'drink', 'pageflip',
 ];
 
 class SoundEngine {
@@ -58,7 +62,7 @@ class SoundEngine {
   prefetch(): void {
     if (this.prefetched || typeof window === 'undefined') return;
     this.prefetched = true;
-    for (const name of SFX_NAMES) {
+    for (const name of SFX_FILES) {
       fetch(`/sounds/${name}.mp3?v=${SFX_VERSION}`)
         .then(async (res) => {
           if (!res.ok) return null;
@@ -248,6 +252,10 @@ class SoundEngine {
       case 'squeak':
         this.tone(ctx, 2600, t, 0.07, 'sine', 0.05);
         this.tone(ctx, 3200, t + 0.08, 0.09, 'sine', 0.05);
+        break;
+      case 'pageflip':
+        // 파일이 없을 때의 대체음. 종이 스치는 짧은 잡음
+        this.crackle(ctx, t, 3);
         break;
       case 'whoosh': {
         const len = 0.7;

@@ -16,12 +16,18 @@ export function Tower() {
   const powerOff = useDeskStore((s) => s.powerOff);
   const ledMat = useRef<THREE.MeshBasicMaterial>(null);
 
+  /** 종료 연출을 거친 뒤인지. 다시 켜면 LED를 되돌려야 한다 */
+  const wasOff = useRef(false);
   useFrame(() => {
     const { phase, shutdownAt } = useDeskStore.getState();
     if (!ledMat.current) return;
     if (phase === 'off') {
+      wasOff.current = true;
       const k = Math.min(1, (sceneTime() - shutdownAt) / 1.9);
       ledMat.current.color.set(k > 0.95 ? scenePalette.led.off : scenePalette.led.on);
+    } else if (wasOff.current) {
+      wasOff.current = false;
+      ledMat.current.color.set(scenePalette.led.on);
     }
   });
 

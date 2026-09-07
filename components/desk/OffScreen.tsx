@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useDeskStore } from '@/stores/useDeskStore';
+import { useWindowStore } from './surfaces/window-state';
 import { getSound } from '@/lib/desk/sound';
+import { resetSceneClock } from '@/lib/desk/runtime';
 import { PowerButton } from './PowerButton';
 
 type Stage = 'hidden' | 'black' | 'collapse' | 'closing';
@@ -22,15 +24,21 @@ function OffSequence() {
   const [stage, setStage] = useState<Stage>('hidden');
   const [shown, setShown] = useState(false);
 
+  const restartScene = useDeskStore((s) => s.restart);
+  const closeAllWindows = useWindowStore((s) => s.closeAll);
+
   /**
    * 다시 켜기. 시작음을 여기서 낸다.
    * 처음 접속할 때 내면 사용자가 아직 화면을 건드리기 전이라 소리가 대기했다가
    * 첫 클릭 때 클릭음과 겹친다. 이 버튼은 사용자가 직접 누른 것이라 바로 울린다.
-   * 소리가 잘리지 않게 잠깐 두고 새로 고친다.
+   * 페이지를 새로 고치지 않고 씬만 부팅 상태로 되돌린다. 새로 고치면 시작음이 부팅 화면으로 넘어가며 끊긴다.
+   * 시계를 먼저 0으로 돌려야 부팅 화면이 처음부터 그려진다.
    */
   const restart = () => {
     getSound().play('chime');
-    window.setTimeout(() => window.location.reload(), 420);
+    closeAllWindows();
+    resetSceneClock();
+    restartScene();
   };
 
   useEffect(() => {
@@ -55,8 +63,9 @@ function OffSequence() {
     <div className={`off-screen${shown ? ' is-visible' : ''}`}>
       <div className={`off-line${stage === 'collapse' || stage === 'closing' ? ' is-collapsed' : ''}`} />
       <div className={`closing${stage === 'closing' ? ' is-visible' : ''}`} aria-hidden={stage !== 'closing'}>
-        <p className="closing-title">긍정적인 검토를 기다리겠습니다.</p>
-        <p className="closing-sub">감사합니다.</p>
+        {/* 마지막 줄은 이력서 맺음말과 같은 문장이다. 이 페이지의 주 방문자는 채용 담당자라 이렇게 두었다 */}
+        <p className="closing-title">여기까지 봐주셔서 감사합니다.</p>
+        <p className="closing-sub">긍정적인 검토를 기다리겠습니다.</p>
         <PowerButton label="다시 켜기" onClick={restart} />
         <p className="closing-hint">seoleem desk</p>
       </div>

@@ -10,8 +10,8 @@ export function drawStickyNote(ctx: CanvasRenderingContext2D, size: number, colo
   ctx.fillRect(0, 0, size, size);
 
   const shade = ctx.createLinearGradient(0, size * 0.6, 0, size);
-  shade.addColorStop(0, 'rgba(0,0,0,0)');
-  shade.addColorStop(1, 'rgba(0,0,0,0.12)');
+  shade.addColorStop(0, canvasPalette.sticky.shadeFrom);
+  shade.addColorStop(1, canvasPalette.sticky.shadeTo);
   ctx.fillStyle = shade;
   ctx.fillRect(0, 0, size, size);
 

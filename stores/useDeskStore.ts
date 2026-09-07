@@ -51,6 +51,8 @@ interface DeskState {
   backToDesk: () => void;
   finishBoot: () => void;
   powerOff: (sceneTime: number) => void;
+  /** 종료 화면에서 다시 켜기. 새로 고치지 않고 부팅 상태로 되돌린다 */
+  restart: () => void;
   consumeCameraRequest: () => void;
 }
 
@@ -103,6 +105,19 @@ export const useDeskStore = create<DeskState>((set) => ({
       hoverLabel: null,
       shutdownAt: sceneTime,
       cameraRequest: { pose: 'close', duration: 1900, id: ++requestId },
+    }),
+
+  // 페이지를 새로 고치면 다시 켜기 버튼에서 낸 시작음이 함께 끊긴다. 씬 상태만 처음으로 돌린다.
+  // 밤낮과 소리 설정은 사용자가 고른 값이라 그대로 둔다
+  restart: () =>
+    set({
+      phase: 'boot',
+      zoomed: null,
+      hoverLabel: null,
+      hoverPoint: null,
+      dragging: false,
+      shutdownAt: -1,
+      cameraRequest: null,
     }),
 
   consumeCameraRequest: () => set({ cameraRequest: null }),

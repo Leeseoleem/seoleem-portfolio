@@ -8,8 +8,10 @@ import { useDeskStore } from '@/stores/useDeskStore';
 import { scenePalette } from '@/lib/desk/palette';
 import { PHONE_YAW, positions, TOP, zoomPoses } from '@/lib/desk/layout';
 
-const BODY: [number, number, number] = [0.31, 0.022, 0.66];
-const SCREEN: [number, number] = [0.276, 0.598];
+/* 실제 폰(9:19.5)보다 조금 넓은 1:2 비율. 화면 안 카드와 타일이 답답하지 않게 */
+const BODY: [number, number, number] = [0.334, 0.022, 0.66];
+const SCREEN: [number, number] = [0.3, 0.6];
+const SCREEN_PX: [number, number] = [390, 780];
 
 /**
  * 핸드폰. 화면 내용은 PhoneScreen(DOM)이 전부 맡는다.
@@ -26,7 +28,15 @@ export function Phone() {
         <planeGeometry args={SCREEN} />
         <meshBasicMaterial color={scenePalette.furniture.black} toneMapped={false} />
       </mesh>
-      <ZoomSurface deskView target="phone" size={SCREEN} pixels={[360, 780]} position={[0, TOP + 0.024, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <ZoomSurface
+        deskView
+        hideWhileOtherZoomed
+        target="phone"
+        size={SCREEN}
+        pixels={SCREEN_PX}
+        position={[0, TOP + 0.024, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+      >
         <PhoneScreen />
       </ZoomSurface>
       {/* 전면 카메라 */}

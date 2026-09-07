@@ -31,8 +31,8 @@ const BAND_Y = BODY_Y - (OPEN_H + BEZEL_H) / 4;
 const NOTES: Array<{ color: string; arrow: number; position: [number, number, number]; tilt: number }> = [
   // 오른쪽 위: 화면을 가리키는 화살표(왼쪽)
   { color: canvasPalette.sticky.yellow, arrow: Math.PI, position: [0.71, BODY_Y + 0.33, LED_Z + 0.003], tilt: -0.07 },
-  // 왼쪽 아래: 책상 위 물건들을 가리키는 화살표(왼쪽 아래)
-  { color: canvasPalette.sticky.pink, arrow: Math.PI * 0.72, position: [-0.71, BODY_Y - 0.26, LED_Z + 0.003], tilt: 0.09 },
+  // 왼쪽, 바탕화면 휴지통 아이콘 높이: 책상 뷰에서는 공책을, 확대 뷰에서는 왼쪽 아래 HUD를 가리키는 화살표(왼쪽 아래)
+  { color: canvasPalette.sticky.pink, arrow: Math.PI * 0.72, position: [-0.71, BODY_Y - 0.07, LED_Z + 0.003], tilt: 0.09 },
 ];
 const NOTE_SIZE = 0.105;
 const NOTE_TEX = 256;
@@ -82,11 +82,22 @@ export function Monitor() {
   const bezel = useMemo(() => createFrameGeometry(BEZEL_W, BEZEL_H, OPEN_W, OPEN_H, BEZEL_D), []);
   useEffect(() => () => bezel.dispose(), [bezel]);
 
+  /** 종료 연출을 그린 뒤인지. 다시 켜면 화면 텍스처와 LED를 되돌려야 한다 */
+  const wasOff = useRef(false);
   useFrame(() => {
     const { phase, shutdownAt } = useDeskStore.getState();
     // 부팅 화면은 BootOverlay가, 책상·확대 화면은 MonitorScreen(DOM)이 맡는다.
     // 여기서 그리는 건 종료 연출뿐이다
-    if (phase !== 'off') return;
+    if (phase !== 'off') {
+      if (wasOff.current) {
+        // 다시 켜진 뒤 첫 프레임. 부팅이 끝나며 비워 둔 캔버스를 올리고 LED를 켠다
+        wasOff.current = false;
+        texture.needsUpdate = true;
+        if (ledMat.current) ledMat.current.color.set(scenePalette.led.on);
+      }
+      return;
+    }
+    wasOff.current = true;
     const ctx = getScreenContext();
     if (!ctx) return;
     const k = Math.min(1, (sceneTime() - shutdownAt) / 1.9);

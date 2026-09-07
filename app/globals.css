@@ -17,6 +17,9 @@
   --brand-accent: #245edb;
   --brand-glow: #7be08a;
   --brand-paper: #f4efe4;
+  /* 부팅·종료 화면. CRT가 꺼진 검정과 수축하는 흰 선이라 브랜드 잉크색과 따로 둔다 */
+  --crt-black: #000000;
+  --crt-white: #ffffff;
 
   --radius-xs: 2px;
   --radius-sm: 3px;
@@ -44,32 +47,91 @@
   --xp-title-to: #3d8aee;
   --xp-title-fg: #ffffff;
   --xp-border: #0831d9;
-  --xp-desktop: #3a6ea5;
+  /* 배경화면(bliss) 밑에 깔리는 바탕색. 이미지가 늦게 오면 이 색이 보인다 */
+  --xp-desktop: #2a6fd6;
   --xp-text: #000000;
-  --xp-sky-top: #2a6fd6;
-  --xp-sky-mid: #8ec5f0;
-  --xp-sky-bottom: #cfe7f7;
-  --xp-hill-far: #5aa53a;
-  --xp-hill-near: #3f8a2c;
-  --xp-taskbar-top: #3a80f0;
+  --xp-menu-head-top: #2b5fd4;
+  --xp-menu-head-bottom: #1c48b6;
+  --xp-menu-foot: #3b73e0;
+  --xp-menu-edge: #1a44a8;
+  --xp-menu-hover: #316ac5;
+  --xp-power: #d9412a;
+  --xp-power-light: #f07a5f;
+  --xp-menu-avatar: #e9eef5;
+  --xp-taskbar-top: #3a8ff0;
   --xp-taskbar-mid: #245edb;
-  --xp-taskbar-bottom: #1b44a8;
-  --xp-start-top: #5fbf4f;
-  --xp-start-bottom: #2e8a2a;
-  --xp-tray: #1a9be6;
-  --xp-icon-shadow: rgba(0, 0, 0, 0.15);
+  --xp-taskbar-bottom: #1a45ab;
+  --xp-taskbar-line: #6fb2f7;
+  --xp-start-top: #5cc253;
+  --xp-start-mid: #3fa63d;
+  --xp-start-bottom: #369a35;
+  --xp-start-deep: #287f28;
+  --xp-start-lit-top: #6fd066;
+  --xp-start-lit-mid: #4db44a;
+  --xp-start-lit-mid2: #43a941;
+  --xp-start-lit-bottom: #2f8a2f;
+  --xp-task-top: #4a8ff2;
+  --xp-task-mid: #2f6fe0;
+  --xp-task-bottom: #2760c8;
+  --xp-task-lit-top: #5c9cf6;
+  --xp-task-lit-mid: #3d7ee8;
+  --xp-task-lit-bottom: #336fd6;
+  --xp-task-active-top: #1c47a9;
+  --xp-task-active-bottom: #1f4fb8;
+  --xp-close-top: #f08b78;
+  --xp-close-bottom: #d4381a;
+  --xp-close-lit-top: #ff9f8c;
+  --xp-close-lit-bottom: #e84526;
+  --xp-tray-top: #1fb0f4;
+  --xp-tray-mid: #1494e6;
+  --xp-tray-bottom: #0f7fd2;
+  --xp-tray-edge: #0b4fa8;
+  --xp-icon-select: rgba(28, 80, 190, 0.38);
   --xp-flag-a: #f35325;
   --xp-flag-b: #81bc06;
   --xp-flag-c: #05a6f0;
   --xp-flag-d: #ffba08;
-  --xp-icon-a: #f7c948;
-  --xp-icon-b: #5b9cf6;
-  --xp-icon-c: #e9eef5;
-  --xp-icon-d: #b8c4d0;
   --xp-title-idle-from: #7e97c8;
   --xp-title-idle-to: #a9bde1;
   --xp-skel: #e3e3e3;
   --xp-skel-strong: #cfcfcf;
+  --xp-text-weak: #6b6b6b;
+  --xp-line: #d9d6cc;
+  --xp-link: #0a56d6;
+  --xp-group-line: #d0d0bf;
+  --xp-group-legend: #0046d5;
+  --xp-btn-border: #003c74;
+  --xp-btn-hover: #f8b330;
+  --xp-btn-mid: #ecebe5;
+  --xp-btn-bottom: #d8d0c4;
+  --xp-code-bg: #1e1e1e;
+  --xp-code-fg: #d4d4d4;
+  --xp-code-muted: #8a8a8a;
+  --xp-code-fence: #161616;
+  --xp-code-rule: #3a3a3a;
+
+  /* 바탕화면 아이콘 픽토그램(components/desk/surfaces/xp-icons.tsx). SVG가 style로 읽는다 */
+  --xpi-folder-back-top: #e6b43a;
+  --xpi-folder-back-bottom: #c8921f;
+  --xpi-folder-front-top: #ffe28a;
+  --xpi-folder-front-mid: #f8cf5e;
+  --xpi-folder-front-bottom: #e7b23c;
+  --xpi-folder-edge: #fff1bd;
+  --xpi-page-top: #ffffff;
+  --xpi-page-bottom: #e4eaf2;
+  --xpi-page-line: #8ea2be;
+  --xpi-page-fold: #cfd9e6;
+  --xpi-page-text: #5b7fb5;
+  --xpi-page-rule: #c9d5e5;
+  --xpi-photo-top: #7fb2f0;
+  --xpi-photo-bottom: #3f7fd6;
+  --xpi-photo-fg: #eaf2ff;
+  --xpi-bin-light: #eef4fa;
+  --xpi-bin-mid: #c9d8e8;
+  --xpi-bin-dark: #9db1c8;
+  --xpi-bin-line: #7f95ad;
+  --xpi-bin-lid: #dfe8f2;
+  --xpi-bin-arrow: #3f9d3a;
 
   /* 핸드폰 UI (토스 스타일). 실제 값은 폰 UI 작업에서 확정한다 */
   --toss-bg: #ffffff;
@@ -88,9 +150,10 @@
   --phone-bg-light: #f6f7f9;
   --phone-ink: #1f2226;
   --phone-ink-weak: #7b8088;
-  --phone-card: #2a2c31;
+  --phone-card: #24262b;
   --phone-card-fg: #f2f3f5;
-  --phone-card-fg-weak: rgba(242, 243, 245, 0.62);
+  --phone-card-fg-weak: rgba(242, 243, 245, 0.6);
+  --phone-card-chip: rgba(255, 255, 255, 0.08);
   --phone-shadow-dark: rgba(31, 34, 38, 0.14);
   --phone-shadow-light: rgba(255, 255, 255, 0.95);
 
@@ -106,16 +169,32 @@
   --ps-fg: #e6e6e6;
   --ps-dim: #9aa6d8;
   --ps-cmd: #ffff66;
-  --ps-mono: 'Consolas', 'D2Coding', 'Courier New', monospace;
+  /* 영문과 선 문자는 고정폭, 한글은 글꼴에 없어서 Pretendard로 떨어진다. 맑은 고딕으로 새지 않게 순서를 둔다 */
+  --ps-mono: Consolas, Menlo, 'Pretendard Variable', Pretendard, 'Courier New', monospace;
 
   /* 공책 속지 (임시) */
-  --nb-a: #f3ece0;
-  --nb-b: #e9e3f0;
-  --nb-c: #e2efe6;
-  --nb-back: #ded6c8;
-  --nb-ink: #3a352c;
-  --nb-ink-weak: #8b8577;
-  --nb-shadow: rgba(58, 53, 44, 0.55);
+  /* 공책. 따뜻한 종이 위에 판을 깔고 화면을 얹는 다이어리 형식이다 */
+  --nb-page: #f7f3ea;
+  --nb-back: #eae4d8;
+  --nb-plate: #ece7db;
+  --nb-ink: #2b2824;
+  --nb-ink-weak: #7d776d;
+  --nb-ink-faint: #ada79c;
+  --nb-rule: rgba(43, 40, 36, 0.16);
+  /* 목차 줄에 손을 얹었을 때 */
+  --nb-row-hover: rgba(43, 40, 36, 0.05);
+  --nb-frame-line: rgba(43, 40, 36, 0.12);
+  --nb-shadow: rgba(43, 40, 36, 0.5);
+  /* 옆에 붙는 인덱스 탭. 프로젝트 순서대로 돌려 쓰는 종이 색 셋 */
+  --nb-tab-0: #d8c6b0;
+  --nb-tab-1: #c8d2c2;
+  --nb-tab-2: #d2c6d5;
+  /* 공책 이미지 전체 화면 보기 */
+  --lb-bg: rgba(14, 14, 16, 0.92);
+  --lb-fg: #f2f2f2;
+  --lb-fg-weak: #a6a6a6;
+  --lb-btn: rgba(255, 255, 255, 0.08);
+  --lb-btn-hover: rgba(255, 255, 255, 0.16);
 
   --duration-fast: 150ms;
   --duration-base: 300ms;
@@ -166,7 +245,7 @@ body {
   position: fixed;
   inset: 0;
   z-index: 10;
-  background: #000;
+  background: var(--crt-black);
 }
 
 .boot-canvas-host {
@@ -224,7 +303,8 @@ body {
 /* ---------- HUD: 파워셸 창 ---------- */
 .ps {
   position: fixed;
-  right: var(--space-5);
+  /* 왼쪽 아래. 모니터 왼쪽의 메모지 화살표가 이 창을 가리키는 방향이다 */
+  left: var(--space-5);
   bottom: var(--space-5);
   z-index: 6;
   width: 300px;
@@ -426,7 +506,7 @@ body {
   position: fixed;
   inset: 0;
   z-index: 20;
-  background: #000;
+  background: var(--crt-black);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -444,7 +524,7 @@ body {
   top: 50%;
   height: 2px;
   width: 100%;
-  background: #fff;
+  background: var(--crt-white);
   transform: translate(-50%, -50%) scaleX(1);
   box-shadow: var(--shadow-crt);
   transition:
@@ -541,8 +621,22 @@ body {
   height: 100%;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(var(--xp-sky-top), var(--xp-sky-mid) 55%, var(--xp-sky-bottom));
+  background: var(--xp-desktop);
   color: var(--xp-title-fg);
+  /* XP는 Tahoma를 썼다. 픽셀 글꼴은 부팅 화면과 HUD에 남기고 바탕화면은 창과 같은 글꼴을 쓴다 */
+  font-family: var(--font-ui);
+}
+
+/* 배경화면. 미리 흐려 둔 이미지다. 매 프레임 변형되는 화면이라 CSS blur 대신 파일에서 흐린다.
+   background-image로는 이 층에서 그려지지 않아 img 요소로 깐다 */
+.xp__wall {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
 }
 
 /* CRT 유리. 확대 화면 DOM은 3D 깊이 판정을 받지 않아 3D 유리판을 앞에 둘 수 없으므로 CSS로 얹는다.
@@ -558,13 +652,6 @@ body {
     radial-gradient(ellipse 72% 68% at 50% 50%, rgba(0, 0, 0, 0) 62%, rgba(0, 0, 0, 0.16) 100%);
 }
 
-.xp__hills {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
 .xp__icons {
   position: absolute;
   top: 32px;
@@ -578,50 +665,39 @@ body {
 }
 
 .xp-icon {
-  width: 92px;
+  width: 96px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 4px;
-  border: none;
+  gap: 6px;
+  padding: 6px 4px 5px;
+  border: 1px solid transparent;
   border-radius: 3px;
   background: transparent;
   color: inherit;
   font: inherit;
+  text-decoration: none;
   cursor: pointer;
 }
 
+/* 고른 아이콘은 XP처럼 반투명한 파란 판이 그림과 이름을 함께 덮는다 */
 .xp-icon:hover,
 .xp-icon:focus-visible {
   outline: none;
-  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.35);
+  background: var(--xp-icon-select);
 }
 
-.xp-icon__tile {
-  width: 44px;
-  height: 40px;
-  border-radius: 4px;
-  border-bottom: 10px solid var(--xp-icon-shadow);
-  box-sizing: border-box;
-}
-
-.xp-icon__tile--a {
-  background: var(--xp-icon-a);
-}
-.xp-icon__tile--b {
-  background: var(--xp-icon-b);
-}
-.xp-icon__tile--c {
-  background: var(--xp-icon-c);
-}
-.xp-icon__tile--d {
-  background: var(--xp-icon-d);
+.xp-icon__pic {
+  display: block;
+  width: 48px;
+  height: 48px;
 }
 
 .xp-icon__label {
   font-size: 15px;
-  line-height: 1;
+  line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
 .xp__taskbar {
@@ -634,32 +710,61 @@ body {
   z-index: 10000;
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: linear-gradient(var(--xp-taskbar-top), var(--xp-taskbar-mid) 10%, var(--xp-taskbar-bottom));
+  gap: 10px;
+  border-top: 1px solid var(--xp-taskbar-line);
+  background: linear-gradient(var(--xp-taskbar-top) 0%, var(--xp-taskbar-mid) 14%, var(--xp-taskbar-mid) 78%, var(--xp-taskbar-bottom) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
 
+/* 시작 단추. 오른쪽 끝만 둥글고, 위 절반이 밝은 두 단 그라데이션이다 */
 .xp-start {
   height: 100%;
-  padding: 0 22px 0 12px;
-  border-radius: 0 8px 8px 0;
-  background: linear-gradient(var(--xp-start-top), var(--xp-start-bottom));
-  font-size: 20px;
-  font-weight: 800;
+  padding: 0 22px 0 10px;
+  border: none;
+  border-radius: 0 12px 12px 0;
+  color: var(--xp-title-fg);
+  font: inherit;
+  cursor: pointer;
+  background: linear-gradient(var(--xp-start-top) 0%, var(--xp-start-mid) 48%, var(--xp-start-bottom) 52%, var(--xp-start-deep) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset -3px 0 4px rgba(0, 0, 0, 0.22), 1px 0 2px rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
+.xp-start:hover,
+.xp-start:focus-visible {
+  outline: none;
+  background: linear-gradient(var(--xp-start-lit-top) 0%, var(--xp-start-lit-mid) 48%, var(--xp-start-lit-mid2) 52%, var(--xp-start-lit-bottom) 100%);
+}
+
+/* 메뉴가 열려 있으면 눌린 상태로 보인다 */
+.xp-start.is-open {
+  background: linear-gradient(var(--xp-start-lit-bottom) 0%, var(--xp-start-bottom) 50%, var(--xp-start-mid) 100%);
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.35);
+}
+
+.xp-start__text {
+  font-size: 20px;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.45);
+}
+
+/* 깃발. 네 조각이 바람에 휘어진 것처럼 살짝 기울어 있다 */
 .xp-start__flag {
   display: grid;
-  grid-template-columns: 9px 9px;
-  grid-template-rows: 9px 9px;
-  gap: 3px;
+  grid-template-columns: 10px 10px;
+  grid-template-rows: 10px 10px;
+  gap: 2px;
+  transform: skewY(-8deg) rotate(-4deg);
 }
 
 .xp-start__flag i {
   display: block;
-  border-radius: 2px;
+  border-radius: 3px 4px 3px 4px;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 .xp-start__flag i:nth-child(1) {
   background: var(--xp-flag-a);
@@ -674,17 +779,183 @@ body {
   background: var(--xp-flag-d);
 }
 
+/* 트레이. 왼쪽 경계에 어두운 선과 밝은 선이 나란히 들고, 시계는 가운데 */
 .xp__tray {
   height: 100%;
-  min-width: 120px;
+  min-width: 132px;
   margin-left: auto;
-  padding: 0 20px;
-  background: var(--xp-tray);
+  padding: 0 22px;
+  border-left: 1px solid var(--xp-tray-edge);
+  box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  background: linear-gradient(var(--xp-tray-top) 0%, var(--xp-tray-mid) 50%, var(--xp-tray-bottom) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
   flex: none;
+}
+
+/* ---------- 시작 메뉴 ---------- */
+.xp-menu-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 9999;
+  border: none;
+  background: transparent;
+  cursor: default;
+}
+
+/* 작업 표시줄 바로 위에 붙어 열린다. 위쪽 모서리만 둥근 XP 모양 */
+.xp-menu {
+  position: absolute;
+  left: 0;
+  bottom: 40px;
+  z-index: 10000;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--xp-menu-edge);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  background: var(--xp-face-light);
+  color: var(--xp-text);
+  overflow: hidden;
+}
+
+.xp-menu__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 64px;
+  padding: 0 14px;
+  background: linear-gradient(var(--xp-menu-head-top), var(--xp-menu-head-bottom));
+  color: var(--xp-title-fg);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.xp-menu__avatar {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  border-radius: 4px;
+  background: var(--xp-menu-avatar);
+}
+
+.xp-menu__avatar .xp-icon__pic {
+  width: 32px;
+  height: 32px;
+}
+
+.xp-menu__user {
+  font-size: 17px;
+  font-weight: 700;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+.xp-menu__list {
+  margin: 0;
+  padding: 8px 6px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.xp-menu__item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  text-decoration: none;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.xp-menu__item .xp-icon__pic {
+  width: 28px;
+  height: 28px;
+}
+
+.xp-menu__item:hover,
+.xp-menu__item:focus-visible {
+  outline: none;
+  background: var(--xp-menu-hover);
+  color: var(--xp-title-fg);
+}
+
+.xp-menu__foot {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 10px;
+  background: linear-gradient(var(--xp-menu-foot), var(--xp-menu-head-bottom));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.xp-menu__power {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--xp-title-fg);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.xp-menu__power:hover,
+.xp-menu__power:focus-visible {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* 빨간 전원 표시. 원과 위쪽 틈 */
+.xp-menu__power-icon {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(var(--xp-power-light), var(--xp-power));
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+.xp-menu__power-icon::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--xp-face-light);
+  border-top-color: transparent;
+  border-radius: 50%;
+  box-sizing: content-box;
+}
+
+.xp-menu__power-icon::after {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 3px;
+  width: 2px;
+  height: 7px;
+  background: var(--xp-face-light);
 }
 
 /* 열려 있는 창 목록 */
@@ -702,14 +973,16 @@ body {
 
 .xp-task {
   max-width: 180px;
-  height: 30px;
+  height: 28px;
   padding: 0 12px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.3);
   border-radius: 3px;
-  background: linear-gradient(rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.06));
+  background: linear-gradient(var(--xp-task-top), var(--xp-task-mid) 60%, var(--xp-task-bottom));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
   color: var(--xp-title-fg);
   font: inherit;
-  font-size: 15px;
+  font-size: 14px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -719,13 +992,13 @@ body {
 .xp-task:hover,
 .xp-task:focus-visible {
   outline: none;
-  background: linear-gradient(rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.14));
+  background: linear-gradient(var(--xp-task-lit-top), var(--xp-task-lit-mid) 60%, var(--xp-task-lit-bottom));
 }
 
 /* 지금 앞에 나와 있는 창은 눌린 것처럼 보인다 */
 .xp-task.is-active {
-  background: rgba(0, 0, 0, 0.22);
-  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.35);
+  background: linear-gradient(var(--xp-task-active-top), var(--xp-task-active-bottom));
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.45);
 }
 
 /* ---------- 모니터 안의 창 ---------- */
@@ -799,12 +1072,12 @@ body {
 }
 
 .xpw__btn--close {
-  background: linear-gradient(#f08b78, #d4381a);
+  background: linear-gradient(var(--xp-close-top), var(--xp-close-bottom));
 }
 
 .xpw__btn--close:hover,
 .xpw__btn--close:focus-visible {
-  background: linear-gradient(#ff9f8c, #e84526);
+  background: linear-gradient(var(--xp-close-lit-top), var(--xp-close-lit-bottom));
 }
 
 .xpw__body {
@@ -812,8 +1085,14 @@ body {
   min-height: 0;
   padding: 12px;
   border: 1px solid var(--xp-face-shadow);
-  background: #ffffff;
+  background: var(--xp-face-light);
   overflow: auto;
+}
+
+.xpw__body--flush {
+  padding: 0;
+  background: var(--xp-face);
+  overflow: hidden;
 }
 
 /* 폴더 창 안의 목록 */
@@ -852,11 +1131,49 @@ body {
 .xp-list__icon {
   flex: none;
   width: 26px;
-  height: 22px;
-  border-radius: 3px;
-  border-bottom: 5px solid var(--xp-icon-shadow);
-  background: var(--xp-icon-a);
-  box-sizing: border-box;
+  height: 26px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.xp-list__name {
+  flex: none;
+  font-weight: 600;
+}
+
+/* 이름 옆에 붙는 한 줄. 고른 행이 파랗게 되면 같이 밝아진다 */
+.xp-list__sub {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  color: var(--xp-text-weak);
+}
+
+.xp-list__row:hover .xp-list__sub,
+.xp-list__row:focus-visible .xp-list__sub {
+  color: inherit;
+  opacity: 0.85;
+}
+
+/* 소개 창. 메모장처럼 흰 종이 위의 글. 첫 문장이 제목이고 나머지는 단락 */
+.xp-about {
+  padding: 14px 16px 8px;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.xp-about__heading {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+
+.xp-about p {
+  margin: 0 0 14px;
 }
 
 /* 글이 들어오기 전까지 자리만 잡아 두는 골격 */
@@ -864,12 +1181,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.xp-doc__shot {
-  height: 150px;
-  border-radius: 3px;
-  background: var(--xp-skel);
 }
 
 .xp-doc__line {
@@ -888,12 +1199,426 @@ body {
   width: 40%;
 }
 
-.xp-empty {
+/* 휴지통. 탐색기의 자세히 보기처럼 표로 놓는다 */
+.xp-trash {
+  margin: -12px;
+}
+
+.xp-trash__note {
   margin: 0;
-  padding: 24px 0;
-  text-align: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--xp-line);
+  background: var(--xp-face);
+  font-size: 13px;
+  color: var(--xp-text-weak);
+}
+
+/* XP 목록 보기의 표. 머리글은 회색 단추 모양, 행은 얇은 선으로 나눈다 */
+.xp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.xp-table th {
+  padding: 6px 12px;
+  border-right: 1px solid var(--xp-line);
+  border-bottom: 1px solid var(--xp-face-shadow);
+  background: linear-gradient(var(--xp-face-light), var(--xp-face));
+  font-weight: 400;
+  text-align: left;
+  color: var(--xp-text-weak);
+  white-space: nowrap;
+}
+
+.xp-table th:last-child {
+  border-right: none;
+}
+
+.xp-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--xp-line);
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.xp-table__project {
+  width: 96px;
+  border-right: 1px solid var(--xp-line);
+  white-space: nowrap;
+}
+
+.xp-table__name {
+  width: 190px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.xp-table__reason {
+  color: var(--xp-text-weak);
+}
+
+/* 프로젝트 이름. 링크 모양이고 누르면 프로젝트 창으로 간다 */
+.xp-table__link {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--xp-link);
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.xp-table__link:hover,
+.xp-table__link:focus-visible {
+  outline: none;
+  text-decoration: underline;
+}
+
+/* ---------- XP 대화상자 부품 ---------- */
+/* 그룹 상자. 테두리에 파란 제목이 걸린 XP 속성 창의 그것 */
+.xp-group {
+  margin: 0;
+  min-width: 0;
+  padding: 10px 14px 14px;
+  border: 1px solid var(--xp-group-line);
+  border-radius: 4px;
+}
+
+.xp-group > legend {
+  padding: 0 4px;
+  font-size: 13px;
+  color: var(--xp-group-legend);
+}
+
+.xp-group > p {
+  margin: 0;
+}
+
+/* XP 단추. 링크에도 같은 모양을 준다 */
+.xp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 14px;
+  border: 1px solid var(--xp-btn-border);
+  border-radius: 3px;
+  background: linear-gradient(var(--xp-face-light), var(--xp-btn-mid) 86%, var(--xp-btn-bottom));
+  color: var(--xp-text);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.3;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.xp-btn:hover,
+.xp-btn:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--xp-btn-hover);
+}
+
+/* ---------- 프로젝트 창 (장 넘김) ---------- */
+/* 장은 스크롤 없이 한 화면에 들어간다. 상태 표시줄이 아래에 고정되고 장 내용이 남은 높이를 쓴다 */
+.pj {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px 24px 12px;
+  box-sizing: border-box;
   font-size: 15px;
-  color: var(--xp-face-shadow);
+}
+
+.pj__page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 상태 표시줄. 칸마다 안으로 들어간 테두리를 둔다 */
+.pj__status {
+  flex: none;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 4px;
+}
+
+.pj__cell {
+  display: flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 6px;
+  border: 1px solid;
+  border-color: var(--xp-face-shadow) var(--xp-face-light) var(--xp-face-light) var(--xp-face-shadow);
+  font-size: 13px;
+}
+
+.pj__cell--prev {
+  justify-content: flex-start;
+}
+
+.pj__cell--next {
+  justify-content: flex-end;
+}
+
+.pj__cell--count {
+  min-width: 72px;
+  justify-content: center;
+  color: var(--xp-text-weak);
+  font-variant-numeric: tabular-nums;
+}
+
+.pj__cell .xp-btn {
+  padding: 2px 10px;
+}
+
+/* 소개 장: 왼쪽 글, 오른쪽 미리 보기 판 */
+.pj-intro {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 28px;
+}
+
+.pj-intro__text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.pj-intro__head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pj-intro__name {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.pj-intro__tagline {
+  margin: 0;
+  font-size: 15px;
+  color: var(--xp-text-weak);
+}
+
+.pj-intro__summary {
+  margin: 0;
+  line-height: 1.65;
+}
+
+.pj-stack {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+}
+
+.pj-stack li {
+  padding: 3px 9px;
+  border: 1px solid var(--xp-group-line);
+  border-radius: 3px;
+  background: var(--xp-face-light);
+  font-size: 13px;
+}
+
+.pj-links {
+  margin: auto 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pj-shots {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  align-content: center;
+}
+
+.pj-shot {
+  margin: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 기기 틀까지 들어 있는 투명 배경 목업이라 자르거나 둥글리지 않고 그대로 놓는다 */
+.pj-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* 아직 이미지가 없는 자리. 점선으로 비어 있음을 드러낸다 */
+.pj-shot__empty {
+  display: block;
+  width: 100%;
+  aspect-ratio: 9 / 19.5;
+  border: 1px dashed var(--xp-skel-strong);
+  border-radius: 8px;
+  background: var(--xp-skel);
+  box-sizing: border-box;
+}
+
+.pj-shot figcaption {
+  font-size: 12px;
+  text-align: center;
+  color: var(--xp-text-weak);
+}
+
+/* 개요 장 */
+.pj-overview {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.pj-meta {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  row-gap: 10px;
+  column-gap: 16px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.pj-meta__row {
+  display: contents;
+}
+
+.pj-meta dt {
+  color: var(--xp-text-weak);
+}
+
+.pj-meta dd {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.pj-overview__note {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* 구조도 장: 검은 판. 위에 프롬프트 한 줄, 그 아래는 마크다운 코드 펜스가 렌더된 모양 */
+.pj-code {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 22px 22px;
+  border-radius: 6px;
+  background: var(--xp-code-bg);
+  color: var(--xp-code-fg);
+}
+
+.pj-code__line {
+  flex: none;
+  margin: 0;
+  font-family: var(--ps-mono);
+  font-size: 13px;
+  line-height: 1.4;
+  white-space: pre;
+}
+
+.pj-code__prompt {
+  color: var(--xp-code-muted);
+}
+
+/* 코드 펜스. 판보다 한 톤 더 어두운 상자가 남은 높이를 채운다 */
+.pj-code__fence {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  padding: 14px 16px;
+  border: 1px solid var(--xp-code-rule);
+  border-radius: 6px;
+  background: var(--xp-code-fence);
+}
+
+/* 그림이 놓이는 칸. 실제 확대는 FitPre가 칸 크기를 재서 한다 */
+.pj-code__fit {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* 줄 간격을 글자 높이에 붙여야 세로 선(│)이 끊기지 않고 이어진다 */
+.pj-code__fit pre {
+  margin: 0;
+  font-family: var(--ps-mono);
+  font-size: 13px;
+  line-height: 1.15;
+  transform-origin: center;
+}
+
+/* Engineering Case 장 */
+.pj-case {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.pj-case__head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pj-case__kicker {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--xp-text-weak);
+}
+
+.pj-case__heading {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.pj-case__grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 1fr;
+  gap: 14px 16px;
+}
+
+.pj-case__grid .xp-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.pj-case__grid p {
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 /* ---------- 공책 속지 (넘김 동작 확인용 임시) ---------- */
@@ -902,7 +1627,7 @@ body {
   width: 100%;
   height: 100%;
   position: relative;
-  background: var(--brand-paper);
+  background: var(--nb-page);
   perspective: 1600px;
   touch-action: none;
   cursor: grab;
@@ -926,7 +1651,8 @@ body {
 .nb__face {
   position: absolute;
   inset: 0;
-  backface-visibility: hidden;
+  /* backface-visibility는 쓰지 않는다. drei의 거울상 변환 안에서는 앞뒤 판정이 뒤집혀 앞면이 사라진다.
+     어느 면을 보일지는 NotebookPages가 넘김 진행도로 정한다 */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -939,14 +1665,8 @@ body {
   background: var(--nb-back);
 }
 
-.nb__face--a {
-  background: var(--nb-a);
-}
-.nb__face--b {
-  background: var(--nb-b);
-}
-.nb__face--c {
-  background: var(--nb-c);
+.nb__face--front {
+  background: var(--nb-page);
 }
 
 /* 종이가 세워질수록 책등 쪽부터 그늘이 진다 */
@@ -961,24 +1681,432 @@ body {
   background: linear-gradient(to left, var(--nb-shadow) 0%, transparent 55%);
 }
 
-.nb__no {
-  font-size: 96px;
+/* ---------- 공책 장 내용 ---------- */
+/*
+ * 짜임은 iOS 화면 규칙을 따른다. 왼쪽 한 줄에 모든 글이 맞춰 서고, 큰 제목 하나가 장을 이끈다.
+ * 글자는 다섯 단계뿐이다(34 제목, 17 본문, 15 보조, 13 머리글과 쪽번호, 12 이름표).
+ * 크기와 굵기와 색만으로 층을 나누고 선이나 장식은 쓰지 않는다.
+ * 치수(가장자리 40, 판 안쪽 20, 프레임 간격 16)는 NotebookPages.tsx의 상수와 같아야 한다.
+ */
+.nbp {
+  position: absolute;
+  inset: 0;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
   color: var(--nb-ink);
+  font-family: var(--font-ui);
+  text-align: left;
 }
 
-.nb__hint {
-  font-size: 20px;
+/* 장 바닥. 왼쪽에 프로젝트 이름, 오른쪽에 쪽번호. 선은 긋지 않는다 */
+.nbp__running {
+  /* 언제나 장 바닥에 붙는다. 내용이 짧아도 자리가 흔들리지 않는다 */
+  margin: auto 0 0;
+  padding-top: 28px;
+  flex: none;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  color: var(--nb-ink-weak);
+  font-variant-numeric: tabular-nums;
+}
+
+.nbp__head {
+  margin: 0 0 28px;
+}
+
+/* 큰 제목. 장을 이끄는 단 하나의 글줄이다 */
+.nbp__title {
+  margin: 0;
+  font-size: 34px;
+  line-height: 41px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.nbp__caption {
+  margin: 8px 0 0;
+  font-size: 17px;
+  line-height: 24px;
+  color: var(--nb-ink-weak);
+  word-break: keep-all;
+}
+
+/*
+ * 화면을 얹는 판. 어두운 화면이 밝은 종이에 바로 놓이면 따로 떠 보여서 한 단계 어두운 판을 깐다.
+ * 판은 장 높이를 채우지 않고 담긴 화면만큼만 차지한다. 빈 판을 크게 벌려 두면 화면이 그 안에서 미아가 된다.
+ */
+.nbp__plate {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--nb-plate);
+}
+
+.nbp__row {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.nbp__frame {
+  margin: 0;
+  flex: none;
+}
+
+.nbp__frame-btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+  border-radius: 8px;
+}
+
+.nbp__frame-btn:focus-visible {
+  outline: 2px solid var(--nb-ink);
+  outline-offset: 2px;
+}
+
+.nbp__frame img {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+  outline: 1px solid var(--nb-frame-line);
+  user-select: none;
+}
+
+.nbp__frame-label {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--nb-ink-weak);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/*
+ * 표지와 간지의 본문. 제목과 목차를 한 덩어리로 묶어 장 가운데에 놓되,
+ * 아래쪽 여백을 조금 더 두어 눈으로 보기에 가운데가 되게 한다. 글은 왼쪽 한 줄에 맞춰 선다.
+ */
+.nbp__body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-bottom: 48px;
+}
+
+/* 표지와 간지. 왼쪽 맞춤이다. 가운데 정렬은 쓰지 않는다 */
+.nbp__cover-title {
+  margin: 0;
+  font-family: var(--font-script), 'Segoe Script', 'Bradley Hand', cursive;
+  font-size: 64px;
+  /* 필기체는 아래로 뻗는 획이 길다. 줄 높이를 좁게 주면 아래 글줄과 겹친다 */
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.nbp__cover .nbp__caption {
+  margin-top: 14px;
+}
+
+.nbp__cover {
+  margin-bottom: 32px;
+}
+
+/* 간지 머리. 로고와 이름이 한 줄에 선다 */
+.nbp__section-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.nbp__section-icon {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 13px;
+  outline: 1px solid var(--nb-frame-line);
+  user-select: none;
+}
+
+.nbp__section-name {
+  margin: 0;
+  font-size: 34px;
+  line-height: 41px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* 목차. 한 덩어리 판 위에 줄을 얹고 줄 사이는 머리글자 자리부터 그은 실선으로 나눈다 */
+.nbp__toc {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: 16px;
+  background: var(--nb-plate);
+  overflow: hidden;
+}
+
+.nbp__toc-row {
+  width: 100%;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 20px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.nbp__toc li + li .nbp__toc-row {
+  border-top: 1px solid var(--nb-rule);
+}
+
+/* 아이콘이 있는 줄은 글자 자리부터 선을 긋는다 */
+.nbp__toc--projects li + li .nbp__toc-row {
+  border-top-color: transparent;
+  background-image: linear-gradient(var(--nb-rule), var(--nb-rule));
+  background-repeat: no-repeat;
+  background-size: calc(100% - 80px) 1px;
+  background-position: 80px 0;
+}
+
+.nbp__toc-row:hover {
+  background-color: var(--nb-row-hover);
+}
+
+.nbp__toc-row:focus-visible {
+  outline: 2px solid var(--nb-ink);
+  outline-offset: -2px;
+}
+
+.nbp__toc-icon {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 10px;
+  outline: 1px solid var(--nb-frame-line);
+  user-select: none;
+}
+
+.nbp__toc-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 400;
+}
+
+.nbp__toc-page {
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--nb-ink-weak);
+  font-variant-numeric: tabular-nums;
+}
+
+.nbp__toc-more {
+  flex: none;
+  width: 8px;
+  height: 13px;
+  color: var(--nb-ink-faint);
+}
+
+/* 인덱스 탭. 장 오른쪽 가장자리 밖으로 튀어나온 색 종이. 장이 넘어가면 장과 함께 왼쪽으로 간다 */
+.nb__tab {
+  position: absolute;
+  right: -30px;
+  width: 30px;
+  height: 108px;
+  padding: 10px 0;
+  border: 0;
+  border-radius: 0 6px 6px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--nb-ink);
+  font-family: var(--font-ui);
+  cursor: pointer;
+}
+
+.nb__tab--0 {
+  background: var(--nb-tab-0);
+}
+.nb__tab--1 {
+  background: var(--nb-tab-1);
+}
+.nb__tab--2 {
+  background: var(--nb-tab-2);
+}
+
+/* 넘어간 장은 거울상이라 글자가 뒤집힌다. 탭을 한 번 더 뒤집어 바로 세운다 */
+.nb__tab--flipped {
+  transform: scaleX(-1);
+}
+
+.nb__tab-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  user-select: none;
+}
+
+.nb__tab-name {
+  writing-mode: vertical-rl;
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
   color: var(--nb-ink-weak);
 }
 
+/* ---------- 공책 이미지 전체 화면 보기 ---------- */
+/* body에 붙는 층. 3D 캔버스와 HUD 위에 온다 */
+.lb {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  color: var(--lb-fg);
+  font-family: var(--font-ui);
+}
+
+.lb__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: var(--lb-bg);
+  cursor: zoom-out;
+}
+
+.lb__img {
+  position: relative;
+  max-width: min(92vw, 1400px);
+  max-height: calc(100vh - 128px);
+  border-radius: 8px;
+  user-select: none;
+}
+
+.lb__bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.lb__label {
+  font-weight: 600;
+}
+
+.lb__count {
+  color: var(--lb-fg-weak);
+  font-variant-numeric: tabular-nums;
+}
+
+.lb__close,
+.lb__arrow {
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--lb-btn);
+  color: var(--lb-fg);
+  cursor: pointer;
+  transition: background var(--duration-fast);
+}
+
+.lb__close:hover,
+.lb__arrow:hover {
+  background: var(--lb-btn-hover);
+}
+
+.lb__close {
+  margin-left: auto;
+  width: 36px;
+  height: 36px;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.lb__arrow {
+  position: absolute;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translateY(-50%);
+  font-size: 28px;
+  line-height: 1;
+  padding-bottom: 3px;
+}
+
+.lb__arrow--prev {
+  left: 20px;
+}
+
+.lb__arrow--next {
+  right: 20px;
+}
+
+.lb__arrow[aria-disabled='true'] {
+  opacity: 0.25;
+  cursor: default;
+}
+
+/* 뒤표지. 장을 다 넘기면 드러난다. 되돌아갈 단추 하나만 둔다 */
 .nb__end {
   position: absolute;
   inset: 0;
-  margin: 0;
   display: grid;
   place-items: center;
-  font-size: 24px;
-  color: var(--nb-ink-weak);
+  font-family: var(--font-ui);
+}
+
+.nb__end-btn {
+  min-height: 44px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--nb-plate);
+  color: var(--nb-ink);
+  font-family: inherit;
+  font-size: 17px;
+  line-height: 24px;
+  cursor: pointer;
+}
+
+.nb__end-btn:hover {
+  background: var(--nb-back);
+}
+
+.nb__end-btn:focus-visible {
+  outline: 2px solid var(--nb-ink);
+  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1095,8 +2223,8 @@ body {
 /* 어두운 소개 카드. 화면의 유일한 짙은 덩어리라 시선이 여기 모인다 */
 .card {
   margin-top: 26px;
-  padding: 22px 22px 20px;
-  border-radius: 22px;
+  padding: 24px 24px 22px;
+  border-radius: 14px;
   background: var(--phone-card);
   color: var(--phone-card-fg);
   box-shadow:
@@ -1108,40 +2236,43 @@ body {
   margin: 0;
 }
 
+/* 핸들. 대문자 자간 벌림 없이 작게 */
 .card__eyebrow {
   font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-weight: 500;
   color: var(--phone-card-fg-weak);
 }
 
 .card__title {
-  margin-top: 8px;
+  margin-top: 6px;
   font-size: 24px;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
+/* 본문은 단어 중간에서 줄이 갈리지 않게 한다 */
 .card__body {
-  margin-top: 10px;
+  margin-top: 14px;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.6;
   color: var(--phone-card-fg-weak);
+  word-break: keep-all;
 }
 
+/* 스택. 선 없는 옅은 칩 */
 .card__meta {
-  margin-top: 16px;
+  margin-top: 18px;
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
 .card__meta span {
   padding: 5px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(242, 243, 245, 0.18);
-  font-size: 12px;
+  border-radius: 6px;
+  background: var(--phone-card-chip);
+  font-size: 11px;
   font-weight: 600;
   color: var(--phone-card-fg);
 }
@@ -1156,6 +2287,15 @@ body {
   gap: 18px 12px;
 }
 
+/* 실제 앱 아이콘. 타일 모서리에 맞춰 둥글게 자른다 */
+.app__tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  object-fit: cover;
+}
+
 .app {
   display: flex;
   flex-direction: column;
@@ -1167,13 +2307,14 @@ body {
   background: transparent;
   color: var(--phone-ink);
   font: inherit;
+  text-decoration: none;
   cursor: pointer;
 }
 
 .app__tile {
   width: 62px;
   height: 62px;
-  border-radius: 18px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1239,7 +2380,7 @@ body {
   bottom: 26px;
   display: flex;
   justify-content: center;
-  gap: 26px;
+  gap: 22px;
 }
 
 .dock__item {
@@ -1261,9 +2402,123 @@ body {
   transform: translateY(-3px);
 }
 
-.screen-placeholder--paper {
-  background: var(--brand-paper);
-  color: #2a2a2a;
+/* ---------- 책상 위 서류: 이력서 PDF 뷰어 ---------- */
+/* 종이 한 장이 곧 페이지 이미지다. 파일명과 넘김 단추만 위아래에 얹는다 */
+.sheet {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--xp-face-light);
+  color: var(--xp-text);
+  font-family: var(--font-ui);
+}
+
+/* 끝에서 더 넘기려 하면 종이가 그 방향으로 살짝 튕기고 돌아온다. 순환하지 않는다는 신호다 */
+.sheet.is-bump-right {
+  animation: sheet-bump-right 0.22s ease-out;
+}
+
+.sheet.is-bump-left {
+  animation: sheet-bump-left 0.22s ease-out;
+}
+
+@keyframes sheet-bump-right {
+  30% {
+    transform: translateX(-6px);
+  }
+}
+
+@keyframes sheet-bump-left {
+  30% {
+    transform: translateX(6px);
+  }
+}
+
+/* 종이는 이미 하얗게 된 뒤라 바탕은 바로 놓이고, 글(PDF)과 단추만 스르륵 나타난다 */
+.sheet__page,
+.sheet__file,
+.sheet__arrow {
+  animation: sheet-ink 0.7s ease both;
+}
+
+@keyframes sheet-ink {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* PDF 한 쪽은 600×840 그대로 두고, 화면(704×920)의 나머지가 여백이다. 양옆 여백이 넘김 단추 자리다 */
+.sheet__page {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 40px 52px;
+  box-sizing: border-box;
+  object-fit: contain;
+  user-select: none;
+}
+
+.sheet__preload {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sheet__file {
+  position: absolute;
+  top: 13px;
+  right: 52px;
+  margin: 0;
+  font-family: var(--ps-mono);
+  font-size: 12px;
+  color: var(--xp-text-weak);
+}
+
+.sheet__count {
+  margin-left: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.sheet__arrow {
+  position: absolute;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  transform: translateY(-50%);
+  border: 1px solid var(--xp-line);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--xp-text);
+  font: inherit;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.sheet__arrow--prev {
+  left: 9px;
+}
+
+.sheet__arrow--next {
+  right: 9px;
+}
+
+.sheet__arrow:hover,
+.sheet__arrow:focus-visible {
+  outline: none;
+  border-color: var(--xp-text-weak);
+}
+
+/* 끝 쪽에서는 흐려진다. 누르면 넘어가는 대신 종이가 튕기므로 단추 자체는 살려 둔다 */
+.sheet__arrow[aria-disabled='true'] {
+  color: var(--xp-line);
+  border-color: var(--xp-line);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1272,5 +2527,12 @@ body {
   .closing,
   .power-btn {
     transition: none;
+  }
+
+  .sheet,
+  .sheet__page,
+  .sheet__file,
+  .sheet__arrow {
+    animation: none;
   }
 }

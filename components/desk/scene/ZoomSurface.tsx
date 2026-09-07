@@ -31,6 +31,11 @@ interface ZoomSurfaceProps {
    * 그 상태 변경이 다시 렌더를 부르며 서로 물릴 수 있기 때문이다.
    */
   waitForZoom?: boolean;
+  /**
+   * 다른 오브젝트를 확대한 동안에는 숨긴다. DOM은 3D 깊이를 무시하고 항상 맨 위에 그려지므로,
+   * 서류를 들어 올려도 옆 핸드폰 화면이 그 위로 비쳐 보이는 것을 막는다. 숨는 동안은 꺼진 화면(검은 면)이 보인다.
+   */
+  hideWhileOtherZoomed?: boolean;
   children: ReactNode;
 }
 
@@ -41,12 +46,23 @@ interface ZoomSurfaceProps {
  * 텍스트 선택, 스크롤, 접근성, CSS 트랜지션이 그대로 동작한다.
  * 좌표는 부모 그룹 기준이라 오브젝트가 움직여도 화면이 따라간다.
  */
-export function ZoomSurface({ target, size, pixels, position, rotation, deskView = false, waitForZoom = false, children }: ZoomSurfaceProps) {
+export function ZoomSurface({
+  target,
+  size,
+  pixels,
+  position,
+  rotation,
+  deskView = false,
+  waitForZoom = false,
+  hideWhileOtherZoomed = false,
+  children,
+}: ZoomSurfaceProps) {
   const phase = useDeskStore((s) => s.phase);
   const zoomed = useDeskStore((s) => s.zoomed);
   const onThis = zoomed === target && (phase === 'zoomed' || (!waitForZoom && phase === 'transition'));
+  const otherZoomed = zoomed !== null && zoomed !== target && (phase === 'zoomed' || phase === 'transition');
   // 부팅 화면과 종료 연출은 캔버스가 그리므로 그때는 비운다
-  const active = onThis || (deskView && phase !== 'boot' && phase !== 'off');
+  const active = onThis || (deskView && phase !== 'boot' && phase !== 'off' && !(hideWhileOtherZoomed && otherZoomed));
   if (!active) return null;
   return <Surface {...{ size, pixels, position, rotation, onThis, children }} />;
 }

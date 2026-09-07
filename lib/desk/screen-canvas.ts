@@ -13,16 +13,26 @@ const CHAR_RATE = 28; // 초당 글자 수
 
 export interface IntroLine {
   at: number;
+  /** ROLE, STACK처럼 앞에 붙는 항목 이름. 없으면 명령줄 한 줄이다 */
+  label?: string;
   text: string;
 }
 
-// 임시 문구. 실제 자기소개로 교체한다.
+/** 라벨 칸의 폭. 값이 이 자리에서 나란히 시작한다 */
+const INTRO_LABEL_W = 130;
+
+/**
+ * 부팅 중 찍히는 줄. 개발 철학이 아니라 컴퓨터가 사용자 프로필을 읽어오는 것처럼 보이는 정보만 둔다.
+ * 문구는 docs/content-brief.md 1장을 따른다.
+ */
 export const introLines: IntroLine[] = [
-  { at: 0.6, text: '> seoleem 포트폴리오를 불러오는 중...' },
-  { at: 1.6, text: '> 디자인과 개발을 잇는 프론트엔드 개발자' },
-  { at: 2.8, text: '> Figma에서 시작해서 React로 끝낸다' },
-  { at: 4.0, text: '> 출시한 앱 2개, 진행 중인 프로젝트 3개' },
-  { at: 5.2, text: '> 책상을 준비하는 중...' },
+  { at: 0.6, text: '> seoleem desk booting...' },
+  { at: 1.5, text: '' },
+  { at: 1.6, label: 'ROLE', text: 'Frontend Developer' },
+  { at: 2.4, label: 'STACK', text: 'React · TypeScript · Next.js · React Native' },
+  { at: 3.4, label: 'PROJECTS', text: 'fitpl · garachato · urido' },
+  { at: 4.3, text: '' },
+  { at: 4.8, text: '> loading workspace...' },
 ];
 
 export function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number): void {
@@ -159,7 +169,7 @@ export function drawBoot(ctx: CanvasRenderingContext2D, t: number, font: string,
 
   const vis = visibleRect(viewportAspect);
   const BLOCK_W = 520;
-  const BLOCK_H = 470;
+  const BLOCK_H = 500;
   const scale = Math.min(1, (vis.w - 48) / BLOCK_W, (vis.h - 48) / BLOCK_H);
   ctx.save();
   ctx.translate(SCREEN_W / 2, SCREEN_H / 2);
@@ -199,16 +209,22 @@ export function drawBoot(ctx: CanvasRenderingContext2D, t: number, font: string,
   }
   ctx.restore();
 
-  // 타자기 소개
+  // 타자기 소개. 라벨이 있는 줄은 라벨을 먼저 흐리게 찍고 값만 타자기로 친다
   ctx.font = `16px ${font}`;
-  ctx.fillStyle = c.intro;
   let y = 320;
   for (const line of introLines) {
     if (t < line.at) continue;
+    let x = 40;
+    if (line.label) {
+      ctx.fillStyle = c.footer;
+      ctx.fillText(line.label, x, y);
+      x += INTRO_LABEL_W;
+    }
     const n = Math.min(line.text.length, Math.floor((t - line.at) * CHAR_RATE));
     let s = line.text.slice(0, n);
     if (n < line.text.length && Math.floor(t * 3) % 2 === 0) s += '_';
-    ctx.fillText(s, 40, y);
+    ctx.fillStyle = c.intro;
+    ctx.fillText(s, x, y);
     y += 26;
   }
   ctx.restore();

@@ -108,6 +108,17 @@ export function CameraRig() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [camera, size.width, size.height]);
 
+  // 전원을 껐다 다시 켜면 시점도 처음 구도로 돌아간다. 부팅 중에는 프레임 루프가 멈춰 있어 스토어 구독으로 잡는다
+  useEffect(
+    () =>
+      useDeskStore.subscribe((s, prev) => {
+        if (s.phase !== 'boot' || prev.phase === 'boot') return;
+        orbit.current = { yaw: orbitDefaults.yaw, pitch: orbitDefaults.pitch, zoom: orbitDefaults.zoom };
+        tween.current = null;
+      }),
+    [],
+  );
+
   // 포인터 입력: 드래그 회전, 핀치·휠 확대. 책상 뷰에서만
   useEffect(() => {
     const el = gl.domElement;

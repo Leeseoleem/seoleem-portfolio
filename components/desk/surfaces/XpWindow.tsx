@@ -97,7 +97,8 @@ export function XpWindow({ win, active, screen, onFocus, onMove, onMinimize, onT
           </button>
         </span>
       </header>
-      <div className="xpw__body">{children}</div>
+      {/* 프로젝트 창은 대화상자처럼 회색 바탕에 직접 그리므로 흰 속과 여백을 걷어낸다 */}
+      <div className={`xpw__body${win.kind === 'project' ? ' xpw__body--flush' : ''}`}>{children}</div>
     </section>
   );
 }

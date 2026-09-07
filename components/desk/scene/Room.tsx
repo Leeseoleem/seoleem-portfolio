@@ -5,13 +5,18 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useDeskStore } from '@/stores/useDeskStore';
 import { scenePalette } from '@/lib/desk/palette';
-import { positions, SCREEN_CENTER } from '@/lib/desk/layout';
+import { positions, ROOM_DEPTH, ROOM_H, ROOM_HALF_W, SCREEN_CENTER } from '@/lib/desk/layout';
 import { lerpLight, nightMix } from '@/lib/desk/night';
 import { shadowDirty } from '@/lib/desk/shadows';
 import { prefersReducedMotion, sceneTime } from '@/lib/desk/runtime';
 
+/** 걸레받이. 벽과 바닥이 맞닿는 선을 한 번 끊어 주어 방이 상자처럼 보이지 않게 한다 */
+const BASEBOARD_H = 0.1;
+const BASEBOARD_T = 0.02;
+
 /**
- * 벽, 바닥, 조명. 밤/낮 전환을 매 프레임 보간한다.
+ * 벽 세 면, 바닥, 조명. 밤/낮 전환을 매 프레임 보간한다.
+ * 뒷벽 하나에 넓은 바닥만 깔면 책상이 빈 들판에 놓인 것처럼 보인다. 옆벽 두 면으로 방을 닫아 아담하게 만든다.
  * 조명 세기는 three r155+의 물리 단위(candela) 기준이라 프로토타입 값에 π를 곱한 수준이다.
  */
 export function Room() {
@@ -19,7 +24,9 @@ export function Room() {
   const gl = useThree((s) => s.gl);
   const shadowMix = useRef(-1);
   const shadowAt = useRef(0);
-  const wallMat = useRef<THREE.MeshStandardMaterial>(null);
+  // 벽 재질 하나를 세 면이 같이 쓴다. 밤낮 보간도 한 번만 한다
+  const wallMaterial = useMemo(() => new THREE.MeshStandardMaterial({ color: scenePalette.room.wallDay, roughness: 0.95 }), []);
+  useEffect(() => () => wallMaterial.dispose(), [wallMaterial]);
   const floorMat = useRef<THREE.MeshStandardMaterial>(null);
   const ambient = useRef<THREE.AmbientLight>(null);
   const hemi = useRef<THREE.HemisphereLight>(null);
@@ -82,7 +89,7 @@ export function Room() {
       shadowMix.current = mix;
       shadowAt.current = now;
     }
-    if (wallMat.current) wallMat.current.color.copy(colors.wallDay).lerp(colors.wallNight, mix);
+    wallMaterial.color.copy(colors.wallDay).lerp(colors.wallNight, mix);
     if (floorMat.current) floorMat.current.color.copy(colors.floorDay).lerp(colors.floorNight, mix);
 
     // 부팅 중에는 검은 배경(화면 밖 여백), 이후에는 방 색으로
@@ -91,16 +98,37 @@ export function Room() {
     scene.background = colors.background;
   });
 
+  const floorZ = positions.wallZ + ROOM_DEPTH / 2;
+  const wallY = ROOM_H / 2;
+
   return (
     <group>
-      <mesh position={[0, 3, positions.wallZ]} receiveShadow>
-        <planeGeometry args={[14, 8]} />
-        <meshStandardMaterial ref={wallMat} color={scenePalette.room.wallDay} roughness={0.95} />
+      {/* 뒷벽 */}
+      <mesh position={[0, wallY, positions.wallZ]} material={wallMaterial} receiveShadow>
+        <planeGeometry args={[ROOM_HALF_W * 2, ROOM_H]} />
       </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[14, 10]} />
+      {/* 옆벽. 안쪽을 향하도록 돌린다 */}
+      <mesh position={[-ROOM_HALF_W, wallY, floorZ]} rotation={[0, Math.PI / 2, 0]} material={wallMaterial} receiveShadow>
+        <planeGeometry args={[ROOM_DEPTH, ROOM_H]} />
+      </mesh>
+      <mesh position={[ROOM_HALF_W, wallY, floorZ]} rotation={[0, -Math.PI / 2, 0]} material={wallMaterial} receiveShadow>
+        <planeGeometry args={[ROOM_DEPTH, ROOM_H]} />
+      </mesh>
+      <mesh position={[0, 0, floorZ]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[ROOM_HALF_W * 2, ROOM_DEPTH]} />
         <meshStandardMaterial ref={floorMat} color={scenePalette.room.floorDay} roughness={0.9} />
       </mesh>
+      {/* 걸레받이. 책상 다리와 같은 나무색이라 밤에도 따로 보간하지 않는다 */}
+      <mesh position={[0, BASEBOARD_H / 2, positions.wallZ + BASEBOARD_T / 2]} receiveShadow>
+        <boxGeometry args={[ROOM_HALF_W * 2, BASEBOARD_H, BASEBOARD_T]} />
+        <meshStandardMaterial color={scenePalette.furniture.woodDark} roughness={0.8} />
+      </mesh>
+      {[-1, 1].map((side) => (
+        <mesh key={side} position={[side * (ROOM_HALF_W - BASEBOARD_T / 2), BASEBOARD_H / 2, floorZ]} receiveShadow>
+          <boxGeometry args={[BASEBOARD_T, BASEBOARD_H, ROOM_DEPTH]} />
+          <meshStandardMaterial color={scenePalette.furniture.woodDark} roughness={0.8} />
+        </mesh>
+      ))}
 
       <ambientLight ref={ambient} color={scenePalette.light.ambientDay} intensity={1.0} />
       <hemisphereLight ref={hemi} color={scenePalette.light.hemiSkyDay} groundColor={scenePalette.light.hemiGround} intensity={0.9} />

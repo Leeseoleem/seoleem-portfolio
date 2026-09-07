@@ -36,19 +36,29 @@ export const PAPER_X = -PAPER_IN / 2;
 export const COVER_T = 0.006;
 export const PAPER_H = 0.034;
 
+/**
+ * 방의 크기. 책상(4.2m)보다 양옆으로 1.1m씩 넓고, 뒷벽에서 앞으로 ROOM_DEPTH만큼 바닥이 깔린다.
+ * 카메라는 이 안에서만 움직여야 한다. 옆벽 밖으로 나가면 벽 뒷면이 시야를 가린다.
+ * 궤도 반지름 최대(radius × zoomMax) × sin(yawMax)가 ROOM_HALF_W보다 작도록 아래 값들을 함께 맞춘다.
+ */
+export const ROOM_HALF_W = 3.2;
+export const ROOM_DEPTH = 6.5;
+export const ROOM_H = 3.0;
+
 /** 책상 뷰 궤도 카메라 기본값 */
 export const orbitDefaults = {
   target: [0, DESK_Y + 0.2, -0.1] as [number, number, number],
   radius: 4.25,
   yaw: 0,
   pitch: 0.52,
-  zoom: 0.78,
-  yawMin: -0.9,
-  yawMax: 0.9,
+  zoom: 0.74,
+  yawMin: -0.8,
+  yawMax: 0.8,
   pitchMin: 0.1,
   pitchMax: 0.78,
   zoomMin: 0.55,
-  zoomMax: 1.12,
+  // 4.25 × 1.0 × sin(0.8) ≈ 3.05 < ROOM_HALF_W
+  zoomMax: 1.0,
 };
 
 
@@ -109,11 +119,12 @@ export const zoomPoses = {
     up: [-Math.sin(NOTEBOOK_YAW), 0, -Math.cos(NOTEBOOK_YAW)] as [number, number, number],
   },
   docs: {
-    // 맨 위 장 기준이다. 가운데 장에 맞추면 실제로 보이는 종이와 각도·자리가 어긋난다
-    target: [positions.docs[0] + 0.04, TOP + 0.012, positions.docs[2] + 0.03] as [number, number, number],
+    // 맨 위 장 기준이다. 가운데 장에 맞추면 실제로 보이는 종이와 각도·자리가 어긋난다.
+    // 확대하면 맨 위 장이 5cm 들리고 여백까지 커지므로(Documents.tsx) 그 높이와 크기에 맞춘다
+    target: [positions.docs[0] + 0.04, TOP + 0.062, positions.docs[2] + 0.03] as [number, number, number],
     dir: tiltToward(DOCS_FAN, 0.24),
-    fit: [0.6, 0.84] as [number, number],
-    margin: 1.16,
+    fit: [0.704, 0.92] as [number, number],
+    margin: 1.1,
     up: [-Math.sin(DOCS_FAN), 0, -Math.cos(DOCS_FAN)] as [number, number, number],
   },
 } satisfies Record<string, CameraPose>;
@@ -153,7 +164,7 @@ export const deskObstacles: Obstacle[] = [
   { x: positions.mug[0], z: positions.mug[2], halfW: 0.15, halfD: 0.15 },
   { x: positions.notebook[0], z: positions.notebook[2], halfW: 0.44, halfD: 0.52 },
   { x: positions.docs[0], z: positions.docs[2], halfW: 0.33, halfD: 0.45 },
-  { x: positions.phone[0], z: positions.phone[2], halfW: 0.17, halfD: 0.34 },
+  { x: positions.phone[0], z: positions.phone[2], halfW: 0.18, halfD: 0.34 },
   // 모니터. 받침뿐 아니라 본체까지 막는다. 본체가 빠지면 마우스가 그 밑으로 들어가 화면에서 사라진다
   { x: 0, z: -0.45, halfW: 0.75, halfD: 0.5 },
   { x: positions.lampBase[0], z: positions.lampBase[2], halfW: 0.2, halfD: 0.2 },
