@@ -22,7 +22,7 @@ import { useClock } from './use-clock';
  * 색·간격은 globals.css의 `--xp-*` 토큰을 쓴다.
  *
  * 바탕화면 아이콘을 누르면 창이 열리고, 열린 창은 작업 표시줄에 쌓인다.
- * 프로젝트, 소개, 휴지통 창의 글은 lib/desk/content/에서 온다. 이력서는 아직 골격이다.
+ * 프로젝트, 소개, 휴지통 창의 글은 lib/desk/content/에서 온다. 이력서 아이콘은 창 없이 PDF를 내려받는다.
  */
 export function MonitorScreen() {
   const { time: clock } = useClock();
@@ -54,11 +54,18 @@ export function MonitorScreen() {
       <ul className="xp__icons">
         {desktopIcons.map((icon) => (
           <li key={icon.id}>
-            {/* 3D 화면 너머로 누르는 것이라 실제 XP와 달리 한 번 누르면 열린다 */}
-            <button type="button" className="xp-icon" onClick={() => open(icon.id)}>
-              <XpIcon name={icon.icon} />
-              <span className="xp-icon__label">{icon.label}</span>
-            </button>
+            {/* 3D 화면 너머로 누르는 것이라 실제 XP와 달리 한 번 누르면 열린다. 이력서는 창 대신 파일을 내려받는다 */}
+            {icon.download ? (
+              <a className="xp-icon" href={icon.download.href} download={icon.download.filename}>
+                <XpIcon name={icon.icon} />
+                <span className="xp-icon__label">{icon.label}</span>
+              </a>
+            ) : (
+              <button type="button" className="xp-icon" onClick={() => open(icon.id)}>
+                <XpIcon name={icon.icon} />
+                <span className="xp-icon__label">{icon.label}</span>
+              </button>
+            )}
           </li>
         ))}
       </ul>
@@ -95,10 +102,22 @@ export function MonitorScreen() {
             <ul className="xp-menu__list">
               {desktopIcons.map((icon) => (
                 <li key={icon.id}>
-                  <button type="button" className="xp-menu__item" onClick={() => openFromStart(icon.id)}>
-                    <XpIcon name={icon.icon} />
-                    <span>{icon.title}</span>
-                  </button>
+                  {icon.download ? (
+                    <a
+                      className="xp-menu__item"
+                      href={icon.download.href}
+                      download={icon.download.filename}
+                      onClick={() => setStartOpen(false)}
+                    >
+                      <XpIcon name={icon.icon} />
+                      <span>{icon.title} 내려받기</span>
+                    </a>
+                  ) : (
+                    <button type="button" className="xp-menu__item" onClick={() => openFromStart(icon.id)}>
+                      <XpIcon name={icon.icon} />
+                      <span>{icon.title}</span>
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>
