@@ -1,6 +1,17 @@
 import type { Metadata, Viewport } from 'next';
+import { La_Belle_Aurore } from 'next/font/google';
 import localFont from 'next/font/local';
 import './globals.css';
+
+// 공책 표지 제목에만 쓰는 잉크 펜 필기체. 빌드할 때 받아 함께 배포되므로 실행 중에 Google을 부르지 않는다.
+// 라틴 글자만 있어서 표지 제목(Design Notes) 말고는 쓰지 않는다
+const script = La_Belle_Aurore({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-script',
+  display: 'swap',
+  fallback: ['Segoe Script', 'Bradley Hand', 'cursive'],
+});
 
 // PF스타더스트 3.0. 픽셀 폰트라 부팅 화면과 HUD의 레트로 톤을 담당한다.
 const stardust = localFont({
@@ -63,7 +74,7 @@ const PRETENDARD_CSS = 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang="ko" className={`${stardust.variable} h-full`}>
+    <html lang="ko" className={`${stardust.variable} ${script.variable} h-full`}>
       <head>
         <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
         <link rel="stylesheet" href={PRETENDARD_CSS} />

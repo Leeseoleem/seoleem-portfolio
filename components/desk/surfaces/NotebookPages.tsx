@@ -1,56 +1,97 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { getSound } from '@/lib/desk/sound';
-import { notebookPages, type BoardPage, type CoverPage, type NotebookRow } from '@/lib/desk/content/notebook';
+import {
+  fullSrc,
+  notebookIndex,
+  notebookPages,
+  type BoardPage,
+  type CoverPage,
+  type NotebookFrame,
+  type NotebookIndexEntry,
+  type NotebookRow,
+} from '@/lib/desk/content/notebook';
 
 /**
  * 공책을 펼쳤을 때 드러난 속지 위에 얹히는 DOM. 기준 크기는 720×940.
- * 내용은 lib/desk/content/notebook.ts에 있고, 여기서는 넘김 동작과 장 배치만 맡는다.
+ * 내용은 lib/desk/content/notebook.ts에 있고, 여기서는 넘김 동작, 장 배치, 전체 화면 보기만 맡는다.
  *
  * 이 화면은 이미 3D 공간에 비스듬히 놓인 DOM이라, 그 위에서 CSS 3D 회전을 한 번 더 거는 셈이다.
  * 장이 실제로 넘어갈 때(끌어서 놓았을 때, 스크롤이 한 장 분량을 넘었을 때) 서류와 같은 종이 소리를 낸다.
+ * 프레임을 누르면 전체 화면으로 크게 본다. 전체 화면은 3D 변환 밖(body)에 그려야 화면에 똑바로 놓인다.
  */
 const PAGES = notebookPages;
+/** 프로젝트마다 첫 장. 표지 목차와 옆의 인덱스 탭이 같은 목록을 본다 */
+const INDEX = notebookIndex(PAGES);
 
 /** 한 장을 넘기는 데 필요한 가로 이동 거리(px) */
 const TURN_DISTANCE = 300;
+/** 이보다 많이 움직이면 끌기다. 그 뒤에 놓아도 프레임을 열지 않는다 */
+const CLICK_SLOP = 6;
 
-/** 장 안쪽 치수. CSS의 .nbp 값과 같아야 프레임 줄이 장 폭을 꼭 채운다 */
+/** 장 안쪽 치수. CSS의 .nbp 값과 같아야 프레임 줄이 판 폭을 꼭 채운다 */
 const PAGE_W = 720;
-const PAGE_PAD = 28;
+const PAGE_PAD = 32;
+const PLATE_PAD = 20;
 const FRAME_GAP = 16;
-const CANVAS_W = PAGE_W - PAGE_PAD * 2;
+const PLATE_W = PAGE_W - PAGE_PAD * 2 - PLATE_PAD * 2;
+
+/** 전체 화면으로 보고 있는 프레임. 같은 장의 프레임 사이를 좌우로 오간다 */
+interface Viewing {
+  frames: NotebookFrame[];
+  index: number;
+}
 
 export function NotebookPages() {
   /** 넘어간 정도. 정수 부분이 넘어간 장 수, 소수 부분이 지금 넘기는 중인 장의 진행도다 */
   const [pos, setPos] = useState(0);
   const [dragging, setDragging] = useState(false);
+  const [viewing, setViewing] = useState<Viewing | null>(null);
   const start = useRef({ x: 0, pos: 0 });
+  /** 끌고 있는 동안의 현재 위치. 놓을 때 상태 갱신 함수 안에서 소리를 내지 않으려고 따로 든다 */
+  const live = useRef(0);
+  const moved = useRef(false);
   const wheel = useRef(0);
 
   const clampPos = (v: number) => Math.min(PAGES.length, Math.max(0, v));
 
+  // 끌기. 포인터 캡처를 쓰지 않고 창에 리스너를 건다. 캡처를 걸면 프레임 단추의 click이 오지 않는다
   const onDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    e.currentTarget.setPointerCapture(e.pointerId);
+    if (e.button !== 0) return;
     start.current = { x: e.clientX, pos };
+    live.current = pos;
+    moved.current = false;
     setDragging(true);
   };
-  const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
+  useEffect(() => {
     if (!dragging) return;
-    const moved = (start.current.x - e.clientX) / TURN_DISTANCE;
-    // 한 번 끌어서 넘길 수 있는 건 한 장까지다. 거리에 그대로 비례시키면 여러 장이 한꺼번에 넘어간다
-    const limited = Math.min(1, Math.max(-1, moved));
-    setPos(clampPos(start.current.pos + limited));
-  };
-  const onUp = () => {
-    if (!dragging) return;
-    setDragging(false);
-    const settled = clampPos(Math.round(pos));
-    // 반쯤 넘기다 놓아 제자리로 돌아가면 소리가 없다. 장이 실제로 바뀔 때만 난다
-    if (settled !== start.current.pos) getSound().play('pageflip');
-    setPos(settled);
-  };
+    const onMove = (e: PointerEvent) => {
+      const dx = start.current.x - e.clientX;
+      if (Math.abs(dx) > CLICK_SLOP) moved.current = true;
+      // 한 번 끌어서 넘길 수 있는 건 한 장까지다. 거리에 그대로 비례시키면 여러 장이 한꺼번에 넘어간다
+      const limited = Math.min(1, Math.max(-1, dx / TURN_DISTANCE));
+      live.current = clampPos(start.current.pos + limited);
+      setPos(live.current);
+    };
+    const onUp = () => {
+      setDragging(false);
+      const settled = clampPos(Math.round(live.current));
+      // 반쯤 넘기다 놓아 제자리로 돌아가면 소리가 없다. 장이 실제로 바뀔 때만 난다
+      if (settled !== start.current.pos) getSound().play('pageflip');
+      setPos(settled);
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dragging]);
 
   // 가로 스크롤로도 넘긴다. 트랙패드는 deltaX, 휠 마우스는 shift + deltaY로 들어온다
   const onWheel = (e: React.WheelEvent<HTMLDivElement>) => {
@@ -65,18 +106,27 @@ export function NotebookPages() {
     setPos(next);
   };
 
+  /** 프레임을 눌렀다. 끌다가 놓은 것이면 열지 않는다 */
+  const open = (frames: NotebookFrame[], index: number) => {
+    if (moved.current) return;
+    getSound().play('click');
+    setViewing({ frames, index });
+  };
+
+  /** 목차나 인덱스 탭으로 특정 장까지 한 번에 넘긴다 */
+  const jump = (page: number) => {
+    if (moved.current) return;
+    const next = clampPos(page);
+    if (next === Math.round(pos)) return;
+    getSound().play('pageflip');
+    setPos(next);
+  };
+
   const front = Math.floor(pos);
 
   return (
-    <div
-      className={`nb${dragging ? ' nb--grabbing' : ''}`}
-      onPointerDown={onDown}
-      onPointerMove={onMove}
-      onPointerUp={onUp}
-      onPointerCancel={onUp}
-      onWheel={onWheel}
-    >
-      <p className="nb__end">마지막 장</p>
+    <div className={`nb${dragging ? ' nb--grabbing' : ''}`} onPointerDown={onDown} onWheel={onWheel}>
+      <p className="nb__end">마지막 장입니다.</p>
       {PAGES.map((page, i) => {
         // 이 장이 얼마나 넘어갔는지. 0이 덮인 상태, 1이 완전히 넘어간 상태
         const t = Math.min(1, Math.max(0, pos - i));
@@ -97,69 +147,111 @@ export function NotebookPages() {
             }}
           >
             <div className="nb__face nb__face--front" style={{ visibility: showBack ? 'hidden' : 'visible' }}>
-              {page.kind === 'cover' ? <Cover page={page} /> : <Board page={page} />}
-              <span className="nbp__no">
-                {i + 1} / {PAGES.length}
-              </span>
+              {page.kind === 'cover' ? (
+                <Cover page={page} pageNo={i + 1} total={PAGES.length} onJump={jump} />
+              ) : (
+                <Board page={page} pageNo={i + 1} total={PAGES.length} onOpen={open} />
+              )}
               <span className="nb__shade" style={{ opacity: shade }} />
             </div>
             <div className="nb__face nb__face--back" style={{ visibility: showBack ? 'visible' : 'hidden' }}>
               <span className="nb__shade nb__shade--back" style={{ opacity: shade }} />
             </div>
+            {/* 인덱스 탭. 프로젝트가 시작하는 장의 오른쪽 가장자리에 붙어 있고, 장이 넘어가면 장과 함께 왼쪽으로 간다 */}
+            {INDEX.filter((e) => e.page === i).map((e) => (
+              <IndexTab key={e.projectId} entry={e} order={INDEX.indexOf(e)} flipped={showBack} onJump={jump} />
+            ))}
           </div>
         );
       })}
+      {viewing && <Lightbox viewing={viewing} onChange={setViewing} onClose={() => setViewing(null)} />}
     </div>
   );
 }
 
-/** 표지. Figma 파일의 커버 프레임처럼, 캔버스 위 프레임 하나에 제목과 목차를 담는다 */
-function Cover({ page }: { page: CoverPage }) {
+/** 장 위아래의 작은 글줄. 위에는 프로젝트 이름, 아래에는 장 번호 */
+function Running({ left, pageNo, total }: { left: string; pageNo: number; total: number }) {
   return (
-    <div className="nbp">
-      <header className="nbp__head">
-        <p className="nbp__name">
-          seoleem / <b>design notes</b>
-        </p>
-      </header>
-      <div className="nbp__rows">
-        <figure className="nbp__frame" style={{ width: CANVAS_W }}>
-          <figcaption className="nbp__frame-label">cover</figcaption>
-          <div className="nbp__cover">
-            <div>
-              <h2 className="nbp__title">{page.title}</h2>
-              <p className="nbp__caption">{page.caption}</p>
-            </div>
-            <dl className="nbp__contents">
-              {page.contents.map((c) => (
-                <div key={c.project} className="nbp__contents-row">
-                  <dt>{c.project}</dt>
-                  <dd>{c.summary}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        </figure>
-      </div>
-    </div>
+    <p className="nbp__running">
+      <span>{left}</span>
+      <span>
+        {String(pageNo).padStart(2, '0')} / {String(total).padStart(2, '0')}
+      </span>
+    </p>
   );
 }
 
-/** Figma 페이지 하나. 왼쪽 위에 장 이름과 캡션, 그 아래로 프레임 줄 */
-function Board({ page }: { page: BoardPage }) {
+/** 표지. 가운데에 필기체 제목과 한 줄 설명, 바닥에 프로젝트 목차 */
+function Cover({ page, pageNo, total, onJump }: { page: CoverPage; pageNo: number; total: number; onJump: (page: number) => void }) {
   return (
     <div className="nbp">
-      <header className="nbp__head">
-        <p className="nbp__name">
-          {page.project} / <b>{page.title}</b>
-        </p>
+      <Running left="seoleem" pageNo={pageNo} total={total} />
+      <div className="nbp__cover">
+        <h2 className="nbp__cover-title">{page.title}</h2>
         <p className="nbp__caption">{page.caption}</p>
+      </div>
+      <ol className="nbp__toc">
+        {INDEX.map((e) => (
+          <li key={e.projectId}>
+            <button type="button" className="nbp__toc-row" onClick={() => onJump(e.page)}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="nbp__toc-icon" src={`/icons/${e.projectId}.png`} alt="" draggable={false} />
+              <span className="nbp__toc-name">{e.project}</span>
+              <span className="nbp__toc-leader" aria-hidden="true" />
+              <span className="nbp__toc-page">{String(e.page + 1).padStart(2, '0')}</span>
+            </button>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+/**
+ * 공책 옆에 붙은 인덱스 탭. 장의 오른쪽 가장자리 밖으로 튀어나온다.
+ * 장이 뒤로 넘어가면 장과 함께 거울상이 되므로 글자를 한 번 더 뒤집어 바로 읽히게 한다.
+ */
+function IndexTab({ entry, order, flipped, onJump }: { entry: NotebookIndexEntry; order: number; flipped: boolean; onJump: (page: number) => void }) {
+  return (
+    <button
+      type="button"
+      className={`nb__tab nb__tab--${order % 3}${flipped ? ' nb__tab--flipped' : ''}`}
+      style={{ top: 96 + order * 124 }}
+      onClick={() => onJump(entry.page)}
+      aria-label={`${entry.project} 장으로`}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img className="nb__tab-icon" src={`/icons/${entry.projectId}.png`} alt="" draggable={false} />
+      <span className="nb__tab-name">{entry.project}</span>
+    </button>
+  );
+}
+
+/** 한 주제를 다루는 장. 제목 하나와 그 아래 프레임을 얹은 판 */
+function Board({
+  page,
+  pageNo,
+  total,
+  onOpen,
+}: {
+  page: BoardPage;
+  pageNo: number;
+  total: number;
+  onOpen: (frames: NotebookFrame[], index: number) => void;
+}) {
+  return (
+    <div className="nbp">
+      <Running left={page.project} pageNo={pageNo} total={total} />
+      <header className="nbp__head">
+        <h2 className="nbp__title">{page.title}</h2>
       </header>
-      <div className="nbp__rows">
+      <div className="nbp__plate">
+        {page.rows.length === 0 && <p className="nbp__empty">화면 시안을 정리하고 있습니다.</p>}
         {page.rows.map((row, i) => (
-          <Row key={i} row={row} />
+          <Row key={i} row={row} onOpen={onOpen} />
         ))}
       </div>
+      {page.rows.length > 0 && <p className="nbp__hint">이미지를 누르면 크게 볼 수 있습니다.</p>}
     </div>
   );
 }
@@ -168,19 +260,75 @@ function Board({ page }: { page: BoardPage }) {
  * 프레임 한 줄. 높이를 정하지 않으면 줄 폭을 꼭 채우는 높이로 맞춘다.
  * 비율이 다른 프레임이 섞여도 한 줄에 나란히 놓인 모양이 된다.
  */
-function Row({ row }: { row: NotebookRow }) {
+function Row({ row, onOpen }: { row: NotebookRow; onOpen: (frames: NotebookFrame[], index: number) => void }) {
   const aspectSum = row.frames.reduce((s, f) => s + f.w / f.h, 0);
-  const height = row.height ?? (CANVAS_W - FRAME_GAP * (row.frames.length - 1)) / aspectSum;
+  const height = row.height ?? (PLATE_W - FRAME_GAP * (row.frames.length - 1)) / aspectSum;
   return (
     <div className="nbp__row">
-      {row.frames.map((f) => (
+      {row.frames.map((f, i) => (
         <figure key={f.src} className="nbp__frame" style={{ width: Math.round((height * f.w) / f.h) }}>
+          <button type="button" className="nbp__frame-btn" onClick={() => onOpen(row.frames, i)} aria-label={`${f.label} 크게 보기`}>
+            {/* 3D 안에서 확대되는 DOM이라 next/image 축소본 대신 미리 줄인 원본을 쓴다 */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={f.src} alt={f.label} style={{ height: Math.round(height) }} draggable={false} />
+          </button>
           <figcaption className="nbp__frame-label">{f.label}</figcaption>
-          {/* 3D 안에서 확대되는 DOM이라 next/image 축소본 대신 미리 줄인 원본을 쓴다 */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={f.src} alt={f.label} style={{ height: Math.round(height) }} draggable={false} />
         </figure>
       ))}
     </div>
+  );
+}
+
+/**
+ * 전체 화면 보기. 3D 변환 안에 그리면 화면에 비스듬히 놓이므로 body에 붙인다.
+ * 방향키로 같은 장의 다른 프레임을 보고, Esc나 바깥을 누르면 닫는다.
+ * Esc는 HUD의 "책상으로" 단축키와 겹치므로 capture 단계에서 먹어 둔다.
+ */
+function Lightbox({ viewing, onChange, onClose }: { viewing: Viewing; onChange: (v: Viewing) => void; onClose: () => void }) {
+  const { frames, index } = viewing;
+  const frame = frames[index];
+  const prev = index > 0 ? index - 1 : null;
+  const next = index < frames.length - 1 ? index + 1 : null;
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        onClose();
+      } else if (e.key === 'ArrowLeft' && prev !== null) {
+        e.stopPropagation();
+        onChange({ frames, index: prev });
+      } else if (e.key === 'ArrowRight' && next !== null) {
+        e.stopPropagation();
+        onChange({ frames, index: next });
+      }
+    };
+    window.addEventListener('keydown', onKey, { capture: true });
+    return () => window.removeEventListener('keydown', onKey, { capture: true });
+  }, [frames, prev, next, onChange, onClose]);
+
+  return createPortal(
+    // 공책의 끌기 처리로 이벤트가 올라가지 않게 여기서 끊는다
+    <div className="lb" role="dialog" aria-modal="true" aria-label={frame.label} onPointerDown={(e) => e.stopPropagation()} onWheel={(e) => e.stopPropagation()}>
+      <button type="button" className="lb__backdrop" aria-label="닫기" onClick={onClose} />
+      <header className="lb__bar">
+        <span className="lb__label">{frame.label}</span>
+        <span className="lb__count">
+          {index + 1} / {frames.length}
+        </span>
+        <button type="button" className="lb__close" onClick={onClose} aria-label="닫기">
+          ×
+        </button>
+      </header>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img key={frame.src} className="lb__img" src={fullSrc(frame)} alt={frame.label} draggable={false} />
+      <button type="button" className="lb__arrow lb__arrow--prev" onClick={() => prev !== null && onChange({ frames, index: prev })} aria-disabled={prev === null} aria-label="이전">
+        ‹
+      </button>
+      <button type="button" className="lb__arrow lb__arrow--next" onClick={() => next !== null && onChange({ frames, index: next })} aria-disabled={next === null} aria-label="다음">
+        ›
+      </button>
+    </div>,
+    document.body,
   );
 }
