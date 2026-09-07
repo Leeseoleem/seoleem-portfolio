@@ -173,13 +173,16 @@
   --ps-mono: Consolas, Menlo, 'Pretendard Variable', Pretendard, 'Courier New', monospace;
 
   /* 공책 속지 (임시) */
-  --nb-a: #f3ece0;
-  --nb-b: #e9e3f0;
-  --nb-c: #e2efe6;
-  --nb-back: #ded6c8;
-  --nb-ink: #3a352c;
-  --nb-ink-weak: #8b8577;
-  --nb-shadow: rgba(58, 53, 44, 0.55);
+  /* 공책. 장 전체가 Figma 캔버스다. 보드 이미지 바탕(#3a3a3a)보다 어두워 프레임이 떠 보인다 */
+  --nb-canvas: #262626;
+  --nb-back: #333333;
+  --nb-fg: #ececec;
+  --nb-fg-weak: #a3a3a3;
+  --nb-fg-faint: #6f6f6f;
+  --nb-cover: #333333;
+  --nb-frame-line: rgba(255, 255, 255, 0.1);
+  --nb-rule: rgba(255, 255, 255, 0.12);
+  --nb-shadow: rgba(0, 0, 0, 0.6);
 
   --duration-fast: 150ms;
   --duration-base: 300ms;
@@ -1612,7 +1615,7 @@ body {
   width: 100%;
   height: 100%;
   position: relative;
-  background: var(--brand-paper);
+  background: var(--nb-canvas);
   perspective: 1600px;
   touch-action: none;
   cursor: grab;
@@ -1636,7 +1639,8 @@ body {
 .nb__face {
   position: absolute;
   inset: 0;
-  backface-visibility: hidden;
+  /* backface-visibility는 쓰지 않는다. drei의 거울상 변환 안에서는 앞뒤 판정이 뒤집혀 앞면이 사라진다.
+     어느 면을 보일지는 NotebookPages가 넘김 진행도로 정한다 */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1649,14 +1653,8 @@ body {
   background: var(--nb-back);
 }
 
-.nb__face--a {
-  background: var(--nb-a);
-}
-.nb__face--b {
-  background: var(--nb-b);
-}
-.nb__face--c {
-  background: var(--nb-c);
+.nb__face--front {
+  background: var(--nb-canvas);
 }
 
 /* 종이가 세워질수록 책등 쪽부터 그늘이 진다 */
@@ -1671,14 +1669,147 @@ body {
   background: linear-gradient(to left, var(--nb-shadow) 0%, transparent 55%);
 }
 
-.nb__no {
-  font-size: 96px;
-  color: var(--nb-ink);
+/* ---------- 공책 장 내용 ---------- */
+/* 장 전체가 Figma 페이지다. 글자는 세 단계만 쓴다: 장 이름(12), 캡션(13), 표지 제목(36). 프레임 이름표는 장 이름과 같은 단계다.
+   치수(패딩 28, 프레임 간격 16)는 NotebookPages.tsx의 상수와 같아야 한다 */
+.nbp {
+  position: absolute;
+  inset: 0;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  color: var(--nb-fg);
+  font-family: var(--font-ui);
+  text-align: left;
 }
 
-.nb__hint {
-  font-size: 20px;
-  color: var(--nb-ink-weak);
+/* 장 이름과 캡션. Figma의 페이지 이름처럼 왼쪽 위에 한 덩어리로 둔다 */
+.nbp__head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nbp__name {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--nb-fg-weak);
+  letter-spacing: 0.01em;
+}
+
+.nbp__name b {
+  font-weight: 600;
+  color: var(--nb-fg);
+}
+
+.nbp__caption {
+  margin: 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--nb-fg-weak);
+  word-break: keep-all;
+}
+
+.nbp__rows {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /* 프레임이 장을 다 채우지 못하면 위아래 여백을 나눈다. 위에만 붙이면 아래가 비어 보인다 */
+  justify-content: center;
+  gap: 20px;
+}
+
+.nbp__row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.nbp__frame {
+  margin: 0;
+  flex: none;
+}
+
+.nbp__frame-label {
+  height: 16px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--nb-fg-weak);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nbp__frame img {
+  display: block;
+  width: 100%;
+  border-radius: 4px;
+  outline: 1px solid var(--nb-frame-line);
+  user-select: none;
+}
+
+.nbp__no {
+  position: absolute;
+  right: 28px;
+  bottom: 20px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--nb-fg-faint);
+  font-family: var(--font-ui);
+}
+
+/* 표지. Figma 파일의 커버 프레임처럼 캔버스 위에 프레임 하나를 놓고 그 안에 제목을 쓴다 */
+.nbp__cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 420px;
+  padding: 32px;
+  border-radius: 8px;
+  background: var(--nb-cover);
+  outline: 1px solid var(--nb-frame-line);
+}
+
+.nbp__title {
+  margin: 0;
+  font-size: 36px;
+  line-height: 44px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.nbp__cover .nbp__caption {
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.nbp__contents {
+  margin: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--nb-rule);
+}
+
+.nbp__contents-row {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 12px;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.nbp__contents-row dt {
+  font-weight: 600;
+}
+
+.nbp__contents-row dd {
+  margin: 0;
+  color: var(--nb-fg-weak);
 }
 
 .nb__end {
@@ -1687,8 +1818,9 @@ body {
   margin: 0;
   display: grid;
   place-items: center;
-  font-size: 24px;
-  color: var(--nb-ink-weak);
+  font-size: 14px;
+  color: var(--nb-fg-faint);
+  font-family: var(--font-ui);
 }
 
 @media (prefers-reduced-motion: reduce) {
