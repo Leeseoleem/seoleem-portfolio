@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDeskStore } from '@/stores/useDeskStore';
+import { useIsMobile } from '@/lib/desk/use-mobile';
 import { getSound } from '@/lib/desk/sound';
 
 const PROMPT = 'PS D:\\seoleem>';
@@ -22,6 +23,7 @@ export function Hud() {
   const backToDesk = useDeskStore((s) => s.backToDesk);
   const soundOn = useDeskStore((s) => s.soundOn);
   const setSound = useDeskStore((s) => s.setSound);
+  const mobile = useIsMobile();
   // 좁은 화면에서는 접힌 채 시작한다. 펼쳐진 창이 3D 씬의 절반을 가리기 때문이다.
   // 부팅 중에는 이 창이 그려지지 않아 서버 렌더와 어긋날 일이 없다
   const [collapsed, setCollapsed] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches);
@@ -130,8 +132,12 @@ export function Hud() {
       {visible && (
         <section
           ref={panel}
-          // 확대 중에는 화면을 가리지 않게 흐려 둔다. 마우스를 올리면 다시 진해진다
-          className={`ps${snapping ? ' is-snapping' : ''}${phase === 'zoomed' ? ' is-dim' : ''}`}
+          // 확대 중에는 화면을 가리지 않게 흐려 둔다. 마우스를 올리면 다시 진해진다.
+          // 좁은 화면에서는 확대된 화면이 세로를 거의 다 쓴다. 왼쪽 아래에 그대로 두면 폰 화면의
+          // 아래쪽 링크 단추를 덮어 눌리지 않는다. 그동안만 위로 올린다
+          className={`ps${snapping ? ' is-snapping' : ''}${phase === 'zoomed' ? ' is-dim' : ''}${
+            mobile && phase === 'zoomed' && !pos ? ' ps--lifted' : ''
+          }`}
           style={pos ? { left: pos.x, top: pos.y, bottom: 'auto' } : undefined}
           aria-label="seoleem 포트폴리오 안내"
         >
