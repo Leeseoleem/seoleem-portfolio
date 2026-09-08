@@ -5,17 +5,14 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useDeskStore } from '@/stores/useDeskStore';
 import { scenePalette } from '@/lib/desk/palette';
-import { positions, ROOM_DEPTH, ROOM_H, ROOM_HALF_W, SCREEN_CENTER } from '@/lib/desk/layout';
+import { BASEBOARD_H, BASEBOARD_T, positions, ROOM_DEPTH, ROOM_H, ROOM_HALF_W, SCREEN_CENTER } from '@/lib/desk/layout';
 import { lerpLight, nightMix } from '@/lib/desk/night';
 import { shadowDirty } from '@/lib/desk/shadows';
 import { prefersReducedMotion, sceneTime } from '@/lib/desk/runtime';
 
-/** 걸레받이. 벽과 바닥이 맞닿는 선을 한 번 끊어 주어 방이 상자처럼 보이지 않게 한다 */
-const BASEBOARD_H = 0.1;
-const BASEBOARD_T = 0.02;
-
 /**
  * 벽 세 면, 바닥, 조명. 밤/낮 전환을 매 프레임 보간한다.
+ * 걸레받이(치수는 layout.ts)는 벽과 바닥이 맞닿는 선을 한 번 끊어 방이 상자처럼 보이지 않게 한다.
  * 뒷벽 하나에 넓은 바닥만 깔면 책상이 빈 들판에 놓인 것처럼 보인다. 옆벽 두 면으로 방을 닫아 아담하게 만든다.
  * 조명 세기는 three r155+의 물리 단위(candela) 기준이라 프로토타입 값에 π를 곱한 수준이다.
  */
