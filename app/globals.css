@@ -331,13 +331,19 @@ body {
  * 확대 화면은 세로를 거의 다 쓴다. 폭을 꽉 채운 창은 위에 두든 아래에 두든 내용을 덮는다.
  * 창 모양(파란 제목 표시줄)은 그대로 두고 자리와 폭만 바꾼다.
  */
-.ps--compact {
+/* .ps를 두 번 적어 뒤에 오는 좁은 화면 규칙(@media max-width 640px)보다 세게 건다 */
+.ps.ps--compact {
   left: var(--space-3);
   right: auto;
   top: max(var(--space-3), env(safe-area-inset-top));
   bottom: auto;
-  width: auto;
+  width: max-content;
   max-width: calc(100% - var(--space-3) * 2);
+}
+
+/* 접힌 제목 표시줄은 아무것도 가리지 않는다. 흐리게 두면 돌아가는 cd ..가 안 보인다 */
+.ps.ps--compact.is-dim {
+  opacity: 1;
 }
 
 .ps.is-dim {
