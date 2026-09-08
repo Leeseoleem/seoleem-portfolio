@@ -127,19 +127,20 @@ export function Hud() {
     if (next) getSound().play('click');
   };
 
+  /** 실제로 접혀 있는지. 좁은 화면에서 확대 중이면 사용자가 펼쳐 뒀더라도 접는다 */
+  const shrunk = collapsed || (mobile && phase === 'zoomed');
+
   return (
     <>
-      {/* 좁은 화면에서 확대 중일 때는 창을 접고 돌아갈 단추만 남긴다. 창을 어디에 두든 확대 화면을 덮는다 */}
-      {visible && mobile && phase === 'zoomed' && (
-        <button type="button" className="ps-back" onClick={back}>
-          cd .. # 책상으로
-        </button>
-      )}
-      {visible && !(mobile && phase === 'zoomed') && (
+      {visible && (
         <section
           ref={panel}
-          // 확대 중에는 화면을 가리지 않게 흐려 둔다. 마우스를 올리면 다시 진해진다
-          className={`ps${snapping ? ' is-snapping' : ''}${phase === 'zoomed' ? ' is-dim' : ''}`}
+          // 확대 중에는 화면을 가리지 않게 흐려 둔다. 마우스를 올리면 다시 진해진다.
+          // 좁은 화면에서 확대 중이면 제목 표시줄만 남기고 내용만큼만 차지한다(ps--compact).
+          // 확대 화면이 세로를 거의 다 쓰기 때문에, 폭을 꽉 채운 창은 어디에 두든 내용을 덮는다
+          className={`ps${snapping ? ' is-snapping' : ''}${phase === 'zoomed' ? ' is-dim' : ''}${
+            mobile && phase === 'zoomed' ? ' ps--compact' : ''
+          }`}
           // 좁은 화면에서는 끌어 옮긴 자리를 쓰지 않는다. 손가락으로 살짝 밀린 자리가 그대로 남아
           // 창이 화면 밖으로 나가 버린다. 자리는 CSS(왼쪽 아래, 화면 폭에 맞춤)에 맡긴다
           style={pos && !mobile ? { left: pos.x, top: pos.y, bottom: 'auto' } : undefined}
@@ -149,22 +150,25 @@ export function Hud() {
           <header className="ps__bar" onPointerDown={onBarDown} onPointerMove={onBarMove} onPointerUp={onBarUp} onPointerCancel={onBarUp}>
             <span className="ps__title">{TITLE}</span>
             {/* 접어 두면 본문의 cd ..가 사라진다. 확대 중에는 돌아갈 길을 제목 표시줄에 남긴다 */}
-            {collapsed && phase === 'zoomed' && (
+            {shrunk && phase === 'zoomed' && (
               <button type="button" className="ps__back" onPointerDown={stopDrag} onClick={back}>
                 cd ..
               </button>
             )}
-            <button
-              type="button"
-              className="ps__min"
-              onPointerDown={stopDrag}
-              onClick={toggleCollapsed}
-              aria-label={collapsed ? '펼치기' : '접기'}
-            >
-              {collapsed ? '□' : '─'}
-            </button>
+            {/* 좁은 화면에서 확대 중일 때는 펼칠 자리가 없다. 그때만 접고 펴는 단추를 감춘다 */}
+            {!(mobile && phase === 'zoomed') && (
+              <button
+                type="button"
+                className="ps__min"
+                onPointerDown={stopDrag}
+                onClick={toggleCollapsed}
+                aria-label={collapsed ? '펼치기' : '접기'}
+              >
+                {collapsed ? '□' : '─'}
+              </button>
+            )}
           </header>
-          {!collapsed && (
+          {!shrunk && (
             <div className="ps__body">
               <p className="ps__line">
                 <span className="ps__prompt">{PROMPT}</span> whoami

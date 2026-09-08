@@ -327,27 +327,17 @@ body {
 
 /* 확대 중에는 아래 화면이 비치게 물러나 있다가, 손이 오면 돌아온다 */
 /*
- * 좁은 화면에서 확대 중일 때 파워셸 창을 대신하는 단추.
- * 확대 화면은 세로를 거의 다 쓴다. 창을 어디에 두든 내용 위를 덮고, 접었다 펴는 두 상태도
- * 좁은 폭에서는 자리를 잡지 못한다. 그동안 필요한 것은 돌아갈 길 하나뿐이라 그것만 남긴다.
+ * 좁은 화면에서 확대 중일 때. 제목 표시줄만 남기고 내용만큼만 차지한다.
+ * 확대 화면은 세로를 거의 다 쓴다. 폭을 꽉 채운 창은 위에 두든 아래에 두든 내용을 덮는다.
+ * 창 모양(파란 제목 표시줄)은 그대로 두고 자리와 폭만 바꾼다.
  */
-.ps-back {
-  position: fixed;
+.ps--compact {
   left: var(--space-3);
+  right: auto;
   top: max(var(--space-3), env(safe-area-inset-top));
-  z-index: 6;
-  min-height: 36px;
-  padding: 0 14px;
-  border: 1px solid var(--ps-border);
-  border-radius: 6px;
-  background: linear-gradient(var(--xp-title-to), var(--xp-title-from) 45%, var(--xp-title-from));
-  color: var(--xp-title-fg);
-  font-family: var(--ps-mono);
-  font-size: 13px;
-  font-weight: 700;
-  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
-  cursor: pointer;
+  bottom: auto;
+  width: auto;
+  max-width: calc(100% - var(--space-3) * 2);
 }
 
 .ps.is-dim {
