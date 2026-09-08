@@ -108,7 +108,9 @@ export function CameraRig() {
       return { pos: new THREE.Vector3(...(pose.position ?? [0, 0, 0])), target, up };
     }
     const tanHalf = Math.tan(THREE.MathUtils.degToRad(syncFov(aspect) / 2));
-    const margin = pose.margin ?? 1.1;
+    // 세로로 긴 화면에서는 여유를 거의 두지 않는다. 폭에 맞춰 들어가고 위아래가 남는 판인데
+    // 거기서 여백까지 주면 종이가 화면 한가운데 작게 뜬다
+    const margin = aspect < 0.8 ? Math.min(pose.margin ?? 1.1, 1.02) : (pose.margin ?? 1.1);
     const [w, h] = pose.fit;
     const dByH = ((h * margin) / 2) / tanHalf;
     const dByW = ((w * margin) / 2) / (tanHalf * aspect);

@@ -1098,57 +1098,6 @@ body {
 }
 
 /*
- * 모바일 서류. 이력서는 읽는 것이 전부라 창틀 없이 화면을 그대로 채운다.
- * 종이(A4)는 object-fit: contain이라 화면 비율이 어떻든 잘리지 않고 최대한 크게 들어간다.
- */
-.doc-full {
-  position: fixed;
-  inset: 0;
-  z-index: 70;
-  background: var(--xp-face-light);
-}
-
-.doc-full .sheet__page {
-  padding: max(10px, env(safe-area-inset-top)) 8px max(34px, env(safe-area-inset-bottom));
-}
-
-.doc-full .sheet__file {
-  top: max(10px, env(safe-area-inset-top));
-  left: 14px;
-  right: auto;
-}
-
-.doc-full .sheet__arrow {
-  width: 34px;
-  height: 34px;
-  left: auto;
-}
-
-.doc-full .sheet__arrow--prev {
-  left: 6px;
-}
-
-.doc-full .sheet__arrow--next {
-  right: 6px;
-}
-
-.doc-full__close {
-  position: absolute;
-  top: max(6px, env(safe-area-inset-top));
-  right: 8px;
-  width: 36px;
-  height: 32px;
-  border: 1px solid var(--xp-line);
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.92);
-  color: var(--xp-text);
-  font-family: var(--font-ui);
-  font-size: 15px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-/*
  * 모바일 창. 모니터 화면이 손톱만 하게 보이는 화면에서는 창을 3D 밖으로 꺼내 띄운다.
  * 화면을 꽉 채우면 창이 아니라 회색 판이 되므로, 사방에 여백을 두고 뒤를 어둡게 깔아 창처럼 세운다.
  * 어두운 바깥을 누르면 닫힌다. 공책 전체 화면 보기(z-index 60)보다 위에 온다.
