@@ -4,7 +4,16 @@ import { useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useDeskStore, type CameraPose } from '@/stores/useDeskStore';
-import { CAMERA_FOV, SCREEN_3D_H, SCREEN_3D_W, SCREEN_CENTER, orbitDefaults } from '@/lib/desk/layout';
+import {
+  ORBIT_PULLBACK_MAX,
+  ORBIT_WALL_MARGIN,
+  ROOM_HALF_W,
+  SCREEN_3D_H,
+  SCREEN_3D_W,
+  SCREEN_CENTER,
+  fovForAspect,
+  orbitDefaults,
+} from '@/lib/desk/layout';
 import { prefersReducedMotion } from '@/lib/desk/runtime';
 
 interface Tween {
@@ -39,8 +48,18 @@ export function CameraRig() {
   const tween = useRef<Tween | null>(null);
   const reduceMotion = useRef(false);
 
+  /** 화면 비율에 맞는 시야각을 카메라에 반영하고 그 값을 돌려준다. 거리 계산이 실제 시야각과 어긋나면 안 된다 */
+  const syncFov = (aspect: number) => {
+    const fov = fovForAspect(aspect);
+    if (Math.abs(camera.fov - fov) > 0.01) {
+      camera.fov = fov;
+      camera.updateProjectionMatrix();
+    }
+    return fov;
+  };
+
   const closePose = (aspect: number): CameraPose => {
-    const tanHalf = Math.tan(THREE.MathUtils.degToRad(CAMERA_FOV / 2));
+    const tanHalf = Math.tan(THREE.MathUtils.degToRad(syncFov(aspect) / 2));
     const dByH = SCREEN_3D_H / 2 / tanHalf;
     const dByW = SCREEN_3D_W / 2 / (tanHalf * aspect);
     const d = Math.min(dByH, dByW);
@@ -50,15 +69,22 @@ export function CameraRig() {
     };
   };
 
+  /**
+   * 책상 뷰 궤도. 세로로 긴 화면에서는 시야각을 넓히고(fovForAspect) 모자란 만큼만 뒤로 물러난다.
+   * 물러날수록 좌우로 돌 수 있는 각이 좁아진다. 반지름이 커진 채로 옆까지 돌면 카메라가 옆벽 밖으로 나간다.
+   */
   const orbitPose = (aspect: number): CameraPose => {
     const o = orbit.current;
-    const radius = orbitDefaults.radius * o.zoom * THREE.MathUtils.clamp(1.6 / aspect, 1, 2.8);
+    syncFov(aspect);
+    const radius = orbitDefaults.radius * o.zoom * THREE.MathUtils.clamp(1.6 / aspect, 1, ORBIT_PULLBACK_MAX);
+    const yawLimit = Math.min(orbitDefaults.yawMax, Math.asin(THREE.MathUtils.clamp((ROOM_HALF_W - ORBIT_WALL_MARGIN) / radius, 0, 1)));
+    const yaw = THREE.MathUtils.clamp(o.yaw, -yawLimit, yawLimit);
     const t = orbitDefaults.target;
     return {
       position: [
-        t[0] + Math.sin(o.yaw) * Math.cos(o.pitch) * radius,
+        t[0] + Math.sin(yaw) * Math.cos(o.pitch) * radius,
         t[1] + Math.sin(o.pitch) * radius,
-        t[2] + Math.cos(o.yaw) * Math.cos(o.pitch) * radius,
+        t[2] + Math.cos(yaw) * Math.cos(o.pitch) * radius,
       ],
       target: [...t],
     };
@@ -81,8 +107,10 @@ export function CameraRig() {
     if (!pose.fit || !pose.dir) {
       return { pos: new THREE.Vector3(...(pose.position ?? [0, 0, 0])), target, up };
     }
-    const tanHalf = Math.tan(THREE.MathUtils.degToRad(CAMERA_FOV / 2));
-    const margin = pose.margin ?? 1.1;
+    const tanHalf = Math.tan(THREE.MathUtils.degToRad(syncFov(aspect) / 2));
+    // 세로로 긴 화면에서는 여유를 거의 두지 않는다. 폭에 맞춰 들어가고 위아래가 남는 판인데
+    // 거기서 여백까지 주면 종이가 화면 한가운데 작게 뜬다
+    const margin = aspect < 0.8 ? Math.min(pose.margin ?? 1.1, 1.02) : (pose.margin ?? 1.1);
     const [w, h] = pose.fit;
     const dByH = ((h * margin) / 2) / tanHalf;
     const dByW = ((w * margin) / 2) / (tanHalf * aspect);
@@ -94,7 +122,7 @@ export function CameraRig() {
   // 초기 위치: 부팅 화면과 맞물리는 근접 포즈
   useEffect(() => {
     reduceMotion.current = prefersReducedMotion();
-    camera.fov = CAMERA_FOV;
+    camera.fov = fovForAspect(size.width / size.height);
     camera.near = 0.02;
     camera.far = 60;
     camera.updateProjectionMatrix();

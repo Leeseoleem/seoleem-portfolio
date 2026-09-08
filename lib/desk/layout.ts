@@ -15,7 +15,23 @@ export const SCREEN_3D_H = 0.9;
 // 앞 테두리 앞면(z = 0.1) 바로 뒤. 더 깊이 물리면 비스듬히 볼 때 확대 화면 DOM이
 // 테두리를 뚫고 나온다. DOM은 3D 깊이 판정을 받지 않기 때문이다.
 export const SCREEN_CENTER: [number, number, number] = [0, TOP + 0.2 + 0.56, 0.095];
+
+/**
+ * 세로 시야각. 가로로 넓은 화면에서는 45도를 쓰고, 세로로 긴 화면(휴대폰)에서는 넓힌다.
+ *
+ * 책상은 가로로 4.2m다. 세로로 긴 화면에서 이 폭을 담으려면 카메라가 아주 멀리 물러나야 하는데,
+ * 그러면 방 밖으로 나가 벽 너머와 바닥 끝이 드러난다. 물러나는 대신 시야각을 넓혀 방 안에 머문다.
+ */
 export const CAMERA_FOV = 45;
+export const CAMERA_FOV_NARROW = 62;
+/** 이 비율보다 넓으면 기본 시야각, 이 비율보다 좁으면 넓은 시야각. 사이는 선형으로 섞는다 */
+const FOV_ASPECT_WIDE = 1.6;
+const FOV_ASPECT_NARROW = 0.55;
+
+export function fovForAspect(aspect: number): number {
+  const t = Math.min(1, Math.max(0, (FOV_ASPECT_WIDE - aspect) / (FOV_ASPECT_WIDE - FOV_ASPECT_NARROW)));
+  return CAMERA_FOV + (CAMERA_FOV_NARROW - CAMERA_FOV) * t;
+}
 
 /** 오브젝트가 y축으로 돌아 있는 각도. 확대 구도를 화면과 나란히 맞출 때 쓴다 */
 export const NOTEBOOK_YAW = 0.22;
@@ -37,13 +53,19 @@ export const COVER_T = 0.006;
 export const PAPER_H = 0.034;
 
 /**
- * 방의 크기. 책상(4.2m)보다 양옆으로 1.1m씩 넓고, 뒷벽에서 앞으로 ROOM_DEPTH만큼 바닥이 깔린다.
- * 카메라는 이 안에서만 움직여야 한다. 옆벽 밖으로 나가면 벽 뒷면이 시야를 가린다.
- * 궤도 반지름 최대(radius × zoomMax) × sin(yawMax)가 ROOM_HALF_W보다 작도록 아래 값들을 함께 맞춘다.
+ * 방의 크기. 책상(4.2m)보다 양옆으로 1.1m씩 넓다.
+ *
+ * 눈에 보이는 것은 책상 뒤쪽 한 귀퉁이뿐이라 벽은 높고 바닥은 깊게 잡아 둔다.
+ * 세로로 긴 화면에서는 카메라가 뒤로 물러나고 시점을 낮출 수도 있는데, 벽이 낮으면 그때 벽 위 빈 곳이 드러난다.
+ * 카메라가 옆벽 밖으로 나가지 않는 것은 CameraRig가 반지름에 맞춰 좌우 회전을 조이는 방식으로 지킨다.
  */
 export const ROOM_HALF_W = 3.2;
-export const ROOM_DEPTH = 6.5;
-export const ROOM_H = 3.0;
+export const ROOM_DEPTH = 9.0;
+export const ROOM_H = 6.0;
+
+/** 걸레받이 높이와 두께. 벽에서 이만큼 앞으로 나와 있어 쥐구멍도 이 앞면에 붙는다 */
+export const BASEBOARD_H = 0.1;
+export const BASEBOARD_T = 0.02;
 
 /** 책상 뷰 궤도 카메라 기본값 */
 export const orbitDefaults = {
@@ -57,9 +79,16 @@ export const orbitDefaults = {
   pitchMin: 0.1,
   pitchMax: 0.78,
   zoomMin: 0.55,
-  // 4.25 × 1.0 × sin(0.8) ≈ 3.05 < ROOM_HALF_W
   zoomMax: 1.0,
 };
+
+/**
+ * 세로로 긴 화면에서 뒤로 더 물러나는 배수. 시야각을 넓히고도 모자란 만큼만 물러난다.
+ * 예전에는 2.8까지 물러났는데, 그러면 방(깊이·높이) 밖으로 나가 벽 위와 바닥 끝이 드러났다.
+ */
+export const ORBIT_PULLBACK_MAX = 1.8;
+/** 카메라가 옆벽에 닿지 않게 남기는 여유 */
+export const ORBIT_WALL_MARGIN = 0.35;
 
 
 
@@ -73,7 +102,8 @@ export const positions = {
   lampBase: [-1.75, TOP + 0.04, -0.55] as [number, number, number],
   // 책상 아래 안쪽. 기본 시점에선 거의 안 보이고 시점을 낮춰야 발견되는, 숨은 고양이다
   cat: [-1.45, 0, -0.5] as [number, number, number],
-  mouseHole: [-0.55, 0, -1.695] as [number, number, number],
+  // 걸레받이 앞면에 뚫린 구멍이다. 벽면(wallZ)에 두면 걸레받이에 파묻힌다
+  mouseHole: [-0.55, 0, -1.7 + BASEBOARD_T + 0.006] as [number, number, number],
   tower: [1.3, 0, -0.2] as [number, number, number],
   // 공책 오른쪽 옆에 놓인 연필. 공책과 머그 사이 틈에 세로로 놓인다
   pencil: [-0.72, TOP, 0.5] as [number, number, number],

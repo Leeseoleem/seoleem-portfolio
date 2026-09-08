@@ -183,6 +183,8 @@
   --nb-rule: rgba(43, 40, 36, 0.16);
   /* 목차 줄에 손을 얹었을 때 */
   --nb-row-hover: rgba(43, 40, 36, 0.05);
+  /* 모바일 창 뒤에 까는 어두운 판 */
+  --xpm-scrim: rgba(12, 12, 16, 0.55);
   --nb-frame-line: rgba(43, 40, 36, 0.12);
   --nb-shadow: rgba(43, 40, 36, 0.5);
   /* 옆에 붙는 인덱스 탭. 프로젝트 순서대로 돌려 쓰는 종이 색 셋 */
@@ -1095,6 +1097,191 @@ body {
   overflow: hidden;
 }
 
+/*
+ * 모바일 창. 모니터 화면이 손톱만 하게 보이는 화면에서는 창을 3D 밖으로 꺼내 띄운다.
+ * 화면을 꽉 채우면 창이 아니라 회색 판이 되므로, 사방에 여백을 두고 뒤를 어둡게 깔아 창처럼 세운다.
+ * 어두운 바깥을 누르면 닫힌다. 공책 전체 화면 보기(z-index 60)보다 위에 온다.
+ */
+.xpm {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(20px, env(safe-area-inset-top)) 16px max(20px, env(safe-area-inset-bottom));
+  background: var(--xpm-scrim);
+}
+
+/* 창틀은 데스크톱 창(.xpw)과 같은 짜임이다. 파란 테두리에 베이지 면 */
+.xpm__win {
+  width: 100%;
+  max-width: 520px;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 3px;
+  border: 1px solid var(--xp-border);
+  border-radius: 8px 8px 2px 2px;
+  background: var(--xp-face);
+  color: var(--xp-text);
+  font-family: var(--font-ui);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+/* 장을 넘기는 창은 안쪽이 세로로 꽉 차야 한다 */
+.xpm__win--tall {
+  height: 100%;
+}
+
+.xpm__bar {
+  flex: none;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px 0 10px;
+  border-radius: 5px 5px 0 0;
+  background: linear-gradient(var(--xp-title-to), var(--xp-title-from) 45%, var(--xp-title-from));
+  color: var(--xp-title-fg);
+  font-size: 14px;
+  font-weight: 700;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.xpm__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.xpm__close {
+  flex: none;
+  width: 30px;
+  height: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 3px;
+  background: linear-gradient(var(--xp-close-top), var(--xp-close-bottom));
+  color: var(--xp-title-fg);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1;
+  text-shadow: none;
+  cursor: pointer;
+}
+
+.xpm__body {
+  flex: 1;
+  min-height: 0;
+  padding: 14px;
+  border: 1px solid var(--xp-face-shadow);
+  background: var(--xp-face-light);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.xpm__body--flush {
+  padding: 0;
+  background: var(--xp-face);
+  overflow: hidden;
+}
+
+/* 손가락으로 미는 화면이라 스크롤 막대를 감춘다. 좁은 창에서 막대가 내용 폭을 갉아먹는다 */
+.xpm *::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.xpm * {
+  scrollbar-width: none;
+}
+
+/* 창 안에서는 폭이 좁다. 두 단으로 짠 장들을 한 단으로 세우고 세로로 흐르게 둔다 */
+.xpm .pj {
+  padding: 14px 14px 10px;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.xpm .pj-intro {
+  grid-template-columns: 1fr;
+  gap: 16px;
+  overflow-y: auto;
+  align-content: start;
+}
+
+.xpm .pj-intro__name {
+  font-size: 22px;
+}
+
+.xpm .pj-links {
+  margin: 0 0 4px;
+}
+
+/* 화면 목업은 기기 틀까지 든 그림이라 위아래 여백이 없다. 앞의 링크 단추와 붙어 보이지 않게 사이를 띄운다 */
+.xpm .pj-shots {
+  align-content: start;
+  gap: 12px;
+}
+
+.xpm .pj-meta {
+  grid-template-columns: 72px 1fr;
+  font-size: 14px;
+}
+
+/* 구조도 장. 좁은 창에서는 프롬프트 한 줄이 판 밖으로 잘린다. 글자와 여백만 줄인다 */
+.xpm .pj-code {
+  gap: 10px;
+  padding: 14px 14px 16px;
+}
+
+.xpm .pj-code__line {
+  font-size: 11px;
+  overflow-x: auto;
+}
+
+.xpm .pj-code__fence {
+  padding: 10px 12px;
+}
+
+/*
+ * Engineering Case 장. 네 칸을 두 단으로 두면 칸마다 폭이 반이라 글이 잘게 끊긴다.
+ * 한 단으로 세워 한 줄을 길게 쓰고, 화면에는 두 칸쯤 보이며 나머지는 밀어 본다.
+ */
+.xpm .pj-case {
+  gap: 12px;
+}
+
+.xpm .pj-case__grid {
+  grid-template-columns: 1fr;
+  grid-auto-rows: min-content;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+.xpm .pj-case__heading {
+  font-size: 18px;
+}
+
+/* 아래 상태 표시줄. 칸 셋이 좁은 폭에 들어가도록 여백을 줄인다 */
+.xpm .pj__status {
+  gap: 6px;
+}
+
+.xpm .pj__cell {
+  padding: 0 4px;
+}
+
+.xpm .pj__cell .xp-btn {
+  padding: 2px 8px;
+}
+
+.xpm .pj__cell--count {
+  min-width: 56px;
+}
+
 /* 폴더 창 안의 목록 */
 .xp-list {
   margin: 0;
@@ -1256,6 +1443,63 @@ body {
 
 .xp-table__reason {
   color: var(--xp-text-weak);
+}
+
+/*
+ * 좁은 화면용 휴지통 목록. 세 칸짜리 표는 폭이 없어 한 글자씩 끊기므로 항목마다 카드 한 장으로 세운다.
+ * 읽는 순서는 무엇을 버렸나(제목) → 왜(이유) → 어느 프로젝트(단추)다. 프로젝트는 이어 보러 갈 문이라 맨 아래에 둔다.
+ */
+.xp-trash__cards {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.xp-trash__card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid var(--xp-group-line);
+  border-radius: 4px;
+  background: var(--xp-face-light);
+}
+
+.xp-trash__name {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.xp-trash__reason {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--xp-text-weak);
+}
+
+.xp-trash__from {
+  margin-top: 2px;
+  padding: 3px 10px;
+  border: 1px solid var(--xp-group-line);
+  border-radius: 999px;
+  background: var(--xp-face);
+  color: var(--xp-link);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 16px;
+  cursor: pointer;
+}
+
+.xp-trash__from:hover,
+.xp-trash__from:focus-visible {
+  outline: none;
+  border-color: var(--xp-link);
 }
 
 /* 프로젝트 이름. 링크 모양이고 누르면 프로젝트 창으로 간다 */
