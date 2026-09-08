@@ -26,8 +26,9 @@ export function Hud() {
   const mobile = useIsMobile();
   // 좁은 화면에서는 접힌 채 시작한다. 펼쳐진 창이 3D 씬의 절반을 가리기 때문이다.
   // 부팅 중에는 이 창이 그려지지 않아 서버 렌더와 어긋날 일이 없다
-  const [collapsed, setCollapsed] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches);
-  /** 사용자가 옮긴 자리. null이면 CSS의 기본 자리(왼쪽 아래)를 쓴다 */
+  // 접힘 여부와 자리(ps--top)가 같은 기준을 봐야 한다. 따로 적으면 태블릿 폭에서 어긋난다
+  const [collapsed, setCollapsed] = useState(mobile);
+  /** 사용자가 옮긴 자리. null이면 CSS의 기본 자리(데스크톱은 왼쪽 아래, 좁은 화면은 위쪽)를 쓴다 */
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   /** 밖으로 나간 창을 도로 들일 때만 켜는 스냅 연출 */
   const [snapping, setSnapping] = useState(false);
@@ -138,7 +139,7 @@ export function Hud() {
           // 확대 중에는 화면을 가리지 않게 흐려 둔다. 마우스를 올리면 다시 진해진다.
           // 좁은 화면에서 확대 중이면 제목 표시줄만 남기고 내용만큼만 차지한다(ps--compact).
           // 확대 화면이 세로를 거의 다 쓰기 때문에, 폭을 꽉 채운 창은 어디에 두든 내용을 덮는다
-          className={`ps${snapping ? ' is-snapping' : ''}${phase === 'zoomed' ? ' is-dim' : ''}${
+          className={`ps${snapping ? ' is-snapping' : ''}${phase === 'zoomed' ? ' is-dim' : ''}${mobile ? ' ps--top' : ''}${
             mobile && phase === 'zoomed' ? ' ps--compact' : ''
           }`}
           // 좁은 화면에서는 끌어 옮긴 자리를 쓰지 않는다. 손가락으로 살짝 밀린 자리가 그대로 남아
