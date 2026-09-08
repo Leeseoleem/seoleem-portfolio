@@ -43,19 +43,21 @@ export const fitpl: ProjectContent = {
       kind: 'diagram',
       title: '서비스 구조',
       // 그림은 가장 긴 줄을 기준으로 가운데 놓인다. 라벨을 상자 옆에 붙이면 그 줄만 오른쪽으로 길어져
-      // 상자가 한쪽으로 밀려 보인다. 라벨도 화살표 아래 한 줄로 내려 좌우를 맞춘다
+      // 상자가 한쪽으로 밀려 보인다. 라벨도 화살표 아래 한 줄로 내려 좌우를 맞춘다.
+      // 상자는 선 문자(─│┌┐)가 아니라 +-|로 그린다. 웹폰트의 라틴 서브셋에는 선 문자가 없어
+      // 기기에 따라 다른 글꼴에서 끌어오고, 그때 글자와 폭이 달라 상자가 어긋난다
       ascii: art(`
-          사용자
+         사용자
             ↓
-┌───────────────────────┐
-│      React Native     │
-│        WebView        │
-└───────────┬───────────┘
-            ↕
++-----------------------+
+|      React Native     |
+|        WebView        |
++-----------+-----------+
+            ↑↓
        Bridge RPC
-┌───────────┴───────────┐
-│       React SPA       │
-└───────────┬───────────┘
++-----------+-----------+
+|       React SPA       |
++-----------+-----------+
             ↓
        Backend API
 `),
@@ -115,28 +117,28 @@ export const garachato: ProjectContent = {
       kind: 'diagram',
       title: '서비스 구조',
       ascii: art(`
-          Vercel Cron
-               ↓
-     ┌─────────┴─────────┐
-     ↓                   ↓
- TJ JSON API          KY HTML
-     └─────────┬─────────┘
-               ↓
-          CrawledSong
-               ↓
-      공통 적재 파이프라인
-               ↓
-   ┌─────────────────────┐
-   │ Supabase PostgreSQL │
-   │ songs               │
-   │ karaoke_tracks      │
-   │ rank_history        │
-   │ search_songs RPC    │
-   └──────────┬──────────┘
-          ┌───┴───┐
-          ↓       ↓
-      Next.js   Mini App
-       Server   Client+RLS
+       Vercel Cron
+            ↓
+      +-----+-----+
+      ↓           ↓
+ TJ JSON API   KY HTML
+      +-----+-----+
+            ↓
+       CrawledSong
+            ↓
+   공통 적재 파이프라인
+            ↓
++-----------------------+
+|  Supabase PostgreSQL  |
+|  songs                |
+|  karaoke_tracks       |
+|  rank_history         |
+|  search_songs RPC     |
++-----------+-----------+
+      +-----+-----+
+      ↓           ↓
+   Next.js     Mini App
+   Server     Client+RLS
 `),
     },
     {
@@ -193,27 +195,25 @@ export const urido: ProjectContent = {
       kind: 'diagram',
       title: '서비스 구조',
       ascii: art(`
-              사용자
-                ↓
-       ┌────────────────┐
-       │ React Native   │
-       │     Expo       │
-       └───────┬────────┘
-               │
-       ┌───────┴────────┐
-       ↓                ↓
-   Screen / UX         Auth
-       │                │
-   Expo Router      OAuth / Token
-       │                │
-       ↓             Refresh
-   Query Hooks       single-flight
-       │
-       ↓
- [ Mock | Fallback | Live ]
-                       │
-                       ↓
-                  Backend API
+           사용자
+             ↓
++-------------------------+
+|   React Native (Expo)   |
++------------+------------+
+             |
+      +------+------+
+      ↓             ↓
+ Screen / UX       Auth
+      |             |
+ Expo Router   OAuth / Token
+      |             |
+ Query Hooks   Refresh Lock
+      |             |
+      +------+------+
+             ↓
+  Mock | Fallback | Live
+             ↓
+        Backend API
 `),
     },
     {
