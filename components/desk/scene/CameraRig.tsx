@@ -5,6 +5,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useDeskStore, type CameraPose } from '@/stores/useDeskStore';
 import {
+  NARROW_ASPECT,
   ORBIT_PULLBACK_MAX,
   ORBIT_WALL_MARGIN,
   ROOM_HALF_W,
@@ -109,14 +110,15 @@ export function CameraRig() {
     }
     const tanHalf = Math.tan(THREE.MathUtils.degToRad(syncFov(aspect) / 2));
     // 세로로 긴 화면에서는 여유를 거의 두지 않는다. 폭에 맞춰 들어가고 위아래가 남는 판인데
-    // 거기서 여백까지 주면 종이가 화면 한가운데 작게 뜬다
-    const margin = aspect < 0.8 ? Math.min(pose.margin ?? 1.1, 1.02) : (pose.margin ?? 1.1);
+    // 거기서 여백까지 주면 종이가 화면 한가운데 작게 뜬다.
+    // 여백이 이만큼 깎이므로 fit에는 화면에 다 보여야 할 것을 전부 넣어 둔다(폰은 화면이 아니라 본체)
+    const margin = aspect < NARROW_ASPECT ? Math.min(pose.margin ?? 1.1, 1.02) : (pose.margin ?? 1.1);
     const [w, h] = pose.fit;
     const dByH = ((h * margin) / 2) / tanHalf;
     const dByW = ((w * margin) / 2) / (tanHalf * aspect);
     const d = Math.max(dByH, dByW);
     // 세로로 긴 화면에서는 비스듬한 구도를 버리고 정면으로 본다(narrowDir)
-    const dir = new THREE.Vector3(...(aspect < 0.8 && pose.narrowDir ? pose.narrowDir : pose.dir)).normalize();
+    const dir = new THREE.Vector3(...(aspect < NARROW_ASPECT && pose.narrowDir ? pose.narrowDir : pose.dir)).normalize();
     return { pos: target.clone().addScaledVector(dir, d), target, up };
   };
 

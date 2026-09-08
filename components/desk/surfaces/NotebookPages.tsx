@@ -320,7 +320,7 @@ function Section({
 }
 
 /**
- * 공책 옆에 붙은 인덱스 탭. 장의 오른쪽 가장자리 밖으로 튀어나온다.
+ * 공책 옆에 붙은 인덱스 탭. 장의 오른쪽 가장자리 밖으로 튀어나온다(좁은 화면에서는 안쪽 여백에 붙는다).
  * 장이 뒤로 넘어가면 장과 함께 거울상이 되므로 글자를 한 번 더 뒤집어 바로 읽히게 한다.
  */
 function IndexTab({ entry, order, flipped, onJump }: { entry: NotebookIndexEntry; order: number; flipped: boolean; onJump: (page: number) => void }) {

@@ -6,12 +6,12 @@ import { PhoneScreen } from '../surfaces/PhoneScreen';
 import { RoundedBox } from './RoundedBox';
 import { useDeskStore } from '@/stores/useDeskStore';
 import { scenePalette } from '@/lib/desk/palette';
-import { PHONE_YAW, positions, TOP, zoomPoses } from '@/lib/desk/layout';
+import { PHONE_BODY, PHONE_SCREEN, PHONE_SCREEN_PX, PHONE_YAW, positions, TOP, zoomPoses } from '@/lib/desk/layout';
 
-/* 실제 폰(9:19.5)보다 조금 넓은 1:2 비율. 화면 안 카드와 타일이 답답하지 않게 */
-const BODY: [number, number, number] = [0.334, 0.022, 0.66];
-const SCREEN: [number, number] = [0.3, 0.6];
-const SCREEN_PX: [number, number] = [390, 780];
+/* 치수는 layout.ts에 있다. 확대 구도가 같은 값에서 나와야 해서 한 곳에서만 정한다 */
+const BODY = PHONE_BODY;
+const SCREEN = PHONE_SCREEN;
+const SCREEN_PX = PHONE_SCREEN_PX;
 
 /**
  * 핸드폰. 화면 내용은 PhoneScreen(DOM)이 전부 맡는다.

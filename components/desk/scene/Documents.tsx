@@ -8,7 +8,7 @@ import { ZoomSurface } from './ZoomSurface';
 import { DocumentSheets } from '../surfaces/DocumentSheets';
 import { useDeskStore } from '@/stores/useDeskStore';
 import { canvasPalette, scenePalette } from '@/lib/desk/palette';
-import { DOCS_FAN, positions, TOP, zoomPoses } from '@/lib/desk/layout';
+import { DOCS_FAN, DOC_SHEET_PX, DOC_SHEET_SIZE, positions, TOP, zoomPoses } from '@/lib/desk/layout';
 import { requestShadowUpdate } from '@/lib/desk/shadows';
 import { prefersReducedMotion } from '@/lib/desk/runtime';
 import { smoothstep } from '@/lib/desk/math';
@@ -31,8 +31,9 @@ const LIFT_H = 0.05;
  * 확대 화면(DOM)의 크기. PDF 한 쪽(600×840)에 여백을 두른 크기다. 여백에 넘김 단추가 놓인다.
  * 맨 위 장은 들리면서 이 크기로 커져서 DOM이 뜰 때 종이 크기가 튀지 않는다.
  */
-const SHEET_PX: [number, number] = [704, 920];
-const SHEET_SIZE: [number, number] = [0.704, 0.92];
+/* 치수는 layout.ts에 있다. 확대 구도가 같은 값을 본다 */
+const SHEET_PX = DOC_SHEET_PX;
+const SHEET_SIZE = DOC_SHEET_SIZE;
 const PAPER_W = 0.6;
 const PAPER_H = 0.84;
 

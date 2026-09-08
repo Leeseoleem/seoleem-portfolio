@@ -28,7 +28,7 @@ export function Hud() {
   // 부팅 중에는 이 창이 그려지지 않아 서버 렌더와 어긋날 일이 없다
   // 접힘 여부와 자리(ps--top)가 같은 기준을 봐야 한다. 따로 적으면 태블릿 폭에서 어긋난다
   const [collapsed, setCollapsed] = useState(mobile);
-  /** 사용자가 옮긴 자리. null이면 CSS의 기본 자리(왼쪽 아래)를 쓴다 */
+  /** 사용자가 옮긴 자리. null이면 CSS의 기본 자리(데스크톱은 왼쪽 아래, 좁은 화면은 위쪽)를 쓴다 */
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   /** 밖으로 나간 창을 도로 들일 때만 켜는 스냅 연출 */
   const [snapping, setSnapping] = useState(false);

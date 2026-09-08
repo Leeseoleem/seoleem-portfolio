@@ -33,11 +33,29 @@ export function fovForAspect(aspect: number): number {
   return CAMERA_FOV + (CAMERA_FOV_NARROW - CAMERA_FOV) * t;
 }
 
+/**
+ * 세로로 긴 화면으로 보는 기준. 이 아래면 확대 구도를 정면으로 바꾸고 여백도 거의 두지 않는다.
+ * 두 판단이 같은 값을 봐야 한다. 따로 적으면 정면으로는 보는데 여백만 데스크톱 기준인 구간이 생긴다.
+ */
+export const NARROW_ASPECT = 0.8;
+
 /** 오브젝트가 y축으로 돌아 있는 각도. 확대 구도를 화면과 나란히 맞출 때 쓴다 */
 export const NOTEBOOK_YAW = 0.22;
 export const PHONE_YAW = -0.18;
 /** 서류가 부채처럼 벌어진 간격. 맨 위 장은 이만큼 틀어져 있다 */
 export const DOCS_FAN = 0.12;
+
+/**
+ * 핸드폰 치수. 실제 폰(9:19.5)보다 조금 넓은 1:2 비율이라 화면 안 카드와 타일이 답답하지 않다.
+ * 확대 구도가 이 값에서 나오므로 Phone.tsx가 아니라 여기서 정한다. 두 곳에 적으면 한쪽만 고쳐도 카메라는 모른다.
+ */
+export const PHONE_BODY: [number, number, number] = [0.334, 0.022, 0.66];
+export const PHONE_SCREEN: [number, number] = [0.3, 0.6];
+export const PHONE_SCREEN_PX: [number, number] = [390, 780];
+
+/** 서류 맨 위 장. 확대하면 이 크기까지 커진다(Documents.tsx가 여백을 넓힌다) */
+export const DOC_SHEET_SIZE: [number, number] = [0.704, 0.92];
+export const DOC_SHEET_PX: [number, number] = [704, 920];
 
 /** 공책 표지와 속지 치수 */
 export const COVER_W = 0.72;
@@ -139,8 +157,10 @@ export const zoomPoses = {
     dir: tiltToward(PHONE_YAW, 0.22),
     // 좁은 화면에서는 기울이지 않고 똑바로 내려다본다. 기울면 세로 투영이 커져 화면 아래가 잘린다
     narrowDir: [0, 1, 0] as [number, number, number],
-    fit: [0.276, 0.598] as [number, number],
-    margin: 1.16,
+    // 화면이 아니라 본체 크기에 맞춘다. 화면만 맞추면 테두리가 화면 밖으로 나가 잘린 것처럼 보인다.
+    // 좁은 화면에서 여백이 1.02로 깎여도 본체 전체가 들어온다
+    fit: [PHONE_BODY[0], PHONE_BODY[2]] as [number, number],
+    margin: 1.06,
     up: [-Math.sin(PHONE_YAW), 0, -Math.cos(PHONE_YAW)] as [number, number, number],
   },
   notebook: {
@@ -157,7 +177,7 @@ export const zoomPoses = {
     target: [positions.docs[0] + 0.04, TOP + 0.062, positions.docs[2] + 0.03] as [number, number, number],
     dir: tiltToward(DOCS_FAN, 0.24),
     narrowDir: [0, 1, 0] as [number, number, number],
-    fit: [0.704, 0.92] as [number, number],
+    fit: DOC_SHEET_SIZE,
     margin: 1.1,
     up: [-Math.sin(DOCS_FAN), 0, -Math.cos(DOCS_FAN)] as [number, number, number],
   },
