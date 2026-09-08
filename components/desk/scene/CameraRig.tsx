@@ -115,7 +115,8 @@ export function CameraRig() {
     const dByH = ((h * margin) / 2) / tanHalf;
     const dByW = ((w * margin) / 2) / (tanHalf * aspect);
     const d = Math.max(dByH, dByW);
-    const dir = new THREE.Vector3(...pose.dir).normalize();
+    // 세로로 긴 화면에서는 비스듬한 구도를 버리고 정면으로 본다(narrowDir)
+    const dir = new THREE.Vector3(...(aspect < 0.8 && pose.narrowDir ? pose.narrowDir : pose.dir)).normalize();
     return { pos: target.clone().addScaledVector(dir, d), target, up };
   };
 

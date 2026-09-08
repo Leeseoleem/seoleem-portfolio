@@ -137,6 +137,8 @@ export const zoomPoses = {
   phone: {
     target: [positions.phone[0], TOP + 0.03, positions.phone[2]] as [number, number, number],
     dir: tiltToward(PHONE_YAW, 0.22),
+    // 좁은 화면에서는 기울이지 않고 똑바로 내려다본다. 기울면 세로 투영이 커져 화면 아래가 잘린다
+    narrowDir: [0, 1, 0] as [number, number, number],
     fit: [0.276, 0.598] as [number, number],
     margin: 1.16,
     up: [-Math.sin(PHONE_YAW), 0, -Math.cos(PHONE_YAW)] as [number, number, number],
@@ -144,6 +146,7 @@ export const zoomPoses = {
   notebook: {
     target: [positions.notebook[0], TOP + 0.05, positions.notebook[2]] as [number, number, number],
     dir: tiltToward(NOTEBOOK_YAW, 0.24),
+    narrowDir: [0, 1, 0] as [number, number, number],
     fit: [PAPER_W, PAPER_D] as [number, number],
     margin: 1.14,
     up: [-Math.sin(NOTEBOOK_YAW), 0, -Math.cos(NOTEBOOK_YAW)] as [number, number, number],
@@ -153,6 +156,7 @@ export const zoomPoses = {
     // 확대하면 맨 위 장이 5cm 들리고 여백까지 커지므로(Documents.tsx) 그 높이와 크기에 맞춘다
     target: [positions.docs[0] + 0.04, TOP + 0.062, positions.docs[2] + 0.03] as [number, number, number],
     dir: tiltToward(DOCS_FAN, 0.24),
+    narrowDir: [0, 1, 0] as [number, number, number],
     fit: [0.704, 0.92] as [number, number],
     margin: 1.1,
     up: [-Math.sin(DOCS_FAN), 0, -Math.cos(DOCS_FAN)] as [number, number, number],

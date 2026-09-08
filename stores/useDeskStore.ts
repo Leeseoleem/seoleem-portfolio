@@ -22,6 +22,11 @@ export interface CameraPose {
   margin?: number;
   /** 화면의 위쪽이 될 방향. 비스듬히 놓인 물건을 화면과 나란히 보여줄 때 쓴다 */
   up?: [number, number, number];
+  /**
+   * 세로로 긴 화면에서 대신 쓰는 방향. 비스듬한 구도는 물건의 투영 크기를 키워
+   * 좁은 화면에서 아래가 잘린다. 그때는 물건을 정면으로 내려다본다.
+   */
+  narrowDir?: [number, number, number];
 }
 
 interface DeskState {

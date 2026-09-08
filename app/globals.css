@@ -331,7 +331,19 @@ body {
  * 확대 화면은 세로를 거의 다 쓴다. 폭을 꽉 채운 창은 위에 두든 아래에 두든 내용을 덮는다.
  * 창 모양(파란 제목 표시줄)은 그대로 두고 자리와 폭만 바꾼다.
  */
-/* .ps를 두 번 적어 뒤에 오는 좁은 화면 규칙(@media max-width 640px)보다 세게 건다 */
+/*
+ * 좁은 화면에서는 처음부터 위쪽에 붙인다. 300px 고정이면 폰 화면 대부분을 덮고,
+ * 아래에 뒀다가 확대할 때 위로 옮기면 창이 화면을 가로질러 날아가는 게 그대로 보인다.
+ * .ps를 두 번 적어 뒤에 오는 .ps 규칙보다 세게 건다. 아래 ps--compact가 이 뒤에 와야 폭을 덮어쓴다
+ */
+.ps.ps--top {
+  left: var(--space-3);
+  right: var(--space-3);
+  top: max(var(--space-3), env(safe-area-inset-top));
+  bottom: auto;
+  width: auto;
+}
+
 .ps.ps--compact {
   left: var(--space-3);
   right: auto;
@@ -471,15 +483,6 @@ body {
   text-decoration: none;
 }
 
-/* 좁은 화면에서는 창이 화면 폭에 맞춰 줄어든다. 300px 고정이면 폰에서 화면 대부분을 덮는다 */
-@media (max-width: 640px) {
-  .ps {
-    left: var(--space-3);
-    right: var(--space-3);
-    bottom: var(--space-3);
-    width: auto;
-  }
-}
 
 /* 화면 밖으로 나갔던 창이 도로 튕겨 들어올 때만 켜진다 */
 .ps.is-snapping {
@@ -2226,6 +2229,12 @@ body {
 }
 
 /* 넘어간 장은 거울상이라 글자가 뒤집힌다. 탭을 한 번 더 뒤집어 바로 세운다 */
+/* 좁은 화면에서는 종이 안쪽 여백으로 들인다. 판은 60px 안쪽에서 시작해 글을 가리지 않는다 */
+.nb__tab--inset {
+  right: 0;
+  border-radius: 6px 0 0 6px;
+}
+
 .nb__tab--flipped {
   transform: scaleX(-1);
 }
