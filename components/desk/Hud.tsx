@@ -129,16 +129,20 @@ export function Hud() {
 
   return (
     <>
-      {visible && (
+      {/* 좁은 화면에서 확대 중일 때는 창을 접고 돌아갈 단추만 남긴다. 창을 어디에 두든 확대 화면을 덮는다 */}
+      {visible && mobile && phase === 'zoomed' && (
+        <button type="button" className="ps-back" onClick={back}>
+          cd .. # 책상으로
+        </button>
+      )}
+      {visible && !(mobile && phase === 'zoomed') && (
         <section
           ref={panel}
-          // 확대 중에는 화면을 가리지 않게 흐려 둔다. 마우스를 올리면 다시 진해진다.
-          // 좁은 화면에서는 확대된 화면이 세로를 거의 다 쓴다. 왼쪽 아래에 그대로 두면 폰 화면의
-          // 아래쪽 링크 단추를 덮어 눌리지 않는다. 그동안만 위로 올린다
-          className={`ps${snapping ? ' is-snapping' : ''}${phase === 'zoomed' ? ' is-dim' : ''}${
-            mobile && phase === 'zoomed' && !pos ? ' ps--lifted' : ''
-          }`}
-          style={pos ? { left: pos.x, top: pos.y, bottom: 'auto' } : undefined}
+          // 확대 중에는 화면을 가리지 않게 흐려 둔다. 마우스를 올리면 다시 진해진다
+          className={`ps${snapping ? ' is-snapping' : ''}${phase === 'zoomed' ? ' is-dim' : ''}`}
+          // 좁은 화면에서는 끌어 옮긴 자리를 쓰지 않는다. 손가락으로 살짝 밀린 자리가 그대로 남아
+          // 창이 화면 밖으로 나가 버린다. 자리는 CSS(왼쪽 아래, 화면 폭에 맞춤)에 맡긴다
+          style={pos && !mobile ? { left: pos.x, top: pos.y, bottom: 'auto' } : undefined}
           aria-label="seoleem 포트폴리오 안내"
         >
           {/* 타이틀바를 잡아 창을 옮긴다 */}

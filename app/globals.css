@@ -172,10 +172,10 @@
   /* 영문과 선 문자는 고정폭, 한글은 글꼴에 없어서 Pretendard로 떨어진다. 맑은 고딕으로 새지 않게 순서를 둔다 */
   /*
    * 고정폭 글꼴. 구조도(ASCII 박스)가 어긋나지 않으려면 글자와 선 문자(─│┌┐└┘)의 폭이 같아야 한다.
-   * Pretendard는 고정폭이 아니라 여기 넣으면 안 된다. 안드로이드처럼 Consolas·Menlo가 없는 기기에서
-   * Pretendard가 잡히면 선과 글자 폭이 달라져 상자가 무너진다. 선 문자를 가진 고정폭만 차례로 둔다.
+   * 시스템 글꼴에 기대면 기기마다 무너지므로 선 문자를 가진 JetBrains Mono를 함께 받아 첫 자리에 둔다(app/layout.tsx).
+   * 뒤는 그 글꼴을 못 받았을 때를 위한 폴백이다. Pretendard처럼 고정폭이 아닌 것은 절대 넣지 않는다.
    */
-  --ps-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'DejaVu Sans Mono', 'Noto Sans Mono', 'Liberation Mono', monospace;
+  --ps-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, 'DejaVu Sans Mono', 'Noto Sans Mono', monospace;
 
   /* 공책 속지 (임시) */
   /* 공책. 따뜻한 종이 위에 판을 깔고 화면을 얹는 다이어리 형식이다 */
@@ -326,10 +326,28 @@ body {
 }
 
 /* 확대 중에는 아래 화면이 비치게 물러나 있다가, 손이 오면 돌아온다 */
-/* 좁은 화면에서 확대 중일 때. 왼쪽 아래는 확대된 화면(폰의 링크 단추 등) 자리라 위로 비켜 준다 */
-.ps--lifted {
+/*
+ * 좁은 화면에서 확대 중일 때 파워셸 창을 대신하는 단추.
+ * 확대 화면은 세로를 거의 다 쓴다. 창을 어디에 두든 내용 위를 덮고, 접었다 펴는 두 상태도
+ * 좁은 폭에서는 자리를 잡지 못한다. 그동안 필요한 것은 돌아갈 길 하나뿐이라 그것만 남긴다.
+ */
+.ps-back {
+  position: fixed;
+  left: var(--space-3);
   top: max(var(--space-3), env(safe-area-inset-top));
-  bottom: auto;
+  z-index: 6;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--ps-border);
+  border-radius: 6px;
+  background: linear-gradient(var(--xp-title-to), var(--xp-title-from) 45%, var(--xp-title-from));
+  color: var(--xp-title-fg);
+  font-family: var(--ps-mono);
+  font-size: 13px;
+  font-weight: 700;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
 }
 
 .ps.is-dim {

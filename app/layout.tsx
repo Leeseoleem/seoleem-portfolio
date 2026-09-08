@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { La_Belle_Aurore } from 'next/font/google';
+import { JetBrains_Mono, La_Belle_Aurore } from 'next/font/google';
 import localFont from 'next/font/local';
 import './globals.css';
 
@@ -11,6 +11,21 @@ const script = La_Belle_Aurore({
   variable: '--font-script',
   display: 'swap',
   fallback: ['Segoe Script', 'Bradley Hand', 'cursive'],
+});
+
+/*
+ * 고정폭 글꼴. 프로젝트 창의 구조도(ASCII 박스)와 파워셸 창이 쓴다.
+ *
+ * 시스템 글꼴에 기대면 기기마다 무너진다. 안드로이드에는 Consolas도 Menlo도 없고,
+ * 기본 고정폭에는 상자를 그리는 선 문자(─│┌┐└┘)가 없어 다른 글꼴로 떨어지며 글자와 폭이 어긋난다.
+ * JetBrains Mono는 그 선 문자를 갖고 있어 어느 기기에서도 상자가 반듯하게 선다. 라틴만 받는다.
+ */
+const mono = JetBrains_Mono({
+  weight: ['400', '700'],
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
+  fallback: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
 });
 
 // PF스타더스트 3.0. 픽셀 폰트라 부팅 화면과 HUD의 레트로 톤을 담당한다.
@@ -74,7 +89,7 @@ const PRETENDARD_CSS = 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang="ko" className={`${stardust.variable} ${script.variable} h-full`}>
+    <html lang="ko" className={`${stardust.variable} ${script.variable} ${mono.variable} h-full`}>
       <head>
         <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
         <link rel="stylesheet" href={PRETENDARD_CSS} />
