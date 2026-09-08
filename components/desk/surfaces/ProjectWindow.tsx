@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { CasePage, DiagramPage, IntroPage, OverviewPage, ProjectContent, ProjectPage } from '@/lib/desk/content/types';
+import { useIsMobile } from '@/lib/desk/use-mobile';
 
 interface Props {
   project: ProjectContent;
@@ -19,6 +20,8 @@ interface Props {
  * 장은 스크롤 없이 한 화면에 들어가야 한다. 첫 장만 보고도 프로젝트를 알 수 있고,
  * 더 궁금한 사람만 다음 장으로 들어가는 구조다.
  * 방향키는 활성 창에서만 듣는다. 창이 여러 개 열려 있을 때 전부 같이 넘어가면 안 된다.
+ * 넘김 단추에는 다음 장의 제목을 적는다. 다만 좁은 화면에서는 제목이 두 줄로 접혀 칸을 밀어내므로
+ * 모바일에서는 이전과 다음으로만 적는다.
  */
 export function ProjectWindow({ project, page, active, onPage }: Props) {
   const pages = project.pages;
@@ -27,6 +30,7 @@ export function ProjectWindow({ project, page, active, onPage }: Props) {
   const current = pages[index];
   const prev = index > 0 ? pages[index - 1] : null;
   const next = index < last ? pages[index + 1] : null;
+  const mobile = useIsMobile();
 
   useEffect(() => {
     if (!active) return;
@@ -47,7 +51,7 @@ export function ProjectWindow({ project, page, active, onPage }: Props) {
         <span className="pj__cell pj__cell--prev">
           {prev && (
             <button type="button" className="xp-btn" onClick={() => onPage(index - 1)}>
-              ‹ {prev.title}
+              ‹ {mobile ? '이전' : prev.title}
             </button>
           )}
         </span>
@@ -57,7 +61,7 @@ export function ProjectWindow({ project, page, active, onPage }: Props) {
         <span className="pj__cell pj__cell--next">
           {next && (
             <button type="button" className="xp-btn" onClick={() => onPage(index + 1)}>
-              {next.title} ›
+              {mobile ? '다음' : next.title} ›
             </button>
           )}
         </span>

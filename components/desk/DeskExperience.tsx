@@ -6,6 +6,7 @@ import { BootOverlay } from './BootOverlay';
 import { Hud } from './Hud';
 import { OffScreen } from './OffScreen';
 import { ErrorScreen } from './ErrorScreen';
+import { MobileDocSheet } from './surfaces/MobileDocSheet';
 import { useDeskStore } from '@/stores/useDeskStore';
 import { getSound } from '@/lib/desk/sound';
 
@@ -15,7 +16,7 @@ const DeskCanvas = dynamic(() => import('./scene/DeskCanvas').then((m) => m.Desk
   loading: () => <div className="desk-canvas-loading" aria-hidden="true" />,
 });
 
-/** 책상 씬 전체: 3D 캔버스 + 부팅 오버레이 + HUD + 종료 화면 + 오류 화면 */
+/** 책상 씬 전체: 3D 캔버스 + 부팅 오버레이 + HUD + 서류 창(모바일) + 종료 화면 + 오류 화면 */
 export function DeskExperience() {
   const setSound = useDeskStore((s) => s.setSound);
   const crashed = useDeskStore((s) => s.crashed);
@@ -39,6 +40,8 @@ export function DeskExperience() {
       <DeskCanvas />
       <BootOverlay />
       <Hud />
+      {/* 모바일에서 서류는 3D 종이 대신 화면을 덮는 창으로 연다 */}
+      <MobileDocSheet />
       <OffScreen />
       {/* WebGL 컨텍스트가 죽으면 캔버스가 하얗게 남는다. 그 위를 오류 화면으로 덮는다 */}
       {crashed && <ErrorScreen code="webgl" />}

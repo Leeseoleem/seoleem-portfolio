@@ -11,6 +11,7 @@ import { canvasPalette, scenePalette } from '@/lib/desk/palette';
 import { DOCS_FAN, positions, TOP, zoomPoses } from '@/lib/desk/layout';
 import { requestShadowUpdate } from '@/lib/desk/shadows';
 import { prefersReducedMotion } from '@/lib/desk/runtime';
+import { useIsMobile } from '@/lib/desk/use-mobile';
 import { smoothstep } from '@/lib/desk/math';
 
 /** 클립이 빠지는 연출 길이(초)와 이동 거리. 카메라가 다가오는 동안 끝나야 한다 */
@@ -42,6 +43,7 @@ const PAPER_H = 0.84;
  */
 export function Documents() {
   const zoomTo = useDeskStore((s) => s.zoomTo);
+  const mobile = useIsMobile();
 
   const { canvas, texture } = useMemo(() => {
     const c = document.createElement('canvas');
@@ -163,10 +165,13 @@ export function Documents() {
             <meshStandardMaterial ref={clipMat} color={scenePalette.furniture.clip} metalness={0.85} roughness={0.3} transparent />
           </mesh>
         </group>
-        {/* 맨 위 장에 정확히 얹는다. 아래 장들은 부채처럼 틀어져 있어 기준이 될 수 없다 */}
-        <ZoomSurface waitForZoom target="docs" size={SHEET_SIZE} pixels={SHEET_PX} position={[0.04, TOP + 0.014, 0.03]} rotation={[-Math.PI / 2, 0, DOCS_FAN]}>
-          <DocumentSheets />
-        </ZoomSurface>
+        {/* 맨 위 장에 정확히 얹는다. 아래 장들은 부채처럼 틀어져 있어 기준이 될 수 없다.
+            모바일에서는 이 자리 대신 화면을 덮는 창(MobileDocSheet)으로 연다 */}
+        {!mobile && (
+          <ZoomSurface waitForZoom target="docs" size={SHEET_SIZE} pixels={SHEET_PX} position={[0.04, TOP + 0.014, 0.03]} rotation={[-Math.PI / 2, 0, DOCS_FAN]}>
+            <DocumentSheets />
+          </ZoomSurface>
+        )}
         <Sheet
           index={2}
           texture={texture}
