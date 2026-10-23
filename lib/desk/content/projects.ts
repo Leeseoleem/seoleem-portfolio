@@ -2,9 +2,11 @@ import { projectLinks } from '@/lib/desk/links';
 import type { ProjectContent } from './types';
 
 /**
- * 프로젝트 창의 글. docs/content-brief.md 5장을 그대로 옮긴 것이다.
+ * 프로젝트 창의 글. docs/content-brief.md 5장을 그대로 옮긴 것이고, 브리프는 PDF 포트폴리오 최종본(2026-10)을 따른다.
  * 채식어디는 이력서 PDF의 Activities에만 두고 여기서는 다루지 않는다.
  * 수치와 사실은 이력서·포트폴리오 최종본에서 검증된 것만 쓴다. 여기서 새로 만들지 않는다.
+ * 하루만 지나도 달라지는 수치(곡 수, 행 수, 비율)는 문서와 같이 쓰지 않는다.
+ * Engineering Case 한 칸은 한글 70자 안팎까지만. 창(760×540)의 2×2 칸에 스크롤 없이 들어가야 한다.
  *
  * 대표 화면은 public/shots/에 있는 기기 목업 이미지다. 투명 배경이라 그대로 놓는다.
  */
@@ -21,8 +23,8 @@ export const fitpl: ProjectContent = {
     {
       kind: 'intro',
       title: '프로젝트 소개',
-      summary: '"카페 → 식사 → 산책"처럼 큰 흐름을 고르면 AI가 세부 장소와 이동 루트를 구성합니다.',
-      stack: ['React', 'TypeScript', 'Zustand', 'TanStack Query', 'React Native WebView'],
+      summary: '"카페 → 식사 → 산책"처럼 큰 흐름만 고르면 세부 장소와 이동 루트를 AI가 구성하는 일정 플래너 앱입니다.',
+      stack: ['React', 'TypeScript', 'Vite', 'Zustand', 'TanStack Query', 'React Native WebView'],
       links: projectLinks.fitpl,
       shots: [
         { label: '메인', src: '/shots/fitpl-1.webp' },
@@ -35,8 +37,8 @@ export const fitpl: ProjectContent = {
       meta: [
         { label: '기간', value: '2025.05 ~ 진행 중' },
         { label: '팀', value: ['프론트엔드 2인', '백엔드 2인'] },
-        { label: '역할', value: ['핵심 일정 플로우, 인증 화면 전담', '공통 UI 구조 설계', 'Android WebView 앱 연동, 출시'] },
-        { label: '상태', value: ['Google Play 출시', 'v2.0.0 배포'] },
+        { label: '역할', value: ['일정 생성/편집과 일반 로그인 화면 전담', '공통 UI 구조 설계', 'Android WebView 앱 연동, 출시'] },
+        { label: '상태', value: ['Google Play 정식 출시', 'v2.0.0 리뉴얼 배포'] },
       ],
     },
     {
@@ -66,21 +68,21 @@ export const fitpl: ProjectContent = {
       kind: 'case',
       title: '헤더 분기를 라우트 설정으로',
       heading: '헤더 분기를 라우트 설정으로 옮겨 변경 지점 단일화',
-      problem: '라우트가 30개를 넘으며 페이지마다 헤더 분기가 쌓였고, 정책 변경 때 여러 파일을 함께 수정해야 했습니다.',
+      problem: '라우트가 30개를 넘어가며 페이지별 헤더 관리의 수정 범위가 커졌고, 새 화면에서 헤더를 빠뜨리거나 정책 변경 시 여러 파일을 함께 고쳐야 했습니다.',
       decision:
-        '헤더 구성을 라우트 설정 맵으로 옮기고 구간 정책은 섹션 패턴으로 처리했습니다. 헤더 5종은 TypeScript discriminated union으로 구분했습니다.',
-      reasoning: '헤더는 개별 화면 상태보다 라우트에 따라 정해지는 UI 정책에 가까워 Context보다 설정 구조가 적합하다고 판단했습니다.',
-      result: '페이지별 분기가 사라지고 변경 지점이 설정 맵으로 모였습니다. 잘못된 헤더 조합도 컴파일 단계에서 차단됩니다.',
+        '헤더 구성을 라우트 설정 맵으로 옮기고 구간 단위 정책은 섹션 패턴 규칙으로 처리했습니다. 헤더 5종은 TypeScript discriminated union으로 정의했습니다.',
+      reasoning: '헤더는 라우트에 따라 정해지는 UI 정책이라 Context보다 설정 구조가 적합했습니다. 타입도 optional 필드를 늘어놓기보다 union으로 나눠, 각 헤더 타입에 필요한 필드만 노출되게 했습니다.',
+      result: '페이지에서 헤더 분기 로직이 사라지고 정책 변경 지점이 설정 맵 한 곳으로 모였습니다. 타입별로 필요한 필드만 노출돼 잘못된 조합은 컴파일 단계에서 차단됩니다.',
     },
     {
       kind: 'case',
       title: 'Web ↔ Native RPC 통합',
-      heading: '웹·네이티브 호출을 하나의 RPC 규약으로 통합',
-      problem: '저장소, 외부 링크, 앱 종료처럼 네이티브 기능이 늘며 기능별 메시지와 콜백이 함께 늘어날 수 있었습니다.',
+      heading: '웹과 네이티브 호출을 하나의 RPC 규약으로 통합',
+      problem: '저장소, 외부 링크, 앱 종료 등 네이티브 기능이 늘면서 기능별 메시지와 콜백을 따로 두면 호출 규칙이 흩어질 수 있었습니다.',
       decision:
-        '요청은 { id, method, payload }, 응답은 __bridgeResolve(id, ok, value)로 통일하고 요청별 Promise를 pending Map으로 관리했습니다.',
-      reasoning: '기능별 메시지를 추가하는 대신 웹에서 모든 네이티브 기능을 같은 Promise 인터페이스로 다루고 싶었습니다.',
-      result: 'FCM 토큰과 앱 버전 조회까지 같은 규약으로 확장했고, 구버전 앱에는 메서드 존재 여부를 확인하는 호환 규칙을 적용했습니다.',
+        '웹에서 RN으로 보내는 요청은 { id, method, payload }, RN에서 웹으로 돌려주는 응답은 window.__bridgeResolve(id, ok, value)로 통일했습니다. 요청별 Promise를 pending Map에 보관하고 3초 안에 응답이 없으면 회수합니다.',
+      reasoning: '기능별 메시지는 비동기 기능이 늘수록 콜백 관리도 함께 늘어납니다. RPC로 통일하면 네이티브 기능을 같은 Promise 인터페이스로 다루고 새 기능도 메서드 추가로 확장할 수 있습니다. 규약은 RN_BRIDGE.md에 두 저장소의 공통 계약으로 적었습니다.',
+      result: 'FCM 토큰과 앱 버전 조회까지 같은 규약에 연결했고, 구버전 앱에 없는 후속 메서드는 optional로 두고 존재 여부를 확인하는 호환 규칙도 추가했습니다.',
     },
   ],
 };
@@ -89,13 +91,13 @@ export const garachato: ProjectContent = {
   id: 'garachato',
   name: '가라챠토',
   slug: 'garachato',
-  tagline: 'J-POP 노래방 곡 검색 서비스',
+  tagline: '노래방 일본곡 번역과 곡 정보 서비스',
   pages: [
     {
       kind: 'intro',
       title: '프로젝트 소개',
-      summary: 'TJ와 금영의 수록곡과 차트 데이터를 수집해 일본 노래방 곡을 검색하고 순위를 확인할 수 있는 서비스입니다.',
-      stack: ['Next.js', 'TypeScript', 'Supabase', 'Gemini API', 'Vercel Cron'],
+      summary: 'TJ/금영 노래방에 수록된 일본곡의 제목과 가수명 번역, 노래방 번호와 곡 정보를 제공하는 서비스입니다. 웹과 앱인토스 미니앱 두 채널을 운영합니다.',
+      stack: ['Next.js', 'Vite', 'TypeScript', 'Supabase', 'Gemini API', 'Vercel Cron'],
       links: projectLinks.garachato,
       shots: [
         { label: 'Apps-in-Toss 미니앱', src: '/shots/garachato-1.webp' },
@@ -137,29 +139,31 @@ export const garachato: ProjectContent = {
 +-----------+-----------+
       +-----+-----+
       ↓           ↓
-   Next.js     Mini App
-   Server     Client+RLS
+  Vite SPA     Next.js
+ Web+MiniApp  Metadata
 `),
     },
     {
       kind: 'case',
-      title: '전곡 검색 구조 재설계',
-      heading: '전곡 검색 확장 중 88.5% 누락 확인, 검색 구조 재설계',
-      problem: '검색 범위를 11,519곡으로 넓힌 뒤 확인해 보니 기존 검색 대상은 1,319행뿐이었고, 카탈로그의 88.5%가 빠지고 있었습니다.',
+      title: '전곡 검색 누락 해결',
+      heading: '전곡 확장 후 검색 누락을 해결한 조회 구조 개선',
+      problem: 'TOP 100에서 전곡으로 확장한 뒤 검색 노출을 점검했고, 새로 수집한 곡 대부분이 검색되지 않았습니다. 원본 테이블과 대조하니 기존 검색은 가공된 곡 정보 테이블에 연결된 곡만 조회하고 있었습니다.',
       decision:
-        '검색을 PostgreSQL RPC로 옮기고 부분 일치, 별칭, trigram, 자모 편집거리 등을 함께 적용했습니다. 인기 차트와 전체 카탈로그 결과도 분리했습니다.',
+        '곡 정보는 순차적으로 가공하되, 가공 전에도 제목과 가수명, 노래방 번호로 찾을 수 있도록 검색 함수에 전곡 테이블 조회를 추가했습니다. 곡 정보에 연결되지 않은 곡만 포함해 중복을 막고, 상세 정보가 없는 곡은 기본 정보 화면으로 보냈습니다.',
       reasoning:
-        'ai는 전체 카탈로그에서 412건이 매칭돼도 하나의 결과 제한에서는 노출되지 않을 수 있었습니다. 정확도뿐 아니라 어떤 결과를 보여줄지도 함께 해결해야 했습니다.',
-      result: '전곡 검색이 가능해졌고, 곡 그룹화도 DB로 옮겨 행이 아닌 곡 기준으로 결과를 반환하도록 했습니다.',
+        'AI 해설과 영상 정보 생성에는 API 호출량과 처리 시간의 제약이 있어 전곡을 한 번에 가공하기 어려웠습니다. 검색은 주로 제목과 가수명을 기준으로 이루어지므로, 전곡 테이블의 기본 정보만으로도 검색 기능을 제공할 수 있다고 판단했습니다.',
+      result: '곡 정보 가공 전에도 새로 수집한 곡을 검색 결과에 노출하면서, TOP 100 차트에 진입한 적 없는 곡도 검색할 수 있게 됐습니다.',
     },
     {
       kind: 'case',
-      title: '미니앱 구조 재설계',
-      heading: 'SSR 미지원 환경에 맞춰 미니앱 구조 재설계',
-      problem: 'Next.js 웹은 Server Component에서 데이터를 조회했지만 Apps-in-Toss에서는 SSR을 사용할 수 없었습니다.',
-      decision: '별도 Vite 앱에서 클라이언트 Supabase 조회와 RLS를 사용하고 라우팅은 React Router로 다시 구성했습니다.',
-      reasoning: '브라우저가 DB를 직접 조회하는 환경에서는 화면 코드가 아니라 실제 DB 정책에서 접근 권한을 제한해야 했습니다.',
-      result: '같은 데이터를 사용하면서 웹은 서버 조회, 미니앱은 클라이언트 조회와 RLS를 사용하는 구조로 분리했습니다.',
+      title: '앱인토스 SPA 환경 대응',
+      heading: '앱인토스의 SPA 환경에 맞춘 화면과 플랫폼 기능 분리',
+      problem: '기존 Next.js 웹을 앱인토스 미니앱으로 확장하려 했지만, 미니앱은 SPA 방식의 배포만 지원해 서버 기반 데이터 조회와 라우팅을 그대로 쓸 수 없었습니다. 웹 화면까지 SPA로 전환하면 초기 HTML에 곡 정보가 담기지 않아 곡별 링크 미리보기를 잃는 문제도 있었습니다.',
+      decision:
+        '화면은 Vite SPA로 전환하되 서버 처리가 필요한 기능은 Next.js에 남겼습니다. 링크 미리보기용 곡별 메타데이터는 Next.js가 초기 HTML에 넣어 제공합니다. 웹과 미니앱은 화면 코드를 공유하고, 환경별로 달라지는 기능만 별도 모듈로 분리했습니다.',
+      reasoning:
+        '같은 화면의 변경을 두 번 반영하지 않으려면 공통 화면은 공유하고 환경별 기능만 분리하는 쪽이 맞았습니다. 링크 미리보기 수집기는 JavaScript를 실행하지 않고 초기 HTML의 메타데이터만 읽으므로, 화면 전체를 서버에서 그릴 필요 없이 곡별 메타데이터만 제공하면 된다고 판단했습니다.',
+      result: '웹과 앱인토스가 같은 SPA 화면을 사용하는 구조로 전환해 서비스 범위를 미니앱까지 확장했습니다. 곡별 HTML 응답의 제목, 설명, OG 이미지를 확인하고 렌더링 후에도 제목이 일치하는지 검증해 링크 미리보기 정보가 유지되는 것을 확인했습니다.',
     },
   ],
 };
@@ -174,7 +178,7 @@ export const urido: ProjectContent = {
       kind: 'intro',
       title: '프로젝트 소개',
       summary: '무엇을 할지 정하는 과정을 룰렛이나 카드 뽑기 같은 놀이로 만들고, 함께 정한 결과를 기록하는 모바일 앱입니다.',
-      stack: ['React Native (Expo)', 'TypeScript', 'Expo Router', 'NativeWind v4', 'TanStack Query', 'Reanimated'],
+      stack: ['React Native (Expo)', 'TypeScript', 'Expo Router', 'NativeWind v4', 'Zustand', 'TanStack Query', 'Reanimated'],
       links: projectLinks.urido,
       shots: [
         { label: '홈', src: '/shots/urido-1.webp' },
@@ -220,21 +224,21 @@ export const urido: ProjectContent = {
       kind: 'case',
       title: '동시 401 재발급 단일화',
       heading: '동시 401 토큰 재발급 단일화',
-      problem: '여러 API가 동시에 401을 받으면 각 요청이 같은 rotating Refresh Token으로 재발급을 시도해 세션이 끊길 수 있었습니다.',
-      decision: '진행 중인 재발급 Promise를 하나만 유지하고 뒤따르는 요청은 같은 결과를 기다리도록 했습니다.',
-      reasoning: '필요한 것은 요청 순서를 맞추는 것이 아니라 여러 요청이 하나의 재발급 결과를 공유하는 것이었습니다.',
-      result: '동시에 여러 요청이 만료돼도 재발급은 한 번만 수행됩니다. 네트워크 오류와 실제 세션 만료도 구분해 처리했습니다.',
+      problem: '액세스 토큰은 15분 뒤 만료되고 Refresh Token은 사용할 때마다 새 토큰으로 교체됩니다. 화면에서 여러 API가 동시에 401을 받으면 각 요청이 같은 Refresh Token으로 재발급을 시도해, 첫 요청 이후 나머지가 이미 폐기된 토큰을 사용하며 세션이 끊길 수 있었습니다.',
+      decision: '진행 중인 재발급 Promise를 하나만 유지하고, 뒤따르는 요청은 새 재발급을 시작하지 않고 같은 결과를 기다리도록 했습니다. 401 요청은 재발급 후 한 번만 다시 시도합니다.',
+      reasoning: '요청을 차례대로 실행하는 것만으로는 각 요청이 다시 Refresh Token을 쓸 수 있어 문제가 남습니다. 필요한 것은 순서가 아니라 여러 요청이 하나의 재발급 결과를 공유하는 것이었습니다. 네트워크 오류는 세션 만료로 보지 않고, 서버가 세션을 거절한 경우에만 토큰을 삭제합니다.',
+      result: '여러 요청이 동시에 만료돼도 토큰 재발급은 한 번만 수행됩니다. API 계층은 화면 이동을 직접 처리하지 않고 세션 만료 콜백만 전달해 인증 처리와 라우팅도 분리했습니다.',
     },
     {
       kind: 'case',
-      title: 'DnD 검증 후 직접 구현',
-      heading: 'DnD 라이브러리 검증 후 직접 구현으로 전환',
+      title: '참여 전 방 확인 API 조율',
+      heading: '참여 전 방 확인을 위한 API 계약 조율',
       problem:
-        '항목 정렬과 리스트 밖 휴지통 삭제를 함께 지원해야 했지만 reanimated-dnd가 외부 drop zone까지 지원하는지는 문서만으로 알기 어려웠습니다.',
+        '초대받은 사람이 방 정보를 먼저 확인하고 참여 여부를 선택하도록 설계했지만, 기존 API로는 참여 요청을 보낸 뒤에야 방 이름을 알 수 있었습니다. 임시로 안내 화면을 참여 이후에 뒀지만, 어느 방인지 모른 채 참여해야 하는 문제가 남았습니다.',
       decision:
-        '소스를 확인해 useSortable의 DropContext 참조가 0건임을 확인하고 라이브러리를 제거했습니다. 이후 Gesture Handler와 Reanimated로 직접 구현했습니다.',
-      reasoning: '라이브러리에 화면 구조를 맞추면 필요한 인터랙션을 포기하거나 우회 로직이 늘어날 가능성이 있었습니다.',
-      result: '기존 화면 구조를 유지하면서 정렬과 외부 삭제 영역을 함께 구현했고, 지원되지 않는 동작을 위한 우회 코드도 남기지 않았습니다.',
+        '참여 전에 방 정보를 조회하는 API를 제안하고, 방 이름, 인원, 정원, 만료 시각을 응답 예시로 정리해 백엔드에 전달했습니다. 일회용 초대 링크가 미리보기만으로 소진되지 않도록, 실제 참여가 완료됐을 때만 사용 처리하는 조건도 명시했습니다.',
+      reasoning: '정보를 얻는 요청 자체가 참여를 실행하므로, 화면 문구나 순서를 바꾸는 것만으로는 참여 전 확인이 불가능했습니다. 의도한 사용자 흐름을 구현하려면 API 단계에서 조회와 참여를 분리해야 한다고 판단했습니다.',
+      result: '추가된 API를 확인 화면에 연동해, 사용자가 방 정보를 본 뒤 입장하기를 눌렀을 때 참여 요청을 보내도록 변경했습니다. 정원이 찬 방은 입장을 막고, 사용할 수 없는 초대는 다른 링크를 입력하도록 안내했습니다.',
     },
   ],
 };

@@ -34,8 +34,8 @@ export interface DesktopIcon extends AppDef {
 export const RESUME = {
   href: '/resume.pdf',
   filename: '이서림_이력서.pdf',
-  /** public/resume/page-N.webp. 페이지 수는 PDF를 다시 렌더할 때 함께 맞춘다 */
-  pages: 6,
+  /** public/resume/page-N.webp. 페이지 수는 PDF를 다시 렌더할 때 함께 맞춘다 (2026-10 연락처 제외본, 5장) */
+  pages: 5,
   page: (n: number) => `/resume/page-${n}.webp`,
 } as const;
 
