@@ -29,7 +29,7 @@ export const trashItems: TrashItem[] = [
   },
   {
     title: '화면에서 필터링하는 검색',
-    reason: '내려온 일부 데이터만 훑는 방식으로는 11,519곡 전체를 감당할 수 없었습니다.',
+    reason: '내려온 일부 데이터만 훑는 방식으로는 전곡 카탈로그를 감당할 수 없었습니다.',
     project: 'garachato',
   },
   {

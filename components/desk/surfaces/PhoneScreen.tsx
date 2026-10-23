@@ -66,9 +66,9 @@ export function PhoneScreen() {
         <p className="card__eyebrow">seoleem</p>
         <p className="card__title">Frontend Developer</p>
         <p className="card__body">
-          문제가 반복되면 눈앞의 수정에 그치지 않고 구조를 다시 봅니다.
+          화면에서 문제가 드러나면 데이터와 처리 흐름을 살펴 원인을 찾습니다.
           <br />
-          실제 동작과 데이터를 확인해 판단하고, 출시와 운영까지 책임지는 프론트엔드 개발자입니다.
+          기능 구현에 그치지 않고, 요구사항을 충족하는지 검증하는 것까지 개발의 범위로 생각합니다.
         </p>
         <div className="card__meta">
           <span>React</span>

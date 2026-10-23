@@ -42,7 +42,7 @@ const stardust = localFont({
 
 /** 링크를 붙였을 때 미리보기 카드에 그대로 나오는 글. 사이트 설명이 아니라 사람 소개다 */
 const SITE_TITLE = 'seoleem desk';
-const SITE_DESCRIPTION = '반복되는 문제를 구조로 해결하는 프론트엔드 개발자 이서림의 포트폴리오';
+const SITE_DESCRIPTION = '실제 데이터와 동작을 근거로 문제를 해결하는 프론트엔드 개발자 이서림의 포트폴리오';
 
 /**
  * 공유 카드 이미지 같은 상대 주소를 절대 주소로 만들 때 쓰는 기준. 상대 주소로 두면 카카오톡, 슬랙 등이 이미지를 못 가져온다.

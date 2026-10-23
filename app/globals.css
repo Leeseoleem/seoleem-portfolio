@@ -1387,6 +1387,8 @@ body {
   font-weight: 700;
   line-height: 1.5;
   letter-spacing: -0.01em;
+  /* 어절 단위로만 줄을 바꾼다. 안 그러면 "이서림 / 입니다"처럼 이름 가운데서 꺾인다 */
+  word-break: keep-all;
 }
 
 .xp-about p {

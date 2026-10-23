@@ -49,6 +49,7 @@
 
 ### B05. 이력서 PDF 갱신 절차
 - 상태: 열림
+- 갱신 기록: 2026-10-23 (`feat/content-sync`) 연락처 제외본 5장으로 교체. `public/resume.pdf`, `public/resume/page-1~5.webp`(144dpi, 폭 1192), `RESUME.pages: 5`. 남은 `page-6.webp`는 삭제. 아직 수동 절차다.
 - 등록: 2026-09-06 / 출처: `feat/content`
 - 내용: 사이트의 이력서는 연락처(전화번호)를 뺀 공개용 PDF다. 원본과 공개용 두 벌을 유지한다. 서류 뷰어는 PDF를 직접 그리지 않고 `public/resume/page-N.webp`를 쓴다.
 - 보류 사유: 이력서를 고칠 때마다 `public/resume.pdf`, 페이지 이미지 6장, `RESUME.pages`(`lib/desk/xp-apps.ts`)를 함께 바꿔야 하는데 이를 자동화할지 정하지 않았다.
